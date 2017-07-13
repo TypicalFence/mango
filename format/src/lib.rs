@@ -3,4 +3,5 @@ extern crate json;
 extern crate flate2;
 
 mod util;
+pub mod image;
 pub mod file;

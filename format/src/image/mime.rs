@@ -1,0 +1,44 @@
+use std::io::{Error, ErrorKind};
+use std::fs::File;
+use std::path::Path;
+
+pub enum Mime {
+    PNG,
+    JPEG,
+}
+
+impl Mime {
+    fn path_string_to_mime(path: &str) -> Option<Mime> {
+        if path.ends_with("png") {
+            Some(Mime::PNG)
+        } else if path.ends_with("jpg") {
+            Some(Mime::JPEG)
+        } else if path.ends_with("jpeg") {
+            Some(Mime::JPEG)
+        } else {
+            None
+        }
+    }
+
+    pub fn get_from_path(p: &Path) -> Result<Mime, Error> {
+        if p.is_file() {
+            match p.to_str() {
+                Some(path_str) => {
+                    match Mime::path_string_to_mime(path_str) {
+                        Some(mime) => Ok(mime),
+                        None => Err(Error::new(
+                            ErrorKind::InvalidInput,
+                            "file format is not supported",
+                        )),
+                    }
+                }
+                None => Err(Error::new(
+                    ErrorKind::Other,
+                    "shot, can't convert your path to string",
+                )),
+            }
+        } else {
+            Err(Error::new(ErrorKind::InvalidInput, "path is not a file"))
+        }
+    }
+}
