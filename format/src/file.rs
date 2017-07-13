@@ -3,7 +3,8 @@ use std::fs::File;
 use std::io::prelude::*;
 use json::JsonValue;
 use json::object::Object;
-use util;
+use image::FileImage;
+use compress::Gz;
 
 pub struct MangoFile {
     name: String,
@@ -45,7 +46,10 @@ impl MangoFile {
     }
 
     pub fn add_image(&mut self, p: &Path) {
-        self.images.push(util::img_compress_to_base64(p))
+        let mut img: FileImage = FileImage::open(p).unwrap();
+        let b64 = img.to_base64();
+        let comp = Gz::new();
+        self.images.push(b64.compress(&comp).get_image())
     }
 
     pub fn get_name(&self) -> &String {
@@ -54,5 +58,18 @@ impl MangoFile {
 
     pub fn set_name(&mut self, n: String) {
         self.name = n;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MangoFile;
+    use std::path::Path;
+
+    #[test]
+    fn create() {
+        let mut file = MangoFile::new("test".to_string());
+        file.add_image(Path::new("test.jpg"));
+        file.save(Path::new("test.json"));
     }
 }

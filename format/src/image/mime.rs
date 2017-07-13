@@ -1,7 +1,8 @@
 use std::io::{Error, ErrorKind};
-use std::fs::File;
 use std::path::Path;
+use std::clone::Clone;
 
+#[derive(Copy)]
 pub enum Mime {
     PNG,
     JPEG,
@@ -40,5 +41,11 @@ impl Mime {
         } else {
             Err(Error::new(ErrorKind::InvalidInput, "path is not a file"))
         }
+    }
+}
+
+impl Clone for Mime {
+    fn clone(&self) -> Mime {
+        *self
     }
 }
