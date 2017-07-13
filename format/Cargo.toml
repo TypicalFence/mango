@@ -1,0 +1,9 @@
+[package]
+name = "mango-format"
+version = "0.1.0"
+authors = ["Alex Fence <alexfence.code@gmail.com>"]
+
+[dependencies]
+base64 = "0.6.0"
+json = "0.11.8"
+flate2 = "0.2.19"

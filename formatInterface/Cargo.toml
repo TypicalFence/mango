@@ -1,0 +1,12 @@
+[package]
+name = "formatInterface"
+version = "0.1.0"
+authors = ["Alex Fence <alexfence.code@gmail.com>"]
+
+[dependencies]
+"mango-format" = { path = "../format"}
+libc = "0.2.26"
+
+[lib]
+name = "mango"
+crate-type = ["cdylib"]
