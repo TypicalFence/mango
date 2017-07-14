@@ -4,9 +4,12 @@ use flate2::write::GzEncoder;
 use image::Base64Image;
 use std::io::Write;
 
-
 pub trait Compression {
     fn compress(&self, image: &Base64Image) -> Base64Image;
+}
+
+pub enum CompressionType {
+    GZIP,
 }
 
 pub struct Gz {}
