@@ -9,6 +9,7 @@ use compress::CompressionType;
 use encrypt::EncryptionType;
 use image::Mime;
 
+
 fn get_checksum(file: &mut File) -> String {
     let mut data = Vec::new();
     file.read_to_end(&mut data);
@@ -18,6 +19,7 @@ fn get_checksum(file: &mut File) -> String {
     checksum.to_hex()
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct FileImageMetadata {
     pub path: String,
     pub checksum: String,
@@ -60,6 +62,7 @@ impl Clone for FileImageMetadata {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Base64ImageMetadata {
     pub compression: Option<CompressionType>,
     pub encryption: Option<EncryptionType>,

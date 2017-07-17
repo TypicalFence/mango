@@ -1,14 +1,14 @@
 use std::path::Path;
 use std::fs::File;
 use std::io::prelude::*;
-use json::JsonValue;
-use json::object::Object;
-use image::FileImage;
+use serde_json;
 use compress::Gz;
+use image::{FileImage, Base64Image};
 
+#[derive(Serialize, Deserialize)]
 pub struct MangoFile {
     name: String,
-    images: Vec<String>,
+    images: Vec<Base64Image>,
 }
 
 impl MangoFile {
@@ -24,33 +24,22 @@ impl MangoFile {
         unimplemented!()
     }
 
-    pub fn to_json(&self) -> String {
-        let mut json_obj: Object = Object::new();
-
-        json_obj.insert("name", JsonValue::from(self.name.clone()));
-
-        let mut images: Vec<String> = Vec::new();
-        for img in &self.images {
-            images.push(img.clone());
-        }
-        json_obj.insert("images", JsonValue::from(images));
-
-        JsonValue::from(json_obj).dump()
-    }
-
     pub fn save(&self, p: &Path) {
-        let json_string = &self.to_json();
+        //TODO error handling
+        let json_string = serde_json::to_string_pretty(&self).unwrap();
         let mut f = File::create(p).expect("Unable to create file");
         f.write_all(json_string.as_bytes()).expect(
             "Unable to write data",
         );
     }
 
+    //TODO error handling
     pub fn add_image(&mut self, p: &Path) {
-        let mut img: FileImage = FileImage::open(p).unwrap();
-        let b64 = img.to_base64();
-        let comp = Gz::new();
-        self.images.push(b64.compress(&comp).get_image())
+        let compressor = Gz::new();
+        let mut image_file = FileImage::open(p).unwrap();
+        self.images.push(
+            image_file.to_base64().compress(&compressor),
+        );
     }
 
     pub fn get_name(&self) -> &String {

@@ -1,11 +1,10 @@
 use std::io::Read;
-use std::fs::File;
 use base64;
-use super::Mime;
 use super::FileImage;
 use meta::Base64ImageMetadata;
 use compress::Compression;
 
+#[derive(Serialize, Deserialize)]
 pub struct Base64Image {
     base64: String,
     meta: Base64ImageMetadata,

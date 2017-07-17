@@ -1,7 +1,6 @@
 use std::io::{Error, ErrorKind, Read};
 use std::fs::File;
 use std::path::Path;
-use super::Mime;
 use super::Base64Image;
 use meta::FileImageMetadata;
 
