@@ -1,8 +1,10 @@
+use std::io::Write;
+use std::clone::Clone;
 use base64;
 use flate2;
 use flate2::write::GzEncoder;
 use image::Base64Image;
-use std::io::Write;
+
 
 pub trait Compression {
     fn compress(&self, image: &Base64Image) -> Base64Image;
@@ -10,6 +12,14 @@ pub trait Compression {
 
 pub enum CompressionType {
     GZIP,
+}
+
+impl Clone for CompressionType {
+    fn clone(&self) -> CompressionType {
+        match self {
+            &CompressionType::GZIP => CompressionType::GZIP,
+        }
+    }
 }
 
 pub struct Gz {}
@@ -23,7 +33,7 @@ impl Compression for Gz {
         let mut muh_base64 = base64::encode(&compressed);
         muh_base64 = muh_base64.replace("\r\n", "");
 
-        Base64Image::new(muh_base64, image.get_mime())
+        Base64Image::new(muh_base64, image.get_meta())
     }
 }
 

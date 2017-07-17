@@ -15,6 +15,7 @@ impl MangoFile {
     pub fn new(name: String) -> MangoFile {
         MangoFile {
             name: name,
+            //TODO change to Base64Image
             images: Vec::new(),
         }
     }
