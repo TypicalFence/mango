@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::path::Path;
 use std::fs::File;
 use std::io::prelude::*;
@@ -20,8 +21,12 @@ impl MangoFile {
         }
     }
 
-    pub fn new_from_file(p: &Path) -> MangoFile {
-        unimplemented!()
+    pub fn open(p: &Path) -> Result<MangoFile, Box<Error>> {
+        let file = File::open(p)?;
+
+        let u = serde_json::from_reader(file)?;
+
+        Ok(u)
     }
 
     pub fn save(&self, p: &Path) {
@@ -61,5 +66,11 @@ mod tests {
         let mut file = MangoFile::new("test".to_string());
         file.add_image(Path::new("test.jpg"));
         file.save(Path::new("test.json"));
+    }
+
+    #[test]
+    fn open() {
+        let mut file = MangoFile::open(Path::new("test.json"));
+        assert_eq!(file.unwrap().name, "test");
     }
 }
