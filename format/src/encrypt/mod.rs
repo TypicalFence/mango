@@ -1,3 +1,4 @@
+#[derive(Serialize, Deserialize)]
 pub enum EncryptionType {
     AES256,
     AES128,

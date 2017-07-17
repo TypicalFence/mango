@@ -10,6 +10,7 @@ pub trait Compression {
     fn compress(&self, image: &Base64Image) -> Base64Image;
 }
 
+#[derive(Serialize, Deserialize)]
 pub enum CompressionType {
     GZIP,
 }
@@ -33,7 +34,10 @@ impl Compression for Gz {
         let mut muh_base64 = base64::encode(&compressed);
         muh_base64 = muh_base64.replace("\r\n", "");
 
-        Base64Image::new(muh_base64, image.get_meta())
+        let mut new_meta = image.get_meta();
+        new_meta.compression = Some(CompressionType::GZIP);
+
+        Base64Image::new(muh_base64, new_meta)
     }
 }
 

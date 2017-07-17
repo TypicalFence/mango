@@ -2,7 +2,7 @@ use std::io::{Error, ErrorKind};
 use std::path::Path;
 use std::clone::Clone;
 
-#[derive(Copy)]
+#[derive(Copy, Serialize, Deserialize)]
 pub enum Mime {
     PNG,
     JPEG,

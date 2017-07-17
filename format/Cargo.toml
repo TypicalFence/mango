@@ -5,7 +5,9 @@ authors = ["Alex Fence <alexfence.code@gmail.com>"]
 
 [dependencies]
 base64 = "0.6.0"
-json = "0.11.8"
 flate2 = "0.2.19"
 sha2 = "0.6.0"
 hex = "0.2.0"
+serde = "1.0.10"
+serde_json = "1.0.2"
+serde_derive = "1.0"
