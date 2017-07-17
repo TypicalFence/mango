@@ -8,6 +8,7 @@ use image::Base64Image;
 
 pub trait Compression {
     fn compress(&self, image: &Base64Image) -> Base64Image;
+    fn uncompress(&self, image: &Base64Image) -> Base64Image;
 }
 
 #[derive(Serialize, Deserialize)]
@@ -23,6 +24,7 @@ impl Clone for CompressionType {
     }
 }
 
+//TODO refactor this
 pub struct Gz {}
 
 impl Compression for Gz {
@@ -38,6 +40,10 @@ impl Compression for Gz {
         new_meta.compression = Some(CompressionType::GZIP);
 
         Base64Image::new(muh_base64, new_meta)
+    }
+
+    fn uncompress(&self, image: &Base64Image) -> Base64Image {
+        unimplemented!()
     }
 }
 

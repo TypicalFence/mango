@@ -34,4 +34,16 @@ impl Base64Image {
     pub fn compress(&self, comp: &Compression) -> Base64Image {
         comp.compress(self)
     }
+
+    pub fn uncompress(&self, comp: &Compression) -> Base64Image {
+        comp.uncompress(self)
+    }
+
+    pub fn encrypt(&self) -> Base64Image {
+        unimplemented!()
+    }
+
+    pub fn decrypt(&self, password: String) -> Base64Image {
+        unimplemented!()
+    }
 }
