@@ -1,3 +1,5 @@
+use image::Base64Image;
+
 #[derive(Serialize, Deserialize)]
 pub enum EncryptionType {
     AES256,
@@ -11,4 +13,12 @@ impl Clone for EncryptionType {
             &EncryptionType::AES256 => EncryptionType::AES256,
         }
     }
+}
+
+pub fn encrypt(etype: EncryptionType, img: Base64Image, key: String) -> Base64Image {
+    unimplemented!()
+}
+
+pub fn decrypt(etype: EncryptionType, img: Base64Image, key: String) -> Base64Image {
+    unimplemented!()
 }

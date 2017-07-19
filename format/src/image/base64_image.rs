@@ -2,7 +2,8 @@ use std::io::Read;
 use base64;
 use super::FileImage;
 use meta::Base64ImageMetadata;
-use compress::Compression;
+use compression;
+use compression::CompressionType;
 
 #[derive(Serialize, Deserialize)]
 pub struct Base64Image {
@@ -31,12 +32,12 @@ impl Base64Image {
         self.base64.clone()
     }
 
-    pub fn compress(&self, comp: &Compression) -> Base64Image {
-        comp.compress(self)
+    pub fn compress(&self, comp: CompressionType) -> Base64Image {
+        compression::compress(comp, self)
     }
 
-    pub fn uncompress(&self, comp: &Compression) -> Base64Image {
-        comp.uncompress(self)
+    pub fn uncompress(&self, comp: CompressionType) -> Base64Image {
+        compression::uncompress(comp, self)
     }
 
     pub fn encrypt(&self) -> Base64Image {
