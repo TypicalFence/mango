@@ -5,8 +5,8 @@ use std::fs::File;
 use std::clone::Clone;
 use sha2::{Sha256, Digest};
 use hex::ToHex;
-use compress::CompressionType;
-use encrypt::EncryptionType;
+use compression::CompressionType;
+use encryption::EncryptionType;
 use image::Mime;
 
 

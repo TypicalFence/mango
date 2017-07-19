@@ -3,7 +3,6 @@ use std::path::Path;
 use std::fs::File;
 use std::io::prelude::*;
 use serde_json;
-use compress::Gz;
 use image::{FileImage, Base64Image};
 
 #[derive(Serialize, Deserialize)]
@@ -40,10 +39,9 @@ impl MangoFile {
 
     //TODO error handling
     pub fn add_image(&mut self, p: &Path) {
-        let compressor = Gz::new();
         let mut image_file = FileImage::open(p).unwrap();
         self.images.push(
-            image_file.to_base64().compress(&compressor),
+            image_file.to_base64()
         );
     }
 
