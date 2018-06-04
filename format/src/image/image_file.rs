@@ -2,20 +2,20 @@ use std::io::{Error, ErrorKind, Read};
 use std::fs::File;
 use std::path::Path;
 use super::Base64Image;
-use meta::FileImageMetadata;
+use meta::ImageFileMetadata;
 
-pub struct FileImage {
+pub struct ImageFile {
     file: File,
-    meta: FileImageMetadata,
+    meta: ImageFileMetadata,
 }
 
-impl FileImage {
-    pub fn open(p: &Path) -> Result<FileImage, Error> {
+impl ImageFile {
+    pub fn open(p: &Path) -> Result<ImageFile, Error> {
         if p.is_file() {
             match File::open(&p) {
                 Ok(file) => {
-                    match FileImageMetadata::new(&p) {
-                        Some(meta) => Ok(FileImage { file, meta }),
+                    match ImageFileMetadata::new(&p) {
+                        Some(meta) => Ok(ImageFile { file, meta }),
                         None => Err(Error::new(ErrorKind::Other, "couldn't read metadata")),
                     }
                 }
@@ -30,7 +30,7 @@ impl FileImage {
         self.file.by_ref()
     }
 
-    pub fn get_meta(&self) -> FileImageMetadata {
+    pub fn get_meta(&self) -> ImageFileMetadata {
         self.meta.clone()
     }
 
