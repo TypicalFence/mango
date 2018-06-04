@@ -1,6 +1,6 @@
 use std::io::Read;
 use base64;
-use super::FileImage;
+use super::ImageFile;
 use meta::Base64ImageMetadata;
 use compression;
 use compression::CompressionType;
@@ -15,7 +15,7 @@ impl Base64Image {
     pub fn new(base64: String, meta: Base64ImageMetadata) -> Base64Image {
         Base64Image { base64, meta }
     }
-    pub fn from_file(file_image: &mut FileImage) -> Base64Image {
+    pub fn from_file(file_image: &mut ImageFile) -> Base64Image {
         let mut vec = Vec::new();
         let _ = file_image.get_file().read_to_end(&mut vec);
         let muh_base64 = base64::encode(&vec);

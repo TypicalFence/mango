@@ -20,21 +20,21 @@ fn get_checksum(file: &mut File) -> String {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct FileImageMetadata {
+pub struct ImageFileMetadata {
     pub path: String,
     pub checksum: String,
     pub mime: Mime,
 }
 
-impl FileImageMetadata {
-    pub fn new(path: &Path) -> Option<FileImageMetadata> {
+impl ImageFileMetadata {
+    pub fn new(path: &Path) -> Option<ImageFileMetadata> {
         match File::open(&path) {
             Ok(mut file) => {
                 let checksum = get_checksum(&mut file);
                 match Mime::get_from_path(path) {
                     Ok(mime) => {
                         let path = path.to_str().unwrap().to_string();
-                        Some(FileImageMetadata {
+                        Some(ImageFileMetadata {
                             path,
                             checksum,
                             mime,
@@ -52,9 +52,9 @@ impl FileImageMetadata {
     }
 }
 
-impl Clone for FileImageMetadata {
-    fn clone(&self) -> FileImageMetadata {
-        FileImageMetadata {
+impl Clone for ImageFileMetadata {
+    fn clone(&self) -> ImageFileMetadata {
+        ImageFileMetadata {
             path: self.path.clone(),
             checksum: self.checksum.clone(),
             mime: self.mime.clone(),
@@ -73,7 +73,7 @@ pub struct Base64ImageMetadata {
 
 
 impl Base64ImageMetadata {
-    pub fn from_file_metadata(data: FileImageMetadata) -> Base64ImageMetadata {
+    pub fn from_file_metadata(data: ImageFileMetadata) -> Base64ImageMetadata {
         Base64ImageMetadata {
             compression: Option::from(Option::None),
             encryption: Option::from(Option::None),

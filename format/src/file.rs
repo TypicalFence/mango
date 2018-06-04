@@ -3,7 +3,7 @@ use std::path::Path;
 use std::fs::File;
 use std::io::prelude::*;
 use serde_json;
-use image::{FileImage, Base64Image};
+use image::{ImageFile, Base64Image};
 
 #[derive(Serialize, Deserialize)]
 pub struct MangoFile {
@@ -39,7 +39,7 @@ impl MangoFile {
 
     //TODO error handling
     pub fn add_image(&mut self, p: &Path) {
-        let mut image_file = FileImage::open(p).unwrap();
+        let mut image_file = ImageFile::open(p).unwrap();
         self.images.push(
             image_file.to_base64()
         );
