@@ -21,7 +21,7 @@ fn get_checksum(file: &mut File) -> String {
 
 #[derive(Serialize, Deserialize)]
 pub struct ImageFileMetadata {
-    pub path: String,
+    pub path: String, 
     pub checksum: String,
     pub mime: Mime,
 }

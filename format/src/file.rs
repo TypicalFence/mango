@@ -59,7 +59,6 @@ mod tests {
     use super::MangoFile;
     use std::path::Path;
 
-    #[test]
     fn create() {
         let mut file = MangoFile::new("test".to_string());
         file.add_image(Path::new("test.jpg"));
@@ -67,8 +66,9 @@ mod tests {
     }
 
     #[test]
-    fn open() {
-        let mut file = MangoFile::open(Path::new("test.json"));
+    fn create_and_open() {
+        create();
+        let file = MangoFile::open(Path::new("test.json"));
         assert_eq!(file.unwrap().name, "test");
     }
 }

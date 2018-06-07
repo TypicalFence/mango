@@ -22,7 +22,7 @@ impl ImageFile {
                 Err(e) => Err(e),
             }
         } else {
-            Err(Error::new(ErrorKind::InvalidInput, "path is not a file"))
+           Err(Error::new(ErrorKind::InvalidInput, "path is not a file"))
         }
     }
 
