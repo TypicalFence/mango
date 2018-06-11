@@ -1,0 +1,12 @@
+[package]
+name = "pymango"
+version = "0.1.0"
+authors = ["Alex Fence <alexfence.code@gmail.com>"]
+
+[dependencies] 
+"mango-format" = { path = "../format"}
+pyo3 = "0.2"
+
+[lib]
+name = "mango"
+crate-type = ["cdylib"]
