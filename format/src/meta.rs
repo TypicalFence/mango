@@ -21,7 +21,7 @@ fn get_checksum(file: &mut File) -> String {
 
 #[derive(Serialize, Deserialize)]
 pub struct ImageFileMetadata {
-    pub path: String, 
+    pub path: String,
     pub checksum: String,
     pub mime: Mime,
 }
@@ -40,10 +40,10 @@ impl ImageFileMetadata {
                             mime,
                         })
                     }
-                    Err(e) => None,
+                    Err(_e) => None,
                 }
             }
-            Err(e) => None,
+            Err(_e) => None,
         }
     }
 
@@ -66,6 +66,7 @@ impl Clone for ImageFileMetadata {
 pub struct Base64ImageMetadata {
     pub compression: Option<CompressionType>,
     pub encryption: Option<EncryptionType>,
+    pub iv: Option<Vec<u8>>,
     pub filename: String,
     pub checksum: String,
     pub mime: Mime,
@@ -75,8 +76,9 @@ pub struct Base64ImageMetadata {
 impl Base64ImageMetadata {
     pub fn from_file_metadata(data: ImageFileMetadata) -> Base64ImageMetadata {
         Base64ImageMetadata {
-            compression: Option::from(Option::None),
-            encryption: Option::from(Option::None),
+            compression: None,
+            encryption: None,
+            iv: None,
             //TODO fix filename
             filename: data.path,
             checksum: data.checksum,
@@ -88,6 +90,7 @@ impl Base64ImageMetadata {
 impl Clone for Base64ImageMetadata {
     fn clone(&self) -> Base64ImageMetadata {
         Base64ImageMetadata {
+            // TODO just WHY???
             compression: match self.compression.clone() {
                 Some(v) => Some(v),
                 None => None,
@@ -96,6 +99,7 @@ impl Clone for Base64ImageMetadata {
                 Some(e) => Some(e),
                 None => None,
             },
+            iv: self.iv.clone(),
             filename: self.filename.clone(),
             checksum: self.checksum.clone(),
             mime: self.mime.clone(),
