@@ -45,6 +45,14 @@ impl MangoFile {
         );
     }
 
+    pub fn get_image(&self, index: usize) -> &Base64Image {
+        &self.images[index]
+    }
+
+    pub fn get_image_mut(&mut self, index: usize) -> &mut Base64Image {
+        &mut self.images[index]
+    }
+
     pub fn get_name(&self) -> &String {
         return &self.name;
     }
@@ -57,9 +65,10 @@ impl MangoFile {
 #[cfg(test)]
 mod tests {
     use super::MangoFile;
+    use encryption;
     use std::path::Path;
 
-    fn create() {
+  fn create() {
         let mut file = MangoFile::new("test".to_string());
         file.add_image(Path::new("test.jpg"));
         file.save(Path::new("test.json"));
@@ -70,5 +79,26 @@ mod tests {
         create();
         let file = MangoFile::open(Path::new("test.json"));
         assert_eq!(file.unwrap().name, "test");
+    }
+
+    // TODO move tests below to base64_image.rs
+    #[test]
+    fn encrypt() {
+        let mut file = MangoFile::new("test".to_string());
+        file.add_image(Path::new("test.jpg"));
+        let image = file.get_image_mut(0);
+        let key = String::from("1234567812345678");
+        let encrypted_image = image.clone().encrypt(encryption::EncryptionType::AES128, key.clone());
+        let decrypted_image = encrypted_image.decrypt(key).unwrap();
+
+        assert_eq!(image.get_image(), decrypted_image.get_image());
+    }
+
+    #[test]
+    fn save() {
+        let mut file = MangoFile::new("test".to_string());
+        file.add_image(Path::new("test.jpg"));
+        let image = file.get_image_mut(0);
+        image.save("test_unencrypted.jpg");
     }
 }
