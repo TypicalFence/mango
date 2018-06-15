@@ -9,13 +9,14 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
-pub mod compression;
-pub mod encryption;
-pub mod meta;
-pub mod image;
-pub mod file;
-
+mod compression;
+mod encryption;
+mod meta;
+mod image;
+mod file;
 
 pub use compression::CompressionType;
 pub use encryption::EncryptionType;
+pub use image::{ImageFile, Base64Image, Mime};
 pub use file::MangoFile;
+pub use meta::{ImageFileMetadata, Base64ImageMetadata};

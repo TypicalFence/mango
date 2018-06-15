@@ -41,16 +41,30 @@ impl Base64Image {
         self.base64.clone()
     }
 
-    pub fn compress(&self, comp: CompressionType) -> Base64Image {
-        compression::compress(comp, self)
+    pub fn compress(&self, comp: CompressionType) -> Option<Base64Image> {
+        if self.meta.encryption.is_none()  && self.meta.compression.is_none() {
+            return Some(compression::compress(comp, self));
+        }
+
+        None
     }
 
-    pub fn uncompress(&self, comp: CompressionType) -> Base64Image {
-        compression::uncompress(comp, self)
+    pub fn uncompress(&self, comp: CompressionType) -> Option<Base64Image> {
+        let meta = &self.meta;
+
+        if meta.compression.is_some() && meta.encryption.is_none() {
+            return Some(compression::uncompress(comp, self));
+        }
+
+        None
     }
 
-    pub fn encrypt(self, etype: EncryptionType, key: String) -> Base64Image {
-        encryption::encrypt(etype, self, key)
+    pub fn encrypt(self, etype: EncryptionType, key: String) -> Option<Base64Image> {
+        if self.meta.encryption.is_none() {
+            return Some(encryption::encrypt(etype, self, key));
+        }
+
+        None
     }
 
     pub fn decrypt(self, key: String) -> Option<Base64Image> {
