@@ -1,3 +1,4 @@
+use std;
 use std::error::Error;
 use std::path::Path;
 use std::fs::File;
@@ -5,6 +6,10 @@ use std::io::prelude::*;
 use serde_json;
 use image::{ImageFile, Base64Image};
 
+
+/// Structure that represents a mango file.
+///
+/// It can be used to create, save and modify the file format.
 #[derive(Serialize, Deserialize)]
 pub struct MangoFile {
     name: String,
@@ -15,11 +20,11 @@ impl MangoFile {
     pub fn new(name: String) -> MangoFile {
         MangoFile {
             name: name,
-            //TODO change to Base64Image
             images: Vec::new(),
         }
     }
 
+    // TODO check  what error serde returns
     pub fn open(p: &Path) -> Result<MangoFile, Box<Error>> {
         let file = File::open(p)?;
 
@@ -28,25 +33,28 @@ impl MangoFile {
         Ok(u)
     }
 
-    pub fn save(&self, p: &Path) {
-        //TODO error handling
-        let json_string = serde_json::to_string_pretty(&self).unwrap();
-        let mut f = File::create(p).expect("Unable to create file");
-        f.write_all(json_string.as_bytes()).expect(
-            "Unable to write data",
-        );
+    pub fn save(&self, p: &Path) -> Result<(), std::io::Error> {
+        let json_string = serde_json::to_string_pretty(&self)?;
+        let mut f = File::create(p)?;;
+        f.write_all(json_string.as_bytes())?;
+        Ok(())
     }
 
-    //TODO error handling
-    pub fn add_image(&mut self, p: &Path) {
-        let mut image_file = ImageFile::open(p).unwrap();
+    pub fn add_image(&mut self, p: &Path) -> Result<(), std::io::Error> {
+        let mut image_file = ImageFile::open(p)?;
         self.images.push(
             image_file.to_base64()
         );
+        Ok(())
     }
 
-    pub fn get_image(&self, index: usize) -> &Base64Image {
-        &self.images[index]
+    pub fn get_image(&self, index: usize) -> Option<&Base64Image> {
+        if &self.images.len() -1 >= index {
+
+            return Some(&self.images[index]);
+        }
+
+        None
     }
 
     pub fn get_image_mut(&mut self, index: usize) -> &mut Base64Image {
