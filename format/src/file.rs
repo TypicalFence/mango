@@ -97,7 +97,7 @@ mod tests {
         let image = file.get_image_mut(0);
         let key = String::from("1234567812345678");
         let encrypted_image = image.clone().encrypt(encryption::EncryptionType::AES128, key.clone());
-        let decrypted_image = encrypted_image.decrypt(key).unwrap();
+        let decrypted_image = encrypted_image.unwrap().decrypt(key).unwrap();
 
         assert_eq!(image.get_image(), decrypted_image.get_image());
     }
