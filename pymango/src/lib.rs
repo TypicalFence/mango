@@ -46,6 +46,12 @@ impl PyMangoImage {
     }
 }
 
+impl PyMangoImage {
+    pub fn get_base64_image(&self) -> Base64Image {
+        return self.img.clone()
+    }
+}
+
 #[pyclass(subclass)]
 struct PyMangoFile {
     file: MangoFile,
@@ -60,9 +66,16 @@ impl PyMangoFile {
         obj.init(|t|  PyMangoFile {file: MangoFile::new(name), token: t})
     }
 
-    pub fn add_image(&mut self, path: String) -> PyResult<()> {
+    pub fn add_image_by_path(&mut self, path: String) -> PyResult<()> {
         let path = std::path::Path::new(&path);
-        &self.file.add_image(&path);
+        &self.file.add_image_by_path(&path);
+        Ok(())
+    }
+
+    // TODO test this really unsure if it does the job
+    pub fn _add_image(&mut self, _py: Python, image_ptr: Py<PyMangoImage>) -> PyResult<()> {
+        let image: &PyMangoImage = image_ptr.as_ref(_py);
+        self.file.add_image(image.get_base64_image());
         Ok(())
     }
 
