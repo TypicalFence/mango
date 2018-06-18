@@ -40,7 +40,11 @@ impl MangoFile {
         Ok(())
     }
 
-    pub fn add_image(&mut self, p: &Path) -> Result<(), std::io::Error> {
+    pub fn add_image(&mut self, image: Base64Image) {
+        self.images.push(image);
+    }
+
+    pub fn add_image_by_path(&mut self, p: &Path) -> Result<(), std::io::Error> {
         let mut image_file = ImageFile::open(p)?;
         self.images.push(
             image_file.to_base64()
