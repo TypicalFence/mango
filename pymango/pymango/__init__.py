@@ -1,1 +1,2 @@
-from .mango import PyMangoFile, PyMangoImage
+from ._mango import MangoFile, MangoImage
+

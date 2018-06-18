@@ -8,5 +8,5 @@ authors = ["Alex Fence <alexfence.code@gmail.com>"]
 pyo3 = "0.2"
 
 [lib]
-name = "mango"
+name = "rust_pymango"
 crate-type = ["cdylib"]

@@ -12,12 +12,9 @@ use pyo3::py::modinit as pymodinit;
 use pyo3::py::methods;
 use pyo3::py::class as pyclass;
 
-use mango_format::MangoFile;
-use mango_format::image::{Base64Image, ImageFile};
+use mango_format::{MangoFile, Base64Image, ImageFile};
 
-
-
-#[pyclass]
+#[pyclass(subclass)]
 struct PyMangoImage {
     img: Base64Image,
     token: PyToken,
@@ -49,7 +46,7 @@ impl PyMangoImage {
     }
 }
 
-#[pyclass]
+#[pyclass(subclass)]
 struct PyMangoFile {
     file: MangoFile,
     token: PyToken,
@@ -76,7 +73,12 @@ impl PyMangoFile {
     }
 
     pub fn get_image(&self, py: Python, index: usize) -> PyResult<Py<PyMangoImage>> {
-        let img: Base64Image = self.file.get_image(index).clone();
+        let img_option = self.file.get_image(index);
+
+        if img_option.is_none() {
+            return Err(exc::IndexError::new("index does not exist"));
+        }
+        let img: Base64Image = img_option.unwrap().clone();
         py.init(|token|  PyMangoImage {img, token})
     }
 
@@ -84,7 +86,7 @@ impl PyMangoFile {
 
 
 
-#[pymodinit(mango)]
+#[pymodinit(_rust_pymango)]
 fn init_mod(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyMangoFile>()?;
     m.add_class::<PyMangoImage>()?;

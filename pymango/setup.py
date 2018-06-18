@@ -28,7 +28,7 @@ setup(
         'Operating System :: POSIX',
     ],
     packages=['pymango'],
-    rust_extensions=[RustExtension('pymango.mango', 'Cargo.toml')],
+    rust_extensions=[RustExtension('pymango._rust_pymango', 'Cargo.toml')],
     install_requires=install_requires,
     setup_requires=setup_requires,
     include_package_data=True,
