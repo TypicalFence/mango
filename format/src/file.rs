@@ -82,7 +82,7 @@ mod tests {
 
   fn create() {
         let mut file = MangoFile::new("test".to_string());
-        file.add_image(Path::new("test.jpg"));
+        file.add_image_by_path(Path::new("test.jpg"));
         file.save(Path::new("test.json"));
     }
 
@@ -97,19 +97,19 @@ mod tests {
     #[test]
     fn encrypt() {
         let mut file = MangoFile::new("test".to_string());
-        file.add_image(Path::new("test.jpg"));
+        file.add_image_by_path(Path::new("test.jpg"));
         let image = file.get_image_mut(0);
         let key = String::from("1234567812345678");
         let encrypted_image = image.clone().encrypt(encryption::EncryptionType::AES128, key.clone());
         let decrypted_image = encrypted_image.unwrap().decrypt(key).unwrap();
 
-        assert_eq!(image.get_image(), decrypted_image.get_image());
+        assert_eq!(image.get_image_data(), decrypted_image.get_image_data());
     }
 
     #[test]
     fn save() {
         let mut file = MangoFile::new("test".to_string());
-        file.add_image(Path::new("test.jpg"));
+        file.add_image_by_path(Path::new("test.jpg"));
         let image = file.get_image_mut(0);
         image.save("test_unencrypted.jpg");
     }
