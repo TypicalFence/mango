@@ -67,6 +67,18 @@ impl Base64Image {
         None
     }
 
+    pub fn encrypt_mut(&mut self, etype: EncryptionType, key: String) -> bool {
+        let encrypted_opt = self.clone().encrypt(etype, key);
+        if encrypted_opt.is_some() {
+            let encrypted_img = encrypted_opt.unwrap();
+            self.base64 = encrypted_img.get_image_data();
+            self.meta = encrypted_img.get_meta();
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn decrypt(self, key: String) -> Option<Base64Image> {
         if self.meta.encryption.is_some() && self.meta.iv.is_some() {
             let iv = self.meta.iv.clone().unwrap();
@@ -77,10 +89,47 @@ impl Base64Image {
         None
     }
 
+    pub fn decrypt_mut(&mut self, key: String) -> bool {
+        let decrypted_opt = self.clone().decrypt(key);
+        if decrypted_opt.is_some() {
+            let decrypted_img = decrypted_opt.unwrap();
+            self.base64 = decrypted_img.get_image_data();
+            self.meta = decrypted_img.get_meta();
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn save(&self, file_name: &str) -> std::io::Result<()> {
         let data = base64::decode(&self.base64).unwrap();
         let mut file = File::create(file_name)?;
         file.write_all(&data)?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use std;
+    use super::{Base64Image, ImageFile, EncryptionType};
+
+    #[test]
+    fn mut_crypt() {
+        let p = std::path::Path::new("test.jpg");
+        let mut file = ImageFile::open(p).unwrap();
+
+        let mut img = Base64Image::from_file(&mut file);
+        let clean_data = img.get_image_data();
+
+        img.encrypt_mut(EncryptionType::AES128, String::from("1234567812345678"));
+        assert_eq!(img.get_meta().encryption.is_some(), true);
+        assert_ne!(img.get_image_data(), clean_data);
+        img.decrypt_mut(String::from("1234567812345678"));
+        assert_eq!(img.get_meta().encryption.is_none(), true);
+        assert_eq!(img.get_image_data(), clean_data);
+
+
+        
     }
 }
