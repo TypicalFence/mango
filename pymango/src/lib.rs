@@ -13,6 +13,22 @@ use pyo3::py::methods;
 use pyo3::py::class as pyclass;
 
 use mango_format::{MangoFile, Base64Image, ImageFile};
+use mango_format::Base64ImageMetadata;
+
+#[pyclass(subclass)]
+struct PyMangoImageMetadata {
+    meta: Base64ImageMetadata,  
+    token: PyToken,
+}
+
+#[methods]
+impl PyMangoImageMetadata {
+    #[getter]
+    pub fn get_checksum(&self) -> PyResult<String> {
+        Ok(self.meta.checksum.clone())
+    }
+
+}
 
 #[pyclass(subclass)]
 struct PyMangoImage {
@@ -30,11 +46,12 @@ impl PyMangoImage {
         obj.init(|t|  PyMangoImage {img: Base64Image::from_file(&mut img), token: t})
     }
 
-    pub fn get_image(&self) -> PyResult<String> {
-        Ok(self.img.get_image())
+    #[getter]
+    pub fn get_image_data(&self) -> PyResult<String> {
+        Ok(self.img.get_image_data())
     }
 
-    pub fn compress(&self, type_string: String) -> PyResult<bool> {
+    pub fn _compress(&self, type_string: String) -> PyResult<bool> {
         let type_enum = enums::compression(type_string);
 
         if type_enum.is_some() {
@@ -44,6 +61,13 @@ impl PyMangoImage {
 
         Ok(false)
     }
+   
+    
+    pub fn _get_meta_data(&self, py: Python) -> PyResult<Py<PyMangoImageMetadata>> {
+        let meta = self.img.get_meta();
+        py.init(|token|  PyMangoImageMetadata {meta, token})
+    }
+   
 }
 
 impl PyMangoImage {
@@ -71,8 +95,7 @@ impl PyMangoFile {
         &self.file.add_image_by_path(&path);
         Ok(())
     }
-
-    // TODO test this really unsure if it does the job
+    
     pub fn _add_image(&mut self, _py: Python, image_ptr: Py<PyMangoImage>) -> PyResult<()> {
         let image: &PyMangoImage = image_ptr.as_ref(_py);
         self.file.add_image(image.get_base64_image());
@@ -103,5 +126,6 @@ impl PyMangoFile {
 fn init_mod(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyMangoFile>()?;
     m.add_class::<PyMangoImage>()?;
+    m.add_class::<PyMangoImageMetadata>()?;
     Ok(())
 }

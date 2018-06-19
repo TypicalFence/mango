@@ -37,7 +37,7 @@ impl Base64Image {
         self.meta.clone()
     }
 
-    pub fn get_image(&self) -> String {
+    pub fn get_image_data(&self) -> String {
         self.base64.clone()
     }
 

@@ -47,7 +47,7 @@ fn openssl_encrypt(
     key: String,
     cipher: Cipher,
 ) -> Base64Image {
-    let image_data = base64::decode(&img.get_image()).unwrap();
+    let image_data = base64::decode(&img.get_image_data()).unwrap();
     let iv = gen_iv(cipher);
     let encrypted_bytes = openssl::symm::encrypt(cipher, key.as_bytes(), Some(&iv), &image_data);
     let encrypted_data = base64::encode(&encrypted_bytes.unwrap());
@@ -58,7 +58,7 @@ fn openssl_encrypt(
 }
 
 fn openssl_decrypt(img: Base64Image, key: String, iv: &[u8], cipher: Cipher) -> Base64Image {
-    let image_data = base64::decode(&img.get_image()).unwrap();
+    let image_data = base64::decode(&img.get_image_data()).unwrap();
     let decrypted_bytes = openssl::symm::decrypt(cipher, key.as_bytes(), Some(iv), &image_data);
     let decrypted_data = base64::encode(&decrypted_bytes.unwrap());
     let mut meta = img.get_meta().clone();

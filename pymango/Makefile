@@ -2,8 +2,11 @@ rust:
 	cargo build
 
 install: rust
-	pip install -e . --user
+	pip3 install -e . --user
 
 clean:
 	cargo clean
-	pip uninstall pymango
+	pip3 uninstall pymango
+
+test: install
+	pytest
