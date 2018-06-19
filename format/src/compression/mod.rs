@@ -33,7 +33,7 @@ pub fn uncompress(ctype: CompressionType, image: &Base64Image) -> Base64Image {
 }
 
 fn gzip_compress(image: &Base64Image) -> Base64Image {
-    let image_vec = base64::decode(&image.get_image()).unwrap();
+    let image_vec = base64::decode(&image.get_image_data()).unwrap();
     let mut e = GzEncoder::new(Vec::new(), flate2::Compression::Best);
     e.write(&image_vec).unwrap();
     let compressed = e.finish().unwrap();
@@ -47,7 +47,7 @@ fn gzip_compress(image: &Base64Image) -> Base64Image {
 }
 
 fn gzip_uncompress(image: &Base64Image) -> Base64Image {
-    let image_data = base64::decode(&image.get_image()).unwrap();
+    let image_data = base64::decode(&image.get_image_data()).unwrap();
     let mut decoder = GzDecoder::new(image_data.as_slice()).unwrap();
     let mut raw_data = Vec::new();
     decoder.read_to_end(&mut raw_data);
