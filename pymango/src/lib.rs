@@ -6,18 +6,21 @@ extern crate mango_format;
 
 mod enums;
 
+use std::string::ToString;
+
 use pyo3::prelude::*;
 use pyo3::{PyResult, Python, PyModule};
 use pyo3::py::modinit as pymodinit;
 use pyo3::py::methods;
 use pyo3::py::class as pyclass;
+use pyo3::py::*;
 
 use mango_format::{MangoFile, Base64Image, ImageFile};
 use mango_format::Base64ImageMetadata;
 
-#[pyclass(subclass)]
+#[pyclass]
 struct PyMangoImageMetadata {
-    meta: Base64ImageMetadata,  
+    meta: Base64ImageMetadata,
     token: PyToken,
 }
 
@@ -28,9 +31,17 @@ impl PyMangoImageMetadata {
         Ok(self.meta.checksum.clone())
     }
 
+    pub fn _get_encryption(&self) -> PyResult<Option<String>>{
+        let encryption = self.meta.encryption.clone();
+        match encryption {
+            Some(v) => Ok(Some(v.to_string())),
+            None => Ok(None),
+        }
+    }
+
 }
 
-#[pyclass(subclass)]
+#[pyclass]
 struct PyMangoImage {
     img: Base64Image,
     token: PyToken,
@@ -51,23 +62,32 @@ impl PyMangoImage {
         Ok(self.img.get_image_data())
     }
 
-    pub fn _compress(&self, type_string: String) -> PyResult<bool> {
+    pub fn compress(&mut self, type_string: String) -> PyResult<bool> {
         let type_enum = enums::compression(type_string);
 
         if type_enum.is_some() {
-            self.img.compress(type_enum.unwrap());
-            return Ok(true);
+            let status = self.img.compress_mut(type_enum.unwrap());
+            return Ok(status);
         }
 
         Ok(false)
     }
-   
-    
+
+    pub fn uncompress(&mut self) -> PyResult<bool> {
+            let status = self.img.uncompress_mut();
+            Ok(status)
+    }
+
     pub fn _get_meta_data(&self, py: Python) -> PyResult<Py<PyMangoImageMetadata>> {
         let meta = self.img.get_meta();
         py.init(|token|  PyMangoImageMetadata {meta, token})
     }
-   
+
+    pub fn save(&self, filename: String) -> PyResult<()> {
+        self.img.save(&filename);
+        Ok(())
+    }
+
 }
 
 impl PyMangoImage {
@@ -95,7 +115,7 @@ impl PyMangoFile {
         &self.file.add_image_by_path(&path);
         Ok(())
     }
-    
+
     pub fn _add_image(&mut self, _py: Python, image_ptr: Py<PyMangoImage>) -> PyResult<()> {
         let image: &PyMangoImage = image_ptr.as_ref(_py);
         self.file.add_image(image.get_base64_image());
@@ -108,7 +128,7 @@ impl PyMangoFile {
         Ok(())
     }
 
-    pub fn get_image(&self, py: Python, index: usize) -> PyResult<Py<PyMangoImage>> {
+    pub fn _get_image(&self, py: Python, index: usize) -> PyResult<Py<PyMangoImage>> {
         let img_option = self.file.get_image(index);
 
         if img_option.is_none() {
@@ -117,7 +137,6 @@ impl PyMangoFile {
         let img: Base64Image = img_option.unwrap().clone();
         py.init(|token|  PyMangoImage {img, token})
     }
-
 }
 
 

@@ -5,7 +5,7 @@ use std::path::Path;
 use std::ffi::{CStr, CString};
 use libc::c_char;
 use std::ptr;
-use mango_format::file::MangoFile;
+use mango_format::MangoFile;
 
 
 #[no_mangle]
@@ -17,14 +17,14 @@ pub extern "C" fn kek(s: *mut c_char) -> *mut c_char {
 #[no_mangle]
 pub extern "C" fn new_mango_file(s: *const c_char) -> *mut MangoFile {
     if s.is_null() {
-        panic!("ASS");
+        //panic!("uggu");
         return ptr::null_mut();
     }
     let c_str = unsafe { CStr::from_ptr(s) };
     if let Ok(name) = c_str.to_str() {
         Box::into_raw(Box::new(MangoFile::new(name.to_string())))
     } else {
-        panic!("FUCK");
+        //panic!("uggu");
         return ptr::null_mut();
     }
 }
@@ -46,7 +46,7 @@ pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, path: String) {
         assert!(!pointer.is_null());
         &mut *pointer
     };
-    file.add_image(Path::new(path.as_str()))
+    file.add_image_by_path(Path::new(path.as_str()));
 }
 
 #[no_mangle]

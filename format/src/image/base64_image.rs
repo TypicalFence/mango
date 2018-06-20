@@ -49,14 +49,39 @@ impl Base64Image {
         None
     }
 
-    pub fn uncompress(&self, comp: CompressionType) -> Option<Base64Image> {
+    pub fn compress_mut(&mut self, comp: CompressionType) -> bool {
+        let compressed_opt = self.clone().compress(comp);
+        if compressed_opt.is_some() {
+            let compressed_img = compressed_opt.unwrap();
+            self.base64 = compressed_img.get_image_data();
+            self.meta = compressed_img.get_meta();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn uncompress(&self) -> Option<Base64Image> {
         let meta = &self.meta;
 
         if meta.compression.is_some() && meta.encryption.is_none() {
+            let comp = meta.clone().compression.unwrap();
             return Some(compression::uncompress(comp, self));
         }
 
         None
+    }
+
+    pub fn uncompress_mut(&mut self) -> bool {
+        let uncompressed_opt = self.clone().uncompress();
+        if uncompressed_opt.is_some() {
+            let uncompressed_img = uncompressed_opt.unwrap();
+            self.base64 = uncompressed_img.get_image_data();
+            self.meta = uncompressed_img.get_meta();
+            true
+        } else {
+            false
+        }
     }
 
     pub fn encrypt(self, etype: EncryptionType, key: String) -> Option<Base64Image> {
@@ -112,7 +137,7 @@ impl Base64Image {
 #[cfg(test)]
 mod test {
     use std;
-    use super::{Base64Image, ImageFile, EncryptionType};
+    use super::{Base64Image, ImageFile, EncryptionType, CompressionType};
 
     #[test]
     fn mut_crypt() {
@@ -128,8 +153,22 @@ mod test {
         img.decrypt_mut(String::from("1234567812345678"));
         assert_eq!(img.get_meta().encryption.is_none(), true);
         assert_eq!(img.get_image_data(), clean_data);
+    }
 
+    #[test]
+    fn mut_compress() {
+        let p = std::path::Path::new("test.jpg");
+        let mut file = ImageFile::open(p).unwrap();
 
-        
+        let mut img = Base64Image::from_file(&mut file);
+        let clean_data = img.get_image_data();
+
+        img.compress_mut(CompressionType::GZIP);
+        assert_eq!(img.get_meta().compression.is_some(), true);
+        assert_ne!(img.get_image_data(), clean_data);
+        img.uncompress_mut();
+        img.save("lol.jpg");
+        assert_eq!(img.get_meta().compression.is_none(), true);
+        assert_eq!(img.get_image_data(), clean_data);
     }
 }
