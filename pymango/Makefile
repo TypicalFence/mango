@@ -9,4 +9,4 @@ clean:
 	pip3 uninstall pymango
 
 test: install
-	pytest
+	pytest -v

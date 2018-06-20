@@ -1,3 +1,4 @@
+use std::fmt;
 use base64;
 use openssl;
 use openssl::symm::Cipher;
@@ -16,6 +17,15 @@ impl Clone for EncryptionType {
         match self {
             &EncryptionType::AES128 => EncryptionType::AES128,
             &EncryptionType::AES256 => EncryptionType::AES256,
+        }
+    }
+}
+
+impl fmt::Display for EncryptionType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            EncryptionType::AES128 => write!(f, "AES128"),
+            EncryptionType::AES256 => write!(f, "AES256"),
         }
     }
 }
