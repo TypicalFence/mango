@@ -35,7 +35,7 @@ pub fn uncompress(ctype: CompressionType, image: &Base64Image) -> Base64Image {
 fn gzip_compress(image: &Base64Image) -> Base64Image {
     let image_vec = base64::decode(&image.get_image_data()).unwrap();
     let mut e = GzEncoder::new(Vec::new(), flate2::Compression::Best);
-    e.write(&image_vec).unwrap();
+    e.write_all(&image_vec).unwrap();
     let compressed = e.finish().unwrap();
     let mut muh_base64 = base64::encode(&compressed);
     muh_base64 = muh_base64.replace("\r\n", "");
