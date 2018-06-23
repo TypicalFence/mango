@@ -47,8 +47,8 @@ impl ImageFileMetadata {
         }
     }
 
-    pub fn to_base64_metadata(self) -> Base64ImageMetadata {
-        Base64ImageMetadata::from_file_metadata(self)
+    pub fn to_base64_metadata(self) -> MangoImageMetadata {
+        MangoImageMetadata::from_file_metadata(self)
     }
 }
 
@@ -63,7 +63,7 @@ impl Clone for ImageFileMetadata {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Base64ImageMetadata {
+pub struct MangoImageMetadata {
     pub compression: Option<CompressionType>,
     pub encryption: Option<EncryptionType>,
     pub iv: Option<Vec<u8>>,
@@ -73,9 +73,9 @@ pub struct Base64ImageMetadata {
 }
 
 
-impl Base64ImageMetadata {
-    pub fn from_file_metadata(data: ImageFileMetadata) -> Base64ImageMetadata {
-        Base64ImageMetadata {
+impl MangoImageMetadata {
+    pub fn from_file_metadata(data: ImageFileMetadata) -> Self {
+         Self {
             compression: None,
             encryption: None,
             iv: None,
@@ -87,9 +87,9 @@ impl Base64ImageMetadata {
     }
 }
 
-impl Clone for Base64ImageMetadata {
-    fn clone(&self) -> Base64ImageMetadata {
-        Base64ImageMetadata {
+impl Clone for MangoImageMetadata {
+    fn clone(&self) -> Self {
+        Self {
             // TODO just WHY???
             compression: match self.compression.clone() {
                 Some(v) => Some(v),

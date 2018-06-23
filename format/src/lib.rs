@@ -19,6 +19,6 @@ mod bson_format;
 
 pub use compression::CompressionType;
 pub use encryption::EncryptionType;
-pub use image::{ImageFile, Base64Image, Mime};
+pub use image::{ImageFile, MangoImage, Mime};
 pub use file::MangoFile;
-pub use meta::{ImageFileMetadata, Base64ImageMetadata};
+pub use meta::{ImageFileMetadata, MangoImageMetadata};
