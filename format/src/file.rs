@@ -4,7 +4,7 @@ use std::path::Path;
 use std::fs::File;
 use std::io::prelude::*;
 use serde_json;
-use image::{ImageFile, Base64Image};
+use image::{ImageFile, MangoImage};
 
 
 /// Structure that represents a mango file.
@@ -13,7 +13,7 @@ use image::{ImageFile, Base64Image};
 #[derive(Serialize, Deserialize)]
 pub struct MangoFile {
     name: String,
-    images: Vec<Base64Image>,
+    images: Vec<MangoImage>,
 }
 
 impl MangoFile {
@@ -40,19 +40,19 @@ impl MangoFile {
         Ok(())
     }
 
-    pub fn add_image(&mut self, image: Base64Image) {
+    pub fn add_image(&mut self, image: MangoImage) {
         self.images.push(image);
     }
 
     pub fn add_image_by_path(&mut self, p: &Path) -> Result<(), std::io::Error> {
         let mut image_file = ImageFile::open(p)?;
         self.images.push(
-            image_file.to_base64()
+            image_file.to_mango_image()
         );
         Ok(())
     }
 
-    pub fn get_image(&self, index: usize) -> Option<&Base64Image> {
+    pub fn get_image(&self, index: usize) -> Option<&MangoImage> {
         if &self.images.len() -1 >= index {
 
             return Some(&self.images[index]);
@@ -61,7 +61,7 @@ impl MangoFile {
         None
     }
 
-    pub fn get_image_mut(&mut self, index: usize) -> &mut Base64Image {
+    pub fn get_image_mut(&mut self, index: usize) -> &mut MangoImage {
         &mut self.images[index]
     }
 

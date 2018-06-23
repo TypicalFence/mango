@@ -4,7 +4,7 @@ use base64;
 use flate2;
 use flate2::write::GzEncoder;
 use flate2::read::GzDecoder;
-use image::Base64Image;
+use image::MangoImage;
 
 #[derive(Serialize, Deserialize)]
 pub enum CompressionType {
@@ -20,42 +20,38 @@ impl Clone for CompressionType {
 }
 
 
-pub fn compress(ctype: CompressionType, image: &Base64Image) -> Base64Image {
+pub fn compress(ctype: CompressionType, image: &MangoImage) -> MangoImage {
     match ctype {
         CompressionType::GZIP => gzip_compress(image)
     }
 }
 
-pub fn uncompress(ctype: CompressionType, image: &Base64Image) -> Base64Image {
+pub fn uncompress(ctype: CompressionType, image: &MangoImage) -> MangoImage {
     match ctype {
         CompressionType::GZIP => gzip_uncompress(image)
     }
 }
 
-fn gzip_compress(image: &Base64Image) -> Base64Image {
-    let image_vec = base64::decode(&image.get_image_data()).unwrap();
+fn gzip_compress(image: &MangoImage) -> MangoImage {
+    let image_vec = &image.get_image_data();
     let mut e = GzEncoder::new(Vec::new(), flate2::Compression::Best);
     e.write_all(&image_vec).unwrap();
     let compressed = e.finish().unwrap();
-    let mut muh_base64 = base64::encode(&compressed);
-    muh_base64 = muh_base64.replace("\r\n", "");
 
     let mut new_meta = image.get_meta();
     new_meta.compression = Some(CompressionType::GZIP);
 
-    Base64Image::new(muh_base64, new_meta)
+    MangoImage::new(compressed, new_meta)
 }
 
-fn gzip_uncompress(image: &Base64Image) -> Base64Image {
-    let image_data = base64::decode(&image.get_image_data()).unwrap();
+fn gzip_uncompress(image: &MangoImage) -> MangoImage {
+    let image_data = &image.get_image_data();
     let mut decoder = GzDecoder::new(image_data.as_slice()).unwrap();
     let mut raw_data = Vec::new();
     decoder.read_to_end(&mut raw_data);
-    let mut muh_base64 = base64::encode(&raw_data);
-    muh_base64 = muh_base64.replace("\r\n", "");
 
     let mut new_meta = image.get_meta();
     new_meta.compression = None;
 
-    Base64Image::new(muh_base64, new_meta)
+    MangoImage::new(raw_data, new_meta)
 }

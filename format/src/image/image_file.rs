@@ -1,7 +1,7 @@
 use std::io::{Error, ErrorKind, Read};
 use std::fs::File;
 use std::path::Path;
-use super::Base64Image;
+use image::MangoImage;
 use meta::ImageFileMetadata;
 
 /// A struct that represents an image file.
@@ -47,7 +47,7 @@ impl ImageFile {
     ///
     /// The file itself stays untouched it just converts the data to what
     /// is used inside .mango files.
-    pub fn to_base64(&mut self) -> Base64Image {
-        Base64Image::from_file(self)
+    pub fn to_mango_image(&mut self) -> MangoImage {
+        MangoImage::from_file(self)
     }
 }
