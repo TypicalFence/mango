@@ -10,7 +10,6 @@ use compression::CompressionType;
 use encryption;
 use encryption::EncryptionType;
 
-
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Base64Image {
     base64: String,
@@ -172,3 +171,5 @@ mod test {
         assert_eq!(img.get_image_data(), clean_data);
     }
 }
+
+
