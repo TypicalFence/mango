@@ -7,7 +7,11 @@ use std::fs::File;
 use std::path::Path;
 use image::MangoImage;
 use meta::MangoImageMetadata;
+use file::MangoFile;
 use std::io::prelude::*;
+use compression::CompressionType;
+use encryption::EncryptionType;
+use image::Mime;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct BSONMangoFile {
@@ -15,27 +19,71 @@ pub struct BSONMangoFile {
     images: Vec<BSONImage>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct BSONImage {
-    data: Bson,
-    meta: MangoImageMetadata,
-}
+impl BSONMangoFile {
+    pub fn from_mangofile(file: &MangoFile) -> Self {
+        let mut bson_imgs = Vec::new();
 
-impl BSONImage {
-    pub fn from_mango_image(img: &MangoImage) -> Self {
+        for image in file.get_images() {
+            bson_imgs.push(BSONImage::from_mango_image(&image))
+        }
+
         Self {
-            data: Binary(BinarySubtype::Generic, base64::decode(&img.get_image_data()).unwrap()),
-            meta: img.get_meta(),
+            name: file.get_name(),
+            images: bson_imgs,
         }
     }
 
-    pub fn save_bson(&self, p: &Path) {
+    pub fn save(&self, p: &Path) {
         let bson_data = bson::to_bson(&self).unwrap();
         if let bson::Bson::Document(document) = bson_data {
             let mut bytes = Vec::new();
             bson::encode_document(&mut bytes, &document);
             let mut f = File::create(p).unwrap();
             f.write_all(&bytes);
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct BsonImageMetadata {
+    pub compression: Option<CompressionType>,
+    pub encryption: Option<EncryptionType>,
+    pub iv: Option<Bson>,
+    pub filename: String,
+    pub checksum: String,
+    pub mime: Mime,
+}
+
+impl BsonImageMetadata {
+    pub fn from_mango(meta: MangoImageMetadata) -> Self {
+        let mut iv = None;
+
+        if meta.iv.is_some() {
+            iv = Some(Binary(BinarySubtype::Generic, meta.iv.unwrap()));
+        }
+
+        Self {
+            compression: meta.compression,
+            encryption: meta.encryption,
+            filename: meta.filename,
+            checksum: meta.checksum,
+            mime: meta.mime,
+            iv,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct BSONImage {
+    data: Bson,
+    meta: BsonImageMetadata,
+}
+
+impl BSONImage {
+    pub fn from_mango_image(img: &MangoImage) -> Self {
+        Self {
+            data: Binary(BinarySubtype::Generic, img.get_image_data()),
+            meta: BsonImageMetadata::from_mango(img.get_meta()),
         }
     }
 }

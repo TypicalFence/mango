@@ -40,6 +40,11 @@ impl MangoFile {
         Ok(())
     }
 
+    pub fn save_bson(&self, p:&Path) {
+        use bson_format::BSONMangoFile;
+        BSONMangoFile::from_mangofile(self).save(p);
+    }
+
     pub fn add_image(&mut self, image: MangoImage) {
         self.images.push(image);
     }
@@ -50,6 +55,10 @@ impl MangoFile {
             image_file.to_mango_image()
         );
         Ok(())
+    }
+
+    pub fn get_images(&self) -> Vec<MangoImage> {
+        self.images.clone()
     }
 
     pub fn get_image(&self, index: usize) -> Option<&MangoImage> {
@@ -65,8 +74,8 @@ impl MangoFile {
         &mut self.images[index]
     }
 
-    pub fn get_name(&self) -> &String {
-        return &self.name;
+    pub fn get_name(&self) -> String {
+        return self.name.clone();
     }
 
     pub fn set_name(&mut self, n: String) {
@@ -80,7 +89,7 @@ mod tests {
     use encryption;
     use std::path::Path;
 
-  fn create() {
+    fn create() {
         let mut file = MangoFile::new("test".to_string());
         file.add_image_by_path(Path::new("test.jpg"));
         file.save(Path::new("test.json"));
@@ -112,5 +121,19 @@ mod tests {
         file.add_image_by_path(Path::new("test.jpg"));
         let image = file.get_image_mut(0);
         image.save("test_unencrypted.jpg");
+    }
+
+    #[test]
+    fn  save_bson() {
+        use compression::CompressionType;
+        use encryption::EncryptionType;
+        use image::{MangoImage, ImageFile};
+
+        let mut file = MangoFile::new("test".to_string());
+        let mut img = MangoImage::from_file(&mut ImageFile::open(Path::new("test.jpg")).unwrap());
+        img.compress_mut(CompressionType::GZIP);
+        img.encrypt_mut(EncryptionType::AES128, "1234567812345678".to_lowercase());
+        file.add_image(img);
+        file.save_bson(Path::new("teste.bson"));
     }
 }
