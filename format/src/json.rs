@@ -49,7 +49,8 @@ impl JsonMangoFile {
             base64_imgs.push(Base64Image::from_mango(image));
         }
 
-        let json_string = serde_json::to_string_pretty(&JsonMangoFile::new(file.get_name(), base64_imgs))?;
+        let json_string =
+            serde_json::to_string_pretty(&JsonMangoFile::new(file.get_name(), base64_imgs))?;
         let mut f = File::create(p)?;
         f.write_all(json_string.as_bytes())?;
         Ok(())
@@ -119,15 +120,15 @@ mod base64Encoding {
     where
         S: Serializer,
     {
-        serializer.serialize_str(&base64::encode(bytes))
+        serializer.serialize_str(&base64::encode(bytes).replace("\r\n", ""))
     }
 
     pub fn deserialize<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error>
     where
         D: Deserializer<'de>,
     {
-        let s = <&str>::deserialize(deserializer)?;
-        base64::decode(s).map_err(de::Error::custom)
+        let s = <String>::deserialize(deserializer)?;
+        base64::decode(&s).map_err(de::Error::custom)
     }
 }
 
@@ -141,7 +142,7 @@ mod base64Option {
     {
         if (bytes.is_some()) {
             let b = bytes.clone().unwrap();
-            serializer.serialize_some(&base64::encode(&b))
+            serializer.serialize_some(&base64::encode(&b).replace("\r\n", ""))
         } else {
             serializer.serialize_none()
         }
@@ -151,9 +152,9 @@ mod base64Option {
     where
         D: Deserializer<'de>,
     {
-        let s = <Option<&str>>::deserialize(deserializer)?;
-        let bytes = base64::decode(s.unwrap()).map_err(de::Error::custom)?;
+        let s = <Option<String>>::deserialize(deserializer)?;
         if (s.is_some()) {
+            let bytes = base64::decode(&s.unwrap()).map_err(de::Error::custom)?;
             Ok(Some(bytes))
         } else {
             Ok(None)
