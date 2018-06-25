@@ -5,7 +5,8 @@ use std::fs::File;
 use std::io::prelude::*;
 use serde_json;
 use image::{ImageFile, MangoImage};
-
+use json::JsonMangoFile;
+use bson;
 
 /// Structure that represents a mango file.
 ///
@@ -26,23 +27,37 @@ impl MangoFile {
 
     // TODO check  what error serde returns
     pub fn open(p: &Path) -> Result<MangoFile, Box<Error>> {
-        let file = File::open(p)?;
+        Self::open_json(&p)
+    }
 
-        let u = serde_json::from_reader(file)?;
+    pub fn open_bson(p: &Path) -> Result<MangoFile, Box<Error>> {
+        let mut file = File::open(p)?;
+        let document = bson::decode_document(&mut file)?;
+        let u = bson::from_bson(bson::Bson::Document(document))?;
 
         Ok(u)
     }
 
-    pub fn save(&self, p: &Path) -> Result<(), std::io::Error> {
-        let json_string = serde_json::to_string_pretty(&self)?;
-        let mut f = File::create(p)?;;
-        f.write_all(json_string.as_bytes())?;
-        Ok(())
+    pub fn open_json(p: &Path) -> Result<MangoFile, Box<Error>> {
+        JsonMangoFile::open(&p)
     }
 
-    pub fn save_bson(&self, p:&Path) {
-        use bson_format::BSONMangoFile;
-        BSONMangoFile::from_mangofile(self).save(p);
+    pub fn save(&self, p: &Path) {
+        self.save_json(p);
+    }
+
+    pub fn save_bson(&self, p: &Path) {
+        let bson_data = bson::to_bson(&self).unwrap();
+        if let bson::Bson::Document(document) = bson_data {
+            let mut buf = Vec::new();
+            bson::encode_document(&mut buf, &document).unwrap();
+            let mut f = File::create(p).unwrap();
+            f.write_all(&buf);
+        }
+    }
+
+    pub fn save_json(&self, p:&Path) {
+        JsonMangoFile::save(p, self);
     }
 
     pub fn add_image(&mut self, image: MangoImage) {
@@ -80,6 +95,10 @@ impl MangoFile {
 
     pub fn set_name(&mut self, n: String) {
         self.name = n;
+    }
+
+    pub fn set_images(&mut self, imgs: Vec<MangoImage>) {
+        self.images = imgs;
     }
 }
 

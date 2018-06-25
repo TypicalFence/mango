@@ -62,10 +62,13 @@ impl Clone for ImageFileMetadata {
     }
 }
 
+use serde_bytes;
+
 #[derive(Serialize, Deserialize)]
 pub struct MangoImageMetadata {
     pub compression: Option<CompressionType>,
     pub encryption: Option<EncryptionType>,
+    //#[serde(with = "serde_bytes")]
     pub iv: Option<Vec<u8>>,
     pub filename: String,
     pub checksum: String,
