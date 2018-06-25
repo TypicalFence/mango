@@ -3,10 +3,10 @@ use std::error::Error;
 use std::path::Path;
 use std::fs::File;
 use std::io::prelude::*;
-use serde_json;
 use image::{ImageFile, MangoImage};
 use json::JsonMangoFile;
 use bson;
+use serde_cbor;
 
 /// Structure that represents a mango file.
 ///
@@ -27,7 +27,7 @@ impl MangoFile {
 
     // TODO check  what error serde returns
     pub fn open(p: &Path) -> Result<MangoFile, Box<Error>> {
-        Self::open_json(&p)
+        Self::open_cbor(&p)
     }
 
     pub fn open_bson(p: &Path) -> Result<MangoFile, Box<Error>> {
@@ -42,8 +42,18 @@ impl MangoFile {
         JsonMangoFile::open(&p)
     }
 
+    pub fn open_cbor(p: &Path) -> Result<MangoFile, Box<Error>> {
+        let mut file = File::open(p)?;
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes);
+        
+        let u  = serde_cbor::from_slice(&bytes)?;
+
+        Ok(u)
+    }
+
     pub fn save(&self, p: &Path) {
-        self.save_json(p);
+        self.save_cbor(p);
     }
 
     pub fn save_bson(&self, p: &Path) {
@@ -58,6 +68,12 @@ impl MangoFile {
 
     pub fn save_json(&self, p:&Path) {
         JsonMangoFile::save(p, self);
+    }
+    
+    pub fn save_cbor(&self, p: &Path) {        
+            let bytes = serde_cbor::to_vec(&self).unwrap();
+            let mut f = File::create(p).unwrap();
+            f.write_all(&bytes);
     }
 
     pub fn add_image(&mut self, image: MangoImage) {
@@ -143,7 +159,7 @@ mod tests {
     }
 
     #[test]
-    fn  save_bson() {
+    fn  save_cbor() {
         use compression::CompressionType;
         use encryption::EncryptionType;
         use image::{MangoImage, ImageFile};
@@ -153,6 +169,20 @@ mod tests {
         img.compress_mut(CompressionType::GZIP);
         img.encrypt_mut(EncryptionType::AES128, "1234567812345678".to_lowercase());
         file.add_image(img);
-        file.save_bson(Path::new("teste.bson"));
+        file.save_cbor(Path::new("teste.bson"));
+    }
+
+    #[test]
+    fn  save_json() {
+        use compression::CompressionType;
+        use encryption::EncryptionType;
+        use image::{MangoImage, ImageFile};
+
+        let mut file = MangoFile::new("test".to_string());
+        let mut img = MangoImage::from_file(&mut ImageFile::open(Path::new("test.jpg")).unwrap());
+        img.compress_mut(CompressionType::GZIP);
+        img.encrypt_mut(EncryptionType::AES128, "1234567812345678".to_lowercase());
+        file.add_image(img);
+        file.save_json(Path::new("teste.bson"));
     }
 }

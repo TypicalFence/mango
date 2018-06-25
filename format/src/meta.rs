@@ -8,7 +8,7 @@ use hex::ToHex;
 use compression::CompressionType;
 use encryption::EncryptionType;
 use image::Mime;
-
+use json::base64Option;
 
 fn get_checksum(file: &mut File) -> String {
     let mut data = Vec::new();
@@ -68,7 +68,7 @@ use serde_bytes;
 pub struct MangoImageMetadata {
     pub compression: Option<CompressionType>,
     pub encryption: Option<EncryptionType>,
-    //#[serde(with = "serde_bytes")]
+    #[serde(with = "base64Option")]
     pub iv: Option<Vec<u8>>,
     pub filename: String,
     pub checksum: String,
@@ -109,3 +109,13 @@ impl Clone for MangoImageMetadata {
         }
     }
 }
+
+/*
+use std::convert::AsRef;
+
+impl AsRef<[u8]> for Option<Vec<u8>> {
+    fn as_ref(&self) -> &[u8] {
+        unimplemented!();
+    }
+}
+*/

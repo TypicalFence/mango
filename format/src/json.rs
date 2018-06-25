@@ -112,7 +112,7 @@ impl Base64Image {
     }
 }
 
-mod base64Encoding {
+pub mod base64Encoding {
     use base64;
     use serde::{Serializer, de, Deserialize, Deserializer};
 
@@ -132,7 +132,7 @@ mod base64Encoding {
     }
 }
 
-mod base64Option {
+pub mod base64Option {
     use base64;
     use serde::{Serializer, de, Deserialize, Deserializer};
 
