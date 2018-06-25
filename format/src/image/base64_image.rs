@@ -2,7 +2,6 @@ use std;
 use std::io::Read;
 use std::fs::File;
 use std::io::prelude::*;
-use base64;
 use super::ImageFile;
 use meta::MangoImageMetadata;
 use compression;
@@ -10,6 +9,7 @@ use compression::CompressionType;
 use encryption;
 use encryption::EncryptionType;
 use serde_bytes;
+use json::base64Encoding;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct MangoImage {
