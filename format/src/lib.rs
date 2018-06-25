@@ -6,6 +6,7 @@ extern crate openssl;
 extern crate serde;
 extern crate serde_json;
 extern crate bson;
+extern crate serde_bytes;
 
 #[macro_use]
 extern crate serde_derive;
@@ -15,7 +16,7 @@ mod encryption;
 mod meta;
 mod image;
 mod file;
-mod bson_format;
+mod json;
 
 pub use compression::CompressionType;
 pub use encryption::EncryptionType;

@@ -9,9 +9,11 @@ use compression;
 use compression::CompressionType;
 use encryption;
 use encryption::EncryptionType;
+use serde_bytes;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct MangoImage {
+    #[serde(with = "serde_bytes")]
     data: Vec<u8>,
     meta: MangoImageMetadata,
 }
@@ -130,6 +132,7 @@ impl MangoImage {
         Ok(())
     }
 }
+
 
 #[cfg(test)]
 mod test {
