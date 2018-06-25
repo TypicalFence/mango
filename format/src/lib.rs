@@ -14,7 +14,7 @@ extern crate serde_derive;
 
 mod compression;
 mod encryption;
-mod meta;
+pub mod meta;
 mod image;
 mod file;
 mod json;

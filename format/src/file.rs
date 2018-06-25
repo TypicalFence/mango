@@ -7,20 +7,22 @@ use image::{ImageFile, MangoImage};
 use json::JsonMangoFile;
 use bson;
 use serde_cbor;
+use meta::MangoMetadata;
+
 
 /// Structure that represents a mango file.
 ///
 /// It can be used to create, save and modify the file format.
 #[derive(Serialize, Deserialize)]
 pub struct MangoFile {
-    name: String,
+    meta: MangoMetadata,
     images: Vec<MangoImage>,
 }
 
 impl MangoFile {
-    pub fn new(name: String) -> MangoFile {
+    pub fn new() -> MangoFile {
         MangoFile {
-            name: name,
+            meta: MangoMetadata::new(),
             images: Vec::new(),
         }
     }
@@ -46,7 +48,7 @@ impl MangoFile {
         let mut file = File::open(p)?;
         let mut bytes = Vec::new();
         file.read_to_end(&mut bytes);
-        
+
         let u  = serde_cbor::from_slice(&bytes)?;
 
         Ok(u)
@@ -69,8 +71,8 @@ impl MangoFile {
     pub fn save_json(&self, p:&Path) {
         JsonMangoFile::save(p, self);
     }
-    
-    pub fn save_cbor(&self, p: &Path) {        
+
+    pub fn save_cbor(&self, p: &Path) {
             let bytes = serde_cbor::to_vec(&self).unwrap();
             let mut f = File::create(p).unwrap();
             f.write_all(&bytes);
@@ -105,12 +107,16 @@ impl MangoFile {
         &mut self.images[index]
     }
 
-    pub fn get_name(&self) -> String {
-        return self.name.clone();
+    pub fn get_meta(&self) -> MangoMetadata {
+        self.meta.clone()
     }
 
-    pub fn set_name(&mut self, n: String) {
-        self.name = n;
+    pub fn get_meta_mut(&mut self) -> &mut MangoMetadata {
+        &mut self.meta
+    }
+
+    pub fn set_meta(&mut self, meta: MangoMetadata) {
+        self.meta = meta;
     }
 
     pub fn set_images(&mut self, imgs: Vec<MangoImage>) {
@@ -157,9 +163,8 @@ mod tests {
         let image = file.get_image_mut(0);
         image.save("test_unencrypted.jpg");
     }
-
-    #[test]
-    fn  save_cbor() {
+    
+    fn get_full_file() -> MangoFile {
         use compression::CompressionType;
         use encryption::EncryptionType;
         use image::{MangoImage, ImageFile};
@@ -169,20 +174,24 @@ mod tests {
         img.compress_mut(CompressionType::GZIP);
         img.encrypt_mut(EncryptionType::AES128, "1234567812345678".to_lowercase());
         file.add_image(img);
-        file.save_cbor(Path::new("teste.bson"));
+        file
+    }
+
+    #[test]
+    fn save_cbor() {
+        let file = get_full_file();
+        file.save_cbor(Path::new("save.cbor"));
     }
 
     #[test]
     fn  save_json() {
-        use compression::CompressionType;
-        use encryption::EncryptionType;
-        use image::{MangoImage, ImageFile};
+        let file = get_full_file();
+        file.save_json(Path::new("save.json"));
+    }
 
-        let mut file = MangoFile::new("test".to_string());
-        let mut img = MangoImage::from_file(&mut ImageFile::open(Path::new("test.jpg")).unwrap());
-        img.compress_mut(CompressionType::GZIP);
-        img.encrypt_mut(EncryptionType::AES128, "1234567812345678".to_lowercase());
-        file.add_image(img);
-        file.save_json(Path::new("teste.bson"));
+    #[test]
+    fn  save_bson() {
+        let file = get_full_file();
+        file.save_bson(Path::new("save.bson"));
     }
 }
