@@ -1,5 +1,4 @@
 use std::fmt;
-use base64;
 use openssl;
 use openssl::symm::Cipher;
 use openssl::rand::rand_bytes;

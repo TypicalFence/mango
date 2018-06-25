@@ -9,7 +9,6 @@ use compression::CompressionType;
 use encryption;
 use encryption::EncryptionType;
 use serde_bytes;
-use json::base64Encoding;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct MangoImage {

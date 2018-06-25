@@ -1,6 +1,5 @@
 use std::io::{Write, Read};
 use std::clone::Clone;
-use base64;
 use flate2;
 use flate2::write::GzEncoder;
 use flate2::read::GzDecoder;

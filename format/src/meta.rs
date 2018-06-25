@@ -62,8 +62,6 @@ impl Clone for ImageFileMetadata {
     }
 }
 
-use serde_bytes;
-
 #[derive(Serialize, Deserialize)]
 pub struct MangoImageMetadata {
     pub compression: Option<CompressionType>,
@@ -110,12 +108,44 @@ impl Clone for MangoImageMetadata {
     }
 }
 
-/*
-use std::convert::AsRef;
 
-impl AsRef<[u8]> for Option<Vec<u8>> {
-    fn as_ref(&self) -> &[u8] {
-        unimplemented!();
+#[derive(Serialize, Deserialize, Clone)]
+pub enum Language {
+    EN,
+    JP,
+    DE,
+    FR,
+    IT,
+    CN,
+    ES,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct MangoMetadata {
+    pub title: Option<String>,
+    pub author: Option<String>,
+    pub publisher: Option<String>,
+    pub source: Option<String>,
+    pub translation: Option<String>,
+    pub language: Option<Language>,
+    pub volume: Option<i16>,
+    pub chapter: Option<i16>,
+    pub year: Option<i16>,
+}
+
+impl MangoMetadata {
+    pub fn new() -> Self {
+        Self {
+            title: None,
+            author: None,
+            publisher: None,
+            source: None,
+            translation: None,
+            language: None,
+            volume: None,
+            chapter: None,
+            year: None,
+        }
     }
 }
-*/
+

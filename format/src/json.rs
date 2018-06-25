@@ -8,16 +8,17 @@ use super::{CompressionType, EncryptionType};
 use std::fs::File;
 use std::path::Path;
 use std::error::Error;
+use meta::MangoMetadata;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct JsonMangoFile {
-    pub name: String,
+    pub meta: MangoMetadata,
     images: Vec<Base64Image>,
 }
 
 impl JsonMangoFile {
-    fn new(name: String, images: Vec<Base64Image>) -> Self {
-        Self { name, images }
+    fn new(meta: MangoMetadata, images: Vec<Base64Image>) -> Self {
+        Self { meta, images }
     }
 
     pub fn get_images(&self) -> Vec<Base64Image> {
@@ -35,8 +36,9 @@ impl JsonMangoFile {
             mango_imgs.push(Base64Image::to_mango(image));
         }
 
-        let mut mango_file = MangoFile::new(img.name);
+        let mut mango_file = MangoFile::new();
         mango_file.set_images(mango_imgs);
+        mango_file.set_meta(img.meta);
 
         Ok(mango_file)
     }
@@ -50,7 +52,7 @@ impl JsonMangoFile {
         }
 
         let json_string =
-            serde_json::to_string_pretty(&JsonMangoFile::new(file.get_name(), base64_imgs))?;
+            serde_json::to_string_pretty(&JsonMangoFile::new(file.get_meta(), base64_imgs))?;
         let mut f = File::create(p)?;
         f.write_all(json_string.as_bytes())?;
         Ok(())
