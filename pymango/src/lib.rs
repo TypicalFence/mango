@@ -15,12 +15,12 @@ use pyo3::py::methods;
 use pyo3::py::class as pyclass;
 use pyo3::py::*;
 
-use mango_format::{MangoFile, Base64Image, ImageFile};
-use mango_format::Base64ImageMetadata;
+use mango_format::{MangoFile, MangoImage, ImageFile};
+use mango_format::MangoImageMetadata;
 
 #[pyclass]
 struct PyMangoImageMetadata {
-    meta: Base64ImageMetadata,
+    meta: MangoImageMetadata,
     token: PyToken,
 }
 
@@ -43,7 +43,7 @@ impl PyMangoImageMetadata {
 
 #[pyclass]
 struct PyMangoImage {
-    img: Base64Image,
+    img:MangoImage,
     token: PyToken,
 }
 
@@ -54,11 +54,11 @@ impl PyMangoImage {
     fn __new__(obj: &PyRawObject, path: String) -> PyResult<()> {
         let path = std::path::Path::new(&path);
         let mut img = ImageFile::open(path)?;
-        obj.init(|t|  PyMangoImage {img: Base64Image::from_file(&mut img), token: t})
+        obj.init(|t|  PyMangoImage {img: MangoImage::from_file(&mut img), token: t})
     }
 
     #[getter]
-    pub fn get_image_data(&self) -> PyResult<String> {
+    pub fn get_image_data(&self) -> PyResult<Vec<u8>> {
         Ok(self.img.get_image_data())
     }
 
@@ -91,7 +91,7 @@ impl PyMangoImage {
 }
 
 impl PyMangoImage {
-    pub fn get_base64_image(&self) -> Base64Image {
+    pub fn get_base64_image(&self) -> MangoImage {
         return self.img.clone()
     }
 }
@@ -107,7 +107,7 @@ impl PyMangoFile {
 
     #[new]
     fn __new__(obj: &PyRawObject, name: String) -> PyResult<()> {
-        obj.init(|t|  PyMangoFile {file: MangoFile::new(name), token: t})
+        obj.init(|t|  PyMangoFile {file: MangoFile::new(), token: t})
     }
 
     pub fn add_image_by_path(&mut self, path: String) -> PyResult<()> {
@@ -134,7 +134,7 @@ impl PyMangoFile {
         if img_option.is_none() {
             return Err(exc::IndexError::new("index does not exist"));
         }
-        let img: Base64Image = img_option.unwrap().clone();
+        let img: MangoImage = img_option.unwrap().clone();
         py.init(|token|  PyMangoImage {img, token})
     }
 }
