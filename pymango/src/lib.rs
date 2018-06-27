@@ -17,6 +17,38 @@ use pyo3::py::*;
 
 use mango_format::{MangoFile, MangoImage, ImageFile};
 use mango_format::MangoImageMetadata;
+use mango_format::meta::MangoMetadata;
+
+#[pyclass]
+struct PyMangoMetadata {
+    meta: MangoMetadata,
+    token: PyToken,
+}
+
+#[methods]
+impl PyMangoMetadata {
+    #[new]
+    fn __new__(obj: &PyRawObject, path: String) -> PyResult<()> {
+        obj.init(|t|  PyMangoMetadata {meta: MangoMetadata::new(), token: t})
+    }
+
+    #[getter]
+    fn get_author(&self) -> PyResult<Option<String>> {
+        Ok(self.meta.author.clone())
+    }
+
+    #[setter]
+    fn set_author(&mut self, value: Option<String>) -> PyResult<()> {
+        self.meta.author = value;
+        Ok(())
+    }
+}
+
+impl PyMangoMetadata {
+    pub fn get_meta(&self) -> MangoMetadata {
+        self.meta.clone()
+    }
+}
 
 #[pyclass]
 struct PyMangoImageMetadata {
@@ -39,6 +71,13 @@ impl PyMangoImageMetadata {
         }
     }
 
+    pub fn _get_compression(&self) -> PyResult<Option<String>>{
+        let encryption = self.meta.compression.clone();
+        match encryption {
+            Some(v) => Ok(Some(v.to_string())),
+            None => Ok(None),
+        }
+    }
 }
 
 #[pyclass]
@@ -79,7 +118,7 @@ impl PyMangoImage {
     }
 
     pub fn _get_meta_data(&self, py: Python) -> PyResult<Py<PyMangoImageMetadata>> {
-        let meta = self.img.get_meta();
+        let meta = self.img.get_meta().clone();
         py.init(|token|  PyMangoImageMetadata {meta, token})
     }
 
@@ -96,6 +135,9 @@ impl PyMangoImage {
     }
 }
 
+//------------------------------------------------------------------------------
+// MangoFile
+//------------------------------------------------------------------------------
 #[pyclass(subclass)]
 struct PyMangoFile {
     file: MangoFile,
@@ -104,9 +146,8 @@ struct PyMangoFile {
 
 #[methods]
 impl PyMangoFile {
-
     #[new]
-    fn __new__(obj: &PyRawObject, name: String) -> PyResult<()> {
+    fn __new__(obj: &PyRawObject) -> PyResult<()> {
         obj.init(|t|  PyMangoFile {file: MangoFile::new(), token: t})
     }
 
@@ -137,6 +178,19 @@ impl PyMangoFile {
         let img: MangoImage = img_option.unwrap().clone();
         py.init(|token|  PyMangoImage {img, token})
     }
+
+    #[getter]
+    pub fn get_meta(&self) -> PyResult<&PyMangoMetadata> {
+        let meta = self.file.get_meta_ref().clone();
+        self.token.py().init_ref(|token|  PyMangoMetadata {meta, token})
+    }
+
+    #[setter]
+    pub fn set_meta(&mut self, meta_ptr: Py<PyMangoMetadata>) -> PyResult<()> {
+        let meta: &PyMangoMetadata = meta_ptr.as_ref(self.token.py());
+        self.file.set_meta(meta.get_meta());
+        Ok(())
+    }
 }
 
 
@@ -145,6 +199,7 @@ impl PyMangoFile {
 fn init_mod(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyMangoFile>()?;
     m.add_class::<PyMangoImage>()?;
+    m.add_class::<PyMangoMetadata>()?;
     m.add_class::<PyMangoImageMetadata>()?;
     Ok(())
 }
