@@ -6,27 +6,11 @@ use std::ffi::{CStr, CString};
 use libc::c_char;
 use std::ptr;
 use mango_format::MangoFile;
-
-
-#[no_mangle]
-pub extern "C" fn kek(s: *mut c_char) -> *mut c_char {
-    s
-}
-
+use mango_format::MangoImage;
 
 #[no_mangle]
-pub extern "C" fn new_mango_file(s: *const c_char) -> *mut MangoFile {
-    if s.is_null() {
-        //panic!("uggu");
-        return ptr::null_mut();
-    }
-    let c_str = unsafe { CStr::from_ptr(s) };
-    if let Ok(name) = c_str.to_str() {
-        Box::into_raw(Box::new(MangoFile::new(name.to_string())))
-    } else {
-        //panic!("uggu");
-        return ptr::null_mut();
-    }
+pub extern "C" fn new_mango_file() -> *mut MangoFile {
+    Box::into_raw(Box::new(MangoFile::new()))
 }
 
 #[no_mangle]
@@ -41,29 +25,64 @@ pub extern "C" fn free_mangofile(pointer: *mut MangoFile) {
 }
 
 #[no_mangle]
-pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, path: String) {
+pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, path: *const c_char) {
     let mut file = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
-    file.add_image_by_path(Path::new(path.as_str()));
-}
-
-#[no_mangle]
-pub extern "C" fn mangofile_get_name(pointer: *mut MangoFile) -> *mut c_char {
-    let file = unsafe {
-        assert!(!pointer.is_null());
-        &*pointer
+    let c_str = unsafe {
+        CStr::from_ptr(path)
     };
-    let c_string = CString::new(file.get_name().clone()).unwrap();
-    c_string.into_raw()
+    let path_str  = c_str.to_str().unwrap();
+    file.add_image_by_path(Path::new(&path_str.to_owned()));
 }
 
 #[no_mangle]
-pub extern "C" fn mangofile_set_name(pointer: *mut MangoFile, name: String) {
-    let mut file = unsafe {
+pub extern "C" fn mangofile_get_image(pointer: *mut MangoFile, index: usize) -> *mut MangoImage {
+    let mut file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
-    file.set_name(name);
+    let img = file.get_image_mut(index);
+    let p_mut: *mut MangoImage = img;
+    p_mut
+}
+
+use mango_format::MangoImageMetadata;
+
+
+#[no_mangle]
+pub extern "C" fn mangoimg_get_meta(pointer: *mut MangoImage) -> *mut MangoImageMetadata {
+    let mut img: &mut MangoImage = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+    let meta = img.get_meta_mut();
+    let p_mut: *mut MangoImageMetadata = meta;
+    p_mut
+}
+
+
+#[no_mangle]
+pub extern "C" fn mangoimg_compress(pointer: *mut MangoImage) -> i8 {
+    let mut img: &mut MangoImage = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+    match img.compress_mut(mango_format::CompressionType::GZIP) {
+        true => 1,
+        false => 2,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn mangoimg_is_compressed(pointer: *mut MangoImage) -> i8 {
+    let mut img: &mut MangoImage = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+    match img.get_meta().compression.is_some() {
+        true => 1,
+        false => 0,
+    }
 }
