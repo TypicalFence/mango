@@ -3,15 +3,24 @@
 #include <stdint.h>
 #include <check.h>
 
-extern void * new_mango_file(char *);
-extern char * mangofile_get_name(void *);
+extern void * new_mango_file();
+extern void mangofile_add_image(void *, char *);
+extern void * mangofile_get_image(void *, int);
+extern int8_t mangoimg_compress(void *);
+extern int8_t mangoimg_is_compressed(void *);
 
 START_TEST(test_create) {
   void *file;
-  char *name;
-  file = new_mango_file("yay");
-  name = mangofile_get_name(file);
-  ck_assert_str_eq(name, "yay");
+  void *img;
+  file = new_mango_file();
+  mangofile_add_image(file, "test.jpg");
+
+  img = mangofile_get_image(file, 0);
+  mangoimg_compress(img);
+
+  img = mangofile_get_image(file, 0);
+  int8_t yay = mangoimg_is_compressed(img);
+  ck_assert(yay == 1);
 }
 END_TEST
 

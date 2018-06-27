@@ -36,6 +36,10 @@ impl MangoImage {
         self.meta.clone()
     }
 
+    pub fn get_meta_mut(&mut self) -> &mut MangoImageMetadata {
+        &mut self.meta
+    }
+
     pub fn get_image_data(&self) -> Vec<u8> {
         self.data.clone()
     }
