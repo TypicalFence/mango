@@ -19,6 +19,17 @@ impl Clone for CompressionType {
 }
 
 
+use std::fmt;
+
+impl fmt::Display for CompressionType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            CompressionType::GZIP => write!(f, "GZIP"),
+        }
+    }
+}
+
+
 pub fn compress(ctype: CompressionType, image: &MangoImage) -> MangoImage {
     match ctype {
         CompressionType::GZIP => gzip_compress(image)

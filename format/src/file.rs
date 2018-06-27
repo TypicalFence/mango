@@ -111,6 +111,10 @@ impl MangoFile {
         self.meta.clone()
     }
 
+    pub fn get_meta_ref(&self) -> &MangoMetadata {
+        &self.meta
+    }
+
     pub fn get_meta_mut(&mut self) -> &mut MangoMetadata {
         &mut self.meta
     }

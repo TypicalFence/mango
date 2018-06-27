@@ -9,4 +9,4 @@ pyo3 = "0.2"
 
 [lib]
 name = "_rust_pymango"
-crate-type = ["cdylib"]
+crate-type = ["dylib"]

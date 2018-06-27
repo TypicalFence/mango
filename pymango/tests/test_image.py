@@ -9,7 +9,6 @@ def test_checksum():
     img_sum = MangoImage.from_path("test.jpg").meta_data.checksum
     sys_proc = subprocess.run(["sha256sum", "test.jpg"], stdout=subprocess.PIPE)
     sys_sum = sys_proc.stdout.decode("utf-8").split(" ")[0]
-    
 
     print(img_sum)
     print(sys_sum)
