@@ -1,6 +1,8 @@
 extern crate mango_format;
 extern crate libc;
 
+mod util;
+
 use std::path::Path;
 use std::ffi::{CStr, CString};
 use libc::c_char;
@@ -231,7 +233,7 @@ pub extern "C" fn mangometa_set_translation(pointer: *mut MangoMetadata, value_p
     }
 }
 //----------------------------------------------------------------------------------------
-// Mango Imagemetadata
+// Mango Image
 //----------------------------------------------------------------------------------------
 use mango_format::MangoImageMetadata;
 
@@ -248,25 +250,45 @@ pub extern "C" fn mangoimg_get_meta(pointer: *mut MangoImage) -> *mut MangoImage
 
 
 #[no_mangle]
-pub extern "C" fn mangoimg_compress(pointer: *mut MangoImage) -> i8 {
+pub extern "C" fn mangoimg_compress(pointer: *mut MangoImage, value_pointer: *mut c_char) -> i8 {
     let mut img: &mut MangoImage = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
-    match img.compress_mut(mango_format::CompressionType::GZIP) {
-        true => 1,
-        false => 2,
+
+    if !value_pointer.is_null() {
+        let c_str = unsafe { CStr::from_ptr(value_pointer) };
+        if let Ok(value) = c_str.to_str() {
+            match util::to_comp_type(value.to_string()) {
+                Some(comptype) => {
+                    return match img.compress_mut(comptype) {
+                        true => 1,
+                        false => 2,
+                    }
+                },
+                None => {
+                    return 2;
+                },
+            }
+        }
     }
+
+    2
 }
 
+
+//----------------------------------------------------------------------------------------
+// Mango Imagemetadata
+//----------------------------------------------------------------------------------------
 #[no_mangle]
-pub extern "C" fn mangoimg_is_compressed(pointer: *mut MangoImage) -> i8 {
-    let mut img: &mut MangoImage = unsafe {
+pub extern "C" fn mangoimgmeta_compression(pointer: *mut MangoImageMetadata) -> *mut c_char {
+    let meta: &mut MangoImageMetadata = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
-    match img.get_meta().compression.is_some() {
-        true => 1,
-        false => 0,
+
+    match meta.compression.clone() {
+        Some(value) => CString::new(util::from_comp_type(value)).unwrap().into_raw(),
+        None => std::ptr::null_mut(),
     }
 }

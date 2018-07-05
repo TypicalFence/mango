@@ -12,11 +12,11 @@ START_TEST(test_compress) {
   mangofile_add_image(file, "test.jpg");
 
   img = mangofile_get_image(file, 0);
-  mangoimg_compress(img);
+  mangoimg_compress(img, "GZIP");
 
   img = mangofile_get_image(file, 0);
-  int8_t yay = mangoimg_is_compressed(img);
-  ck_assert(yay == 1);
+  char * compression = mangoimgmeta_compression(mangoimg_get_meta(img));
+  ck_assert(strcmp(compression, "GZIP") == 0);
 }
 END_TEST
 
