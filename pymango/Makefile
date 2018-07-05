@@ -9,4 +9,4 @@ clean:
 	pip3 uninstall pymango
 
 test: install
-	pytest -v
+	LD_LIBRARY_PATH=../formatInterface/target/release pytest -v
