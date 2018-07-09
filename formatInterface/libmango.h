@@ -10,11 +10,14 @@ extern MangoImage mangofile_get_image(MangoFile, int);
 extern MangoMeta mangofile_get_meta(MangoFile);
 
 // Mango Image
+extern MangoImage mangoimg_from_path(char *);
 extern int mangoimg_compress(MangoImage, char *);
+extern int mangoimg_uncompress(MangoImage);
 extern MangoImageMeta mangoimg_get_meta(MangoImage);
 
 // Mango Image Meta
 extern char * mangoimgmeta_compression(MangoImageMeta);
+extern char * mangoimgmeta_checksum(MangoImageMeta);
 
 // Mango Meta
 extern char * mangometa_get_title(MangoMeta);

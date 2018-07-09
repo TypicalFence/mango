@@ -232,9 +232,25 @@ pub extern "C" fn mangometa_set_translation(pointer: *mut MangoMetadata, value_p
         meta.translation = None;
     }
 }
+
 //----------------------------------------------------------------------------------------
 // Mango Image
 //----------------------------------------------------------------------------------------
+pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoImage {
+    if !value_pointer.is_null() {
+        let c_str = unsafe { CStr::from_ptr(value_pointer) };
+        if let Ok(value) = c_str.to_str() {
+            use mango_format::ImageFile;
+            // TODO this should only be temporary
+            let mut img = MangoImage::from_file(&mut ImageFile::open(std::path::Path::new(value)).unwrap());
+            let p_mut: *mut MangoImage = &mut img;
+            return p_mut;
+        }
+    }
+
+    std::ptr::null_mut()
+}
+
 use mango_format::MangoImageMetadata;
 
 #[no_mangle]
@@ -276,6 +292,18 @@ pub extern "C" fn mangoimg_compress(pointer: *mut MangoImage, value_pointer: *mu
     2
 }
 
+#[no_mangle]
+pub extern "C" fn mangoimg_uncompress(pointer: *mut MangoImage) -> i8 {
+    let mut img: &mut MangoImage = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    match img.uncompress_mut() {
+        true => 1,
+        false => 2,
+    }
+}
 
 //----------------------------------------------------------------------------------------
 // Mango Imagemetadata
@@ -291,4 +319,14 @@ pub extern "C" fn mangoimgmeta_compression(pointer: *mut MangoImageMetadata) -> 
         Some(value) => CString::new(util::from_comp_type(value)).unwrap().into_raw(),
         None => std::ptr::null_mut(),
     }
+}
+
+#[no_mangle]
+pub extern "C" fn mangoimgmeta_checksum(pointer: *mut MangoImageMetadata) -> *mut c_char {
+    let meta: &mut MangoImageMetadata = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    CString::new(meta.checksum.clone()).unwrap().into_raw()
 }
