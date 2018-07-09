@@ -4,7 +4,7 @@ use std::path::Path;
 use image::MangoImage;
 use meta::ImageFileMetadata;
 
-/// A struct that represents an image file.
+/// Structure that represents an image file.
 ///
 /// In most cases you should not need to use this struct yourself.
 /// I exposed it to the outside just in case.
