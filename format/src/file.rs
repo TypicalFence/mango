@@ -20,6 +20,7 @@ pub struct MangoFile {
 }
 
 impl MangoFile {
+    /// Creates a new Instance
     pub fn new() -> MangoFile {
         MangoFile {
             meta: MangoMetadata::new(),
@@ -27,8 +28,11 @@ impl MangoFile {
         }
     }
 
-    // TODO check  what error serde returns
+    
+    // TODO fix error
+    /// Opens a existing .mango file
     pub fn open(p: &Path) -> Result<MangoFile, Box<Error>> {
+        // TODO check if bson
         Self::open_cbor(&p)
     }
 
@@ -54,6 +58,7 @@ impl MangoFile {
         Ok(u)
     }
 
+    /// Saves a .mango file
     pub fn save(&self, p: &Path) {
         self.save_cbor(p);
     }
@@ -78,10 +83,14 @@ impl MangoFile {
             f.write_all(&bytes);
     }
 
+    /// Adds a MangoImage to the file
+    ///
+    /// use add_image_by_path for a neat shortcut
     pub fn add_image(&mut self, image: MangoImage) {
         self.images.push(image);
     }
 
+    /// Adds a MangoImage to the file by Path
     pub fn add_image_by_path(&mut self, p: &Path) -> Result<(), std::io::Error> {
         let mut image_file = ImageFile::open(p)?;
         self.images.push(
@@ -90,10 +99,12 @@ impl MangoFile {
         Ok(())
     }
 
+    /// Gets all images of the file
     pub fn get_images(&self) -> Vec<MangoImage> {
         self.images.clone()
     }
 
+    /// Gets one image of the file
     pub fn get_image(&self, index: usize) -> Option<&MangoImage> {
         if &self.images.len() -1 >= index {
 
@@ -103,26 +114,33 @@ impl MangoFile {
         None
     }
 
+    /// Gets a mutable image from the file
     pub fn get_image_mut(&mut self, index: usize) -> &mut MangoImage {
         &mut self.images[index]
     }
 
+    /// Gets a copy of the metadata of the file
     pub fn get_meta(&self) -> MangoMetadata {
         self.meta.clone()
     }
 
+    /// Gets a reference of the metadata of the file
     pub fn get_meta_ref(&self) -> &MangoMetadata {
         &self.meta
     }
 
+    /// Gets a mutable reference of the metadata of the file
     pub fn get_meta_mut(&mut self) -> &mut MangoMetadata {
         &mut self.meta
     }
 
+    // TODO is this really needed?
+    /// Sets a new Metadata object
     pub fn set_meta(&mut self, meta: MangoMetadata) {
         self.meta = meta;
     }
 
+    /// Sets the images of the file
     pub fn set_images(&mut self, imgs: Vec<MangoImage>) {
         self.images = imgs;
     }
@@ -135,7 +153,8 @@ mod tests {
     use std::path::Path;
 
     fn create() {
-        let mut file = MangoFile::new("test".to_string());
+        let mut file = MangoFile::new();
+        file.get_meta_mut().title = Some("test".to_string());
         file.add_image_by_path(Path::new("test.jpg"));
         file.save(Path::new("test.json"));
     }
@@ -144,13 +163,13 @@ mod tests {
     fn create_and_open() {
         create();
         let file = MangoFile::open(Path::new("test.json"));
-        assert_eq!(file.unwrap().name, "test");
+        assert_eq!(file.unwrap().get_meta().title, Some("test".to_string()));
     }
 
     // TODO move tests below to base64_image.rs
     #[test]
     fn encrypt() {
-        let mut file = MangoFile::new("test".to_string());
+        let mut file = MangoFile::new();
         file.add_image_by_path(Path::new("test.jpg"));
         let image = file.get_image_mut(0);
         let key = String::from("1234567812345678");
@@ -162,7 +181,7 @@ mod tests {
 
     #[test]
     fn save() {
-        let mut file = MangoFile::new("test".to_string());
+        let mut file = MangoFile::new();
         file.add_image_by_path(Path::new("test.jpg"));
         let image = file.get_image_mut(0);
         image.save("test_unencrypted.jpg");
@@ -173,7 +192,7 @@ mod tests {
         use encryption::EncryptionType;
         use image::{MangoImage, ImageFile};
 
-        let mut file = MangoFile::new("test".to_string());
+        let mut file = MangoFile::new();
         let mut img = MangoImage::from_file(&mut ImageFile::open(Path::new("test.jpg")).unwrap());
         img.compress_mut(CompressionType::GZIP);
         img.encrypt_mut(EncryptionType::AES128, "1234567812345678".to_lowercase());
