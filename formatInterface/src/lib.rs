@@ -31,14 +31,16 @@ pub extern "C" fn free_mangofile(pointer: *mut MangoFile) {
 }
 
 #[no_mangle]
-pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, path: *const c_char) {
+pub extern "C" fn mangofile_add_image_by_path(pointer: *mut MangoFile, path: *const c_char) {
     let mut file = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
+
     let c_str = unsafe {
         CStr::from_ptr(path)
     };
+
     let path_str  = c_str.to_str().unwrap();
     file.add_image_by_path(Path::new(&path_str.to_owned()));
 }
@@ -236,6 +238,7 @@ pub extern "C" fn mangometa_set_translation(pointer: *mut MangoMetadata, value_p
 //----------------------------------------------------------------------------------------
 // Mango Image
 //----------------------------------------------------------------------------------------
+#[no_mangle]
 pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoImage {
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
@@ -243,6 +246,7 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoIm
             use mango_format::ImageFile;
             // TODO this should only be temporary
             let mut img = MangoImage::from_file(&mut ImageFile::open(std::path::Path::new(value)).unwrap());
+            //println!("{}", img.clone().get_meta().checksum);
             let p_mut: *mut MangoImage = &mut img;
             return p_mut;
         }
@@ -327,6 +331,10 @@ pub extern "C" fn mangoimgmeta_checksum(pointer: *mut MangoImageMetadata) -> *mu
         assert!(!pointer.is_null());
         &mut *pointer
     };
-
-    CString::new(meta.checksum.clone()).unwrap().into_raw()
+    // TODO fix this
+    if meta.checksum.len() > 0 {
+        return CString::new(meta.checksum.clone()).unwrap().into_raw();
+    } else {
+        return CString::new("OH NO!".to_string()).unwrap().into_raw();
+    }
 }

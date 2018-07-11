@@ -5,7 +5,7 @@ typedef void * MangoMeta;
 
 // Mango File
 extern MangoFile new_mango_file();
-extern void mangofile_add_image(MangoFile, char *);
+extern void mangofile_add_image_by_path(MangoFile, char *);
 extern MangoImage mangofile_get_image(MangoFile, int);
 extern MangoMeta mangofile_get_meta(MangoFile);
 
