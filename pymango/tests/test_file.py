@@ -9,10 +9,10 @@ def test_meta_is_none():
 def test_set_meta():
     mango_file = MangoFile()
     # a = mango_file.meta.author
-    print(mango_file.meta)
-    mango_file.meta.author = "someone"
-    print(mango_file.meta.author)
-    assert mango_file.meta.author == "someone"
+    print(mango_file.meta_data)
+    mango_file.meta_data.author = "someone"
+    print(mango_file.meta_data.author)
+    assert mango_file.meta_data.author == "someone"
 
 
 def test_file():
@@ -22,9 +22,10 @@ def test_file():
     img.compress(CompressionType.GZIP)
     sum1 = img.meta_data.checksum
     sum2 = m.get_image(0).meta_data.checksum
-    print(sum1)
-    print(sum2)
-    print(img.meta_data.checksum)
+    #print(sum1)
+    #print(sum2)
+    #print(img.meta_data.checksum)
+    assert sum1 == sum2
      
-test_file()
+#test_file()
 #test_set_meta()

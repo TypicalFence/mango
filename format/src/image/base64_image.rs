@@ -174,6 +174,16 @@ mod test {
         assert_eq!(img.get_meta().compression.is_none(), true);
         assert_eq!(img.get_image_data(), clean_data);
     }
+
+    #[test]
+    fn check_sum() {
+        let p = std::path::Path::new("test.jpg");
+        let mut file = ImageFile::open(p).unwrap();
+
+        let mut img = MangoImage::from_file(&mut file);
+        //img.meta.checksum
+        assert_eq!(img.meta.checksum.len() > 0, true)
+    }
 }
 
 

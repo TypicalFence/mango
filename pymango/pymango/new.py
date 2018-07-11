@@ -15,6 +15,9 @@ class MangoFile(object):
         pointer = libmango.mangofile_get_image(self._pointer, index)
         return MangoImage(pointer)
 
+    def add_image_by_path(self, path):
+        # TODO check type of path
+        libmango.mangofile_add_image_by_path(self._pointer, path.encode("utf-8"))
 
 class MangoMetaData(object):
     def __init__(self, pointer):
@@ -35,12 +38,32 @@ class MangoMetaData(object):
 
     @title.setter
     def title(self, value):
-
         libmango.mangometa_set_title(self._pointer, value.encode("utf-8"))
+
+    @property
+    def author(self):
+        ptr = libmango.mangometa_get_author(self._pointer)
+        try:
+            value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
+        except:
+            value = None
+        finally:
+            # TODO free pointer here desu
+            pass
+
+        return value
+
+    @author.setter
+    def author(self, value):
+        libmango.mangometa_set_author(self._pointer, value.encode("utf-8"))
+
 
 class MangoImage(object):
     def __init__(self, pointer):
         self._pointer = pointer
+    
+    def from_path(path):
+        return MangoImage(libmango.mangoimg_from_path(path.encode("utf-8")))
 
     @property
     def meta_data(self):
@@ -57,7 +80,10 @@ class MangoImage(object):
         else:
             raise TypeError
 
-        libmango.mangoimg_compress(self._pointer, comp_type)
+        libmango.mangoimg_compress(self._pointer, comp_type.encode("utf-8"))
+
+    def uncompress(self):
+        libmango.gmangoimg_uncompress(self._pointer)
 
 class MangoImageMetadata(object):
     def __init__(self, pointer):
@@ -70,5 +96,16 @@ class MangoImageMetadata(object):
 
     @property
     def checksum(self):
-        checksum = libmango.mangoimgmeta_checksum(self._pointer)
+        ptr = libmango.mangoimgmeta_checksum(self._pointer)
+        try:
+            value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
+        except:
+            print("holy fucking shit")
+            value = None
+        finally:
+            # TODO free pointer here desu
+            pass
+
+        return value
+
         return checksum
