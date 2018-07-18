@@ -9,7 +9,7 @@ START_TEST(test_compress) {
   void *file;
   void *img;
   file = new_mango_file();
-  mangofile_add_image(file, "test.jpg");
+  mangofile_add_image_by_path(file, "test.jpg");
 
   img = mangofile_get_image(file, 0);
   mangoimg_compress(img, "GZIP");
