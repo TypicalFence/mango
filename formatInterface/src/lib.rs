@@ -254,8 +254,7 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoIm
             if file.is_ok() {
                 let mut img = file.unwrap().to_mango_image();
                 //println!("{}", img.clone().get_meta().checksum);
-                let p_mut: *mut MangoImage = &mut img;
-                return p_mut;
+                return Box::into_raw(Box::new(img));
             }
         }
     }
