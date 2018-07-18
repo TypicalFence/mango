@@ -243,12 +243,20 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoIm
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
         if let Ok(value) = c_str.to_str() {
+            use std::fs;
+            use std::error::Error;
+            let data = "Some data!";
+            fs::write("/tmp/foo", value).expect("Unable to write file");
+
             use mango_format::ImageFile;
-            // TODO this should only be temporary
-            let mut img = MangoImage::from_file(&mut ImageFile::open(std::path::Path::new(value)).unwrap());
-            //println!("{}", img.clone().get_meta().checksum);
-            let p_mut: *mut MangoImage = &mut img;
-            return p_mut;
+
+            let mut file = ImageFile::open(std::path::Path::new(value));
+            if file.is_ok() {
+                let mut img = file.unwrap().to_mango_image();
+                //println!("{}", img.clone().get_meta().checksum);
+                let p_mut: *mut MangoImage = &mut img;
+                return p_mut;
+            }
         }
     }
 
@@ -331,6 +339,8 @@ pub extern "C" fn mangoimgmeta_checksum(pointer: *mut MangoImageMetadata) -> *mu
         assert!(!pointer.is_null());
         &mut *pointer
     };
+    use std::fs;
+    fs::write("/tmp/sum", meta.checksum.clone()).expect("Unable to write file");
     // TODO fix this
     if meta.checksum.len() > 0 {
         return CString::new(meta.checksum.clone()).unwrap().into_raw();
