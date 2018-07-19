@@ -13,7 +13,7 @@ int main(void) {
 	MangoImage img  = mangoimg_from_path("test.jpg");
 
 	MangoImage meta = mangoimg_get_meta(img);
-	printf(mangoimgmeta_checksum(meta));
+	printf("%s\n", mangoimgmeta_checksum(meta));
 	
 	return 0;
 }

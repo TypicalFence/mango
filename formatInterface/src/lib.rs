@@ -262,6 +262,55 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoIm
     std::ptr::null_mut()
 }
 
+
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct ImageData {
+    pub pointer: *mut u8,
+    pub length: usize,
+}
+
+use std::slice;
+
+#[no_mangle]
+pub unsafe extern "C" fn mango_imagedata_free(bytes: ImageData) {
+    let ImageData { pointer, length } = bytes;
+
+    // Re-create the slice from the pointer and length. The cast is because we
+    // are working in terms of a raw pointer, not a mutable reference with the
+    // arbitrary lifetime it would come up with.
+    let slice = slice::from_raw_parts_mut(pointer, length) as *mut _;
+
+    // Re-create the boxed slice, and drop it. This will deallocate t he memory.
+    drop(Box::from_raw(slice));
+}
+
+#[no_mangle]
+pub extern "C" fn mangoimg_get_image_data(pointer: *mut MangoImage) -> ImageData {
+	let mut img: &mut MangoImage = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    // For simplicity, make the Vec into a boxed slice.
+    // This way we do not have to think of capacity and length separately.
+    // This is zero-cost if the global allocator is worth its salt.
+    let slice: Box<[u8]> = img.get_image_data().into_boxed_slice();
+
+    // Save the length now because otherwise we have to do it unsafely.
+    let length = slice.len();
+
+    // Retrieve the raw pointer from the boxed slice. The cast is because we cannot
+    // transmit a pointer to a slice (which has unstable ABI) to C, and we have the
+    // length anyway.
+    let pointer = Box::into_raw(slice) as *mut u8;
+	
+	ImageData {
+		pointer,
+		length,
+	}
+}
+
 use mango_format::MangoImageMetadata;
 
 #[no_mangle]
@@ -270,6 +319,7 @@ pub extern "C" fn mangoimg_get_meta(pointer: *mut MangoImage) -> *mut MangoImage
         assert!(!pointer.is_null());
         &mut *pointer
     };
+
     let meta = img.get_meta_mut();
     let p_mut: *mut MangoImageMetadata = meta;
     p_mut
