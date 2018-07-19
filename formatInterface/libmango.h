@@ -1,7 +1,14 @@
+#include <stdint.h>
+
 typedef void * MangoFile;
 typedef void * MangoImage;
 typedef void * MangoImageMeta;
 typedef void * MangoMeta;
+
+typedef struct ImageData {
+    uint8_t* pointer;
+    size_t length;
+} ImageData;
 
 // Mango File
 extern MangoFile new_mango_file();
@@ -14,6 +21,7 @@ extern MangoImage mangoimg_from_path(char *);
 extern int mangoimg_compress(MangoImage, char *);
 extern int mangoimg_uncompress(MangoImage);
 extern MangoImageMeta mangoimg_get_meta(MangoImage);
+extern ImageData mangoimg_get_image_data(MangoImage);
 
 // Mango Image Meta
 extern char * mangoimgmeta_compression(MangoImageMeta);
