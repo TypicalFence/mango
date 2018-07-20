@@ -15,6 +15,12 @@ class RustMangoImage(Structure):
 class RustMangoImageMetadata(Structure):
     pass
 
+class ImageData(Structure):
+	_fields_ = [("pointer", POINTER(c_ubyte)),
+				("length", c_size_t)]
+	
+	def __exit__(self, exc_type, exc_value, traceback):
+            libmango.mango_imagedata_free(self)
 
 # -----------------------------------------------------------------------------
 # Mango File
@@ -52,6 +58,12 @@ libmango.mangometa_set_title.restype = None
 # -----------------------------------------------------------------------------
 libmango.mangoimg_get_meta.argtypes = (POINTER(RustMangoImage),)
 libmango.mangoimg_get_meta.restype = POINTER(RustMangoImageMetadata)
+
+libmango.mangoimg_get_image_data.argtypes = (POINTER(RustMangoImage),)
+libmango.mangoimg_get_image_data.restype = ImageData
+
+libmango.mangoimg_get_base64_image_data.argtypes = (POINTER(RustMangoImage),)
+libmango.mangoimg_get_base64_image_data.restype = c_void_p
 
 libmango.mangoimg_compress.argtypes = (POINTER(RustMangoImage), c_char_p)
 libmango.mangoimg_compress.restype = c_bool

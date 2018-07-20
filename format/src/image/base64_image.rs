@@ -9,6 +9,7 @@ use compression::CompressionType;
 use encryption;
 use encryption::EncryptionType;
 use serde_bytes;
+use base64;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct MangoImage {
@@ -43,7 +44,11 @@ impl MangoImage {
     pub fn get_image_data(&self) -> Vec<u8> {
         self.data.clone()
     }
-
+	
+	pub fn get_base64_image_data(&self) -> String {
+		base64::encode(&self.data.clone())
+	}
+	
     pub fn compress(&self, comp: CompressionType) -> Option<MangoImage> {
         if self.meta.encryption.is_none()  && self.meta.compression.is_none() {
             return Some(compression::compress(comp, self));
