@@ -81,6 +81,13 @@ libmango.mangoimg_from_path.restype = POINTER(RustMangoImage)
 libmango.mangoimgmeta_compression.argtypes = (POINTER(RustMangoImageMetadata),)
 libmango.mangoimgmeta_compression.restype = c_char_p
 
+libmango.mangoimgmeta_encryption.argtypes = (POINTER(RustMangoImageMetadata),)
+libmango.mangoimgmeta_encryption.restype = c_char_p
+
+libmango.mangoimgmeta_compression.argtypes = (POINTER(RustMangoImageMetadata),)
+libmango.mangoimgmeta_compression.restype = c_char_p
+
+
 # char * mangoimgmeta_checksum(MangoImageMeta);
 libmango.mangoimgmeta_checksum.argtypes = (POINTER(RustMangoImageMetadata),)
 libmango.mangoimgmeta_checksum.restype = c_void_p # char_p

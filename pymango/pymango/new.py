@@ -106,7 +106,18 @@ class MangoImageMetadata(object):
     @property
     def compression(self):
         comp_type = libmango.mangoimgmeta_compression(self._pointer)
-        return CompressionType(comp_type)
+        if comp_type is not None:
+            return CompressionType(comp_type)
+        else:
+            return None
+    
+    @property
+    def encryption(self):
+        enc_type = libmango.mangoimgmeta_encryption(self._pointer)
+        if enc_type is not None:
+            return EncryptionType(enc_type)
+        else:
+            return None
 
     @property
     def checksum(self):

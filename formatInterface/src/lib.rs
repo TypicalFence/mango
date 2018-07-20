@@ -394,6 +394,19 @@ pub extern "C" fn mangoimgmeta_compression(pointer: *mut MangoImageMetadata) -> 
 }
 
 #[no_mangle]
+pub extern "C" fn mangoimgmeta_encryption(pointer: *mut MangoImageMetadata) -> *mut c_char {
+    let meta: &mut MangoImageMetadata = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    match meta.encryption.clone() {
+        Some(value) => CString::new(util::from_enc_type(value)).unwrap().into_raw(),
+        None => std::ptr::null_mut(),
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn mangoimgmeta_checksum(pointer: *mut MangoImageMetadata) -> *mut c_char {
     let meta: &mut MangoImageMetadata = unsafe {
         assert!(!pointer.is_null());
