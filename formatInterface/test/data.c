@@ -10,6 +10,7 @@ int main(void) {
 	
 	uint8_t* it  = data.pointer;
 	uint8_t* ite = it + data.length;
+	printf("%ld\n", data.length);
 
 	for(; it != ite; ++it) {
 		printf("%i", (uint32_t)*it);

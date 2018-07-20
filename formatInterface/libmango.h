@@ -22,6 +22,7 @@ extern int mangoimg_compress(MangoImage, char *);
 extern int mangoimg_uncompress(MangoImage);
 extern MangoImageMeta mangoimg_get_meta(MangoImage);
 extern ImageData mangoimg_get_image_data(MangoImage);
+extern char * mangoimg_get_base64_image_data(MangoImage);
 
 // Mango Image Meta
 extern char * mangoimgmeta_compression(MangoImageMeta);

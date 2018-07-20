@@ -311,6 +311,17 @@ pub extern "C" fn mangoimg_get_image_data(pointer: *mut MangoImage) -> ImageData
 	}
 }
 
+
+#[no_mangle]
+pub extern "C" fn mangoimg_get_base64_image_data(pointer: *mut MangoImage) -> *mut c_char {
+    let img: &mut MangoImage = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+    
+    CString::new(img.get_base64_image_data()).unwrap().into_raw() 
+}
+
 use mango_format::MangoImageMetadata;
 
 #[no_mangle]

@@ -1,3 +1,4 @@
+import base64
 import ctypes
 from pymango.c import libmango
 from pymango.enums import CompressionType, EncryptionType
@@ -70,6 +71,19 @@ class MangoImage(object):
         pointer = libmango.mangoimg_get_meta(self._pointer)
         return MangoImageMetadata(pointer)
 
+    @property
+    def image_data(self):
+        ptr = libmango.mangoimg_get_base64_image_data(self._pointer)
+        try:
+            value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
+        except:
+            value = None
+        
+        if value is not None:
+            value = base64.b64decode(value) 
+
+        return value
+
     def compress(self, ctype):
         comp_type = None
 
@@ -83,7 +97,7 @@ class MangoImage(object):
         libmango.mangoimg_compress(self._pointer, comp_type.encode("utf-8"))
 
     def uncompress(self):
-        libmango.gmangoimg_uncompress(self._pointer)
+        libmango.mangoimg_uncompress(self._pointer)
 
 class MangoImageMetadata(object):
     def __init__(self, pointer):
