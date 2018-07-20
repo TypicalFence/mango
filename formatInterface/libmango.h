@@ -26,6 +26,7 @@ extern char * mangoimg_get_base64_image_data(MangoImage);
 
 // Mango Image Meta
 extern char * mangoimgmeta_compression(MangoImageMeta);
+extern char * mangoimgmeta_encryption(MangoImageMeta);
 extern char * mangoimgmeta_checksum(MangoImageMeta);
 
 // Mango Meta

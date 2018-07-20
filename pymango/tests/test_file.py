@@ -4,7 +4,7 @@ from pymango import MangoImage, EncryptionType, CompressionType, MangoFile
 def test_meta_is_none(): 
     mango_file = MangoFile()
 
-    assert mango_file.meta.author is  None
+    assert mango_file.meta_data.author is  None
 
 def test_set_meta():
     mango_file = MangoFile()
