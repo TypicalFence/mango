@@ -1,10 +1,10 @@
 [package]
-name = "formatInterface"
+name = "libmango"
 version = "0.1.0"
 authors = ["Alex Fence <alexfence.code@gmail.com>"]
 
 [dependencies]
-"mango-format" = { path = "../format"}
+"mangofmt" = { path = "../mangofmt"}
 libc = "0.2.26"
 
 [lib]

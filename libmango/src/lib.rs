@@ -1,4 +1,4 @@
-extern crate mango_format;
+extern crate mangofmt;
 extern crate libc;
 
 mod util;
@@ -7,9 +7,9 @@ use std::path::Path;
 use std::ffi::{CStr, CString};
 use libc::c_char;
 use std::ptr;
-use mango_format::MangoFile;
-use mango_format::MangoImage;
-use mango_format::meta::MangoMetadata;
+use mangofmt::MangoFile;
+use mangofmt::MangoImage;
+use mangofmt::meta::MangoMetadata;
 
 //----------------------------------------------------------------------------------------
 // Mango File
@@ -248,7 +248,7 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoIm
             let data = "Some data!";
             fs::write("/tmp/foo", value).expect("Unable to write file");
 
-            use mango_format::ImageFile;
+            use mangofmt::ImageFile;
 
             let mut file = ImageFile::open(std::path::Path::new(value));
             if file.is_ok() {
@@ -322,7 +322,7 @@ pub extern "C" fn mangoimg_get_base64_image_data(pointer: *mut MangoImage) -> *m
     CString::new(img.get_base64_image_data()).unwrap().into_raw() 
 }
 
-use mango_format::MangoImageMetadata;
+use mangofmt::MangoImageMetadata;
 
 #[no_mangle]
 pub extern "C" fn mangoimg_get_meta(pointer: *mut MangoImage) -> *mut MangoImageMetadata {

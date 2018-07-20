@@ -1,5 +1,5 @@
 rust:
-	cargo build
+	cd  ../libmango && cargo build
 
 install: rust
 	pip3 install -e . --user
@@ -8,5 +8,5 @@ clean:
 	cargo clean
 	pip3 uninstall pymango
 
-test: install
-	LD_LIBRARY_PATH=../formatInterface/target/release pytest -v
+test:
+	LD_LIBRARY_PATH=../libmango/target/debug pytest -v
