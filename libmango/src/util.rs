@@ -1,5 +1,5 @@
-use mango_format::CompressionType;
-use mango_format::EncryptionType;
+use mangofmt::CompressionType;
+use mangofmt::EncryptionType;
 
 pub fn to_comp_type(value: String) -> Option<CompressionType> {
     match value.as_ref() {

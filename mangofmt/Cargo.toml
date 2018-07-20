@@ -1,5 +1,5 @@
 [package]
-name = "mango-format"
+name = "mangofmt"
 version = "0.1.0"
 authors = ["Alex Fence <alexfence.code@gmail.com>"]
 
