@@ -99,14 +99,53 @@ START_TEST(test_set_source) {
 }
 END_TEST
 
+// Save
+START_TEST(test_save) {
+  MangoFile file;
+  MangoImage img;
+  
+  file = new_mango_file();
+  mangofile_add_image_by_path(file, "test.jpg");
+
+  mangofile_save(file, "testfile.mango");
+
+  // check if the file was created
+  FILE * created_file;
+  created_file = fopen("testfile.mango", "r");
+
+  ck_assert(created_file != NULL);
+}
+END_TEST
+
+START_TEST(test_save_json) {
+  MangoFile file;
+  MangoImage img;
+  
+  file = new_mango_file();
+  mangofile_add_image_by_path(file, "test.jpg");
+
+  mangofile_save_json(file, "testfile.json");
+
+  // check if the file was created
+  FILE * created_file;
+  created_file = fopen("testfile.json", "r");
+
+  ck_assert(created_file != NULL);
+}
+END_TEST
+
 Suite * mango_suite(void) {
 	Suite *s;
 	TCase *tc_core;
+	TCase *tc_io;
 	
 
 	s = suite_create("Mango");
+	
 	tc_core = tcase_create("Core");
-
+	tc_io = tcase_create("IO");
+	
+	// Core
 	tcase_add_test(tc_core, test_compress);
 	tcase_add_test(tc_core, test_set_null);
 	tcase_add_test(tc_core, test_set_title);
@@ -115,10 +154,18 @@ Suite * mango_suite(void) {
 
 	tcase_add_test(tc_core, test_set_source);
 	tcase_add_test(tc_core, test_set_translation);
+	
+	// IO
+	tcase_add_test(tc_io, test_save);
+	tcase_add_test(tc_io, test_save_json);
+	
+	// add cases to suites
 	suite_add_tcase(s, tc_core);
+	suite_add_tcase(s, tc_io);
 
 	return s;
 }
+
 
 int main(void) {
 	int number_failed;

@@ -68,6 +68,68 @@ pub extern "C" fn mangofile_get_meta(pointer: *mut MangoFile) -> *mut MangoMetad
     p_mut
 }
 
+// Save
+#[no_mangle]
+pub extern "C" fn mangofile_save(pointer: *mut MangoFile, path_pointer: *mut c_char) {
+    let mut file: &mut MangoFile = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    if !path_pointer.is_null() {
+        let c_str = unsafe { CStr::from_ptr(path_pointer) };
+        if let Ok(value) = c_str.to_str() {
+            file.save(std::path::Path::new(value))
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn mangofile_save_cbor(pointer: *mut MangoFile, path_pointer: *mut c_char) {
+    let mut file: &mut MangoFile = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    if !path_pointer.is_null() {
+        let c_str = unsafe { CStr::from_ptr(path_pointer) };
+        if let Ok(value) = c_str.to_str() {
+            file.save_cbor(std::path::Path::new(value))
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn mangofile_save_bson(pointer: *mut MangoFile, path_pointer: *mut c_char) {
+    let mut file: &mut MangoFile = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+    if !path_pointer.is_null() {
+        let c_str = unsafe { CStr::from_ptr(path_pointer) };
+        if let Ok(value) = c_str.to_str() {
+            file.save_bson(std::path::Path::new(value))
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn mangofile_save_json(pointer: *mut MangoFile, path_pointer: *mut c_char) {
+    let mut file: &mut MangoFile = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    if !path_pointer.is_null() {
+        let c_str = unsafe { CStr::from_ptr(path_pointer) };
+        if let Ok(value) = c_str.to_str() {
+            file.save_json(std::path::Path::new(value))
+        }
+    }
+}
+
+// Open
+
 //----------------------------------------------------------------------------------------
 // Mango File Metadata
 //----------------------------------------------------------------------------------------
