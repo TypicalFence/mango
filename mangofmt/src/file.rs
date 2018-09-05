@@ -3,6 +3,7 @@ use std::error::Error;
 use std::path::Path;
 use std::fs::File;
 use std::io::prelude::*;
+use std::io;
 use image::{ImageFile, MangoImage};
 use json::JsonMangoFile;
 use bson;
@@ -28,12 +29,31 @@ impl MangoFile {
         }
     }
 
-    
     // TODO fix error
     /// Opens a existing .mango file
     pub fn open(p: &Path) -> Result<MangoFile, Box<Error>> {
-        // TODO check if bson
-        Self::open_cbor(&p)
+        // try to open the default format cbor
+        let cbor_file = Self::open_cbor(&p);
+        if cbor_file.is_ok() {
+            return cbor_file;
+        }
+
+        // try bson as a fallback
+        let bson_file = Self::open_bson(&p);
+        if bson_file.is_ok() {
+            return bson_file;
+        }
+
+        // open json, should the support for this dropped?
+        let json_file = Self::open_json(&p);
+        if json_file.is_ok() {
+            return json_file;
+        }
+
+        let error = io::Error::new(io::ErrorKind::InvalidInput,
+                                   "file is not a  MangoFile");
+
+        Err(Box::new(error))
     }
 
     pub fn open_bson(p: &Path) -> Result<MangoFile, Box<Error>> {
@@ -60,6 +80,8 @@ impl MangoFile {
 
     /// Saves a .mango file
     pub fn save(&self, p: &Path) {
+        // use cbor as the default format
+        // (lowest overhead)
         self.save_cbor(p);
     }
 
@@ -186,7 +208,7 @@ mod tests {
         let image = file.get_image_mut(0);
         image.save("test_unencrypted.jpg");
     }
-    
+
     fn get_full_file() -> MangoFile {
         use compression::CompressionType;
         use encryption::EncryptionType;
