@@ -4,6 +4,7 @@
 #include <check.h>
 #include <string.h>
 #include "../libmango.h"
+#include "test.h"
 
 START_TEST(test_compress) {
     void *file;
@@ -114,6 +115,9 @@ START_TEST(test_save) {
     created_file = fopen("testfile.mango", "r");
 
     ck_assert(created_file != NULL);
+
+    // remove file
+    remove("testfile.mango");
 }
 END_TEST
 
@@ -131,16 +135,19 @@ START_TEST(test_save_json) {
     created_file = fopen("testfile.json", "r");
 
     ck_assert(created_file != NULL);
+    
+    // remove file
+    remove("testfile.json");
 }
 END_TEST
 
-Suite * mango_suite(void) {
+Suite * file_suite(void) {
     Suite *s;
     TCase *tc_core;
     TCase *tc_io;
 
 
-    s = suite_create("Mango");
+    s = suite_create("MangoFile");
 
     tc_core = tcase_create("Core");
     tc_io = tcase_create("IO");
@@ -166,17 +173,6 @@ Suite * mango_suite(void) {
     return s;
 }
 
-
-int main(void) {
-    int number_failed;
-    Suite *s;
-    SRunner *sr;
-
-    s = mango_suite();
-    sr = srunner_create(s);
-
-    srunner_run_all(sr, CK_NORMAL);
-    number_failed = srunner_ntests_failed(sr);
-    srunner_free(sr);
-    return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+Suite * make_file_suite() {
+    return file_suite();
 }
