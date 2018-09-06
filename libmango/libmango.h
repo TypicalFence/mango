@@ -22,6 +22,8 @@ extern void mangofile_save(MangoFile, char *);
 extern void mangofile_save_cbor(MangoFile, char *);
 extern void mangofile_save_bson(MangoFile, char *);
 extern void mangofile_save_json(MangoFile, char *);
+// open
+extern MangoFile mangofile_open(char *);
 
 // --------------------------
 // Mango Image

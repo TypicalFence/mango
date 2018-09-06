@@ -129,7 +129,20 @@ pub extern "C" fn mangofile_save_json(pointer: *mut MangoFile, path_pointer: *mu
 }
 
 // Open
+#[no_mangle]
+pub extern "C" fn mangofile_open(path_pointer: *mut c_char) -> *mut MangoFile {
+    if !path_pointer.is_null() {
+        let c_str = unsafe { CStr::from_ptr(path_pointer) };
+        if let Ok(path) = c_str.to_str() {
+            let file = MangoFile::open(Path::new(path));
+            if file.is_ok() {
+                Box::into_raw(Box::new(file.unwrap()));
+            }
+        }
+    }
 
+    std::ptr::null_mut()
+}
 //----------------------------------------------------------------------------------------
 // Mango File Metadata
 //----------------------------------------------------------------------------------------
@@ -366,11 +379,11 @@ pub extern "C" fn mangoimg_get_image_data(pointer: *mut MangoImage) -> ImageData
     // transmit a pointer to a slice (which has unstable ABI) to C, and we have the
     // length anyway.
     let pointer = Box::into_raw(slice) as *mut u8;
-	
-	ImageData {
-		pointer,
-		length,
-	}
+
+    ImageData {
+		    pointer,
+        length,
+	  }
 }
 
 
@@ -380,8 +393,8 @@ pub extern "C" fn mangoimg_get_base64_image_data(pointer: *mut MangoImage) -> *m
         assert!(!pointer.is_null());
         &mut *pointer
     };
-    
-    CString::new(img.get_base64_image_data()).unwrap().into_raw() 
+
+    CString::new(img.get_base64_image_data()).unwrap().into_raw()
 }
 
 use mangofmt::MangoImageMetadata;
