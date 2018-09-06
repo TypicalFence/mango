@@ -136,7 +136,7 @@ pub extern "C" fn mangofile_open(path_pointer: *mut c_char) -> *mut MangoFile {
         if let Ok(path) = c_str.to_str() {
             let file = MangoFile::open(Path::new(path));
             if file.is_ok() {
-                Box::into_raw(Box::new(file.unwrap()));
+                return Box::into_raw(Box::new(file.unwrap()));
             }
         }
     }

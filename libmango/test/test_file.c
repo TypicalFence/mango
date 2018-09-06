@@ -161,7 +161,8 @@ START_TEST(test_open) {
     img = mangofile_get_image(file, 0);
     char * checksum_after = mangoimgmeta_checksum(mangoimg_get_meta(img));
     
-    ck_assert(strcmp(checksum_before, checksum_after) == 1);
+    // strcmp returns 0 when the strings are equal!
+    ck_assert(strcmp(checksum_before, checksum_after) == 0);
     
     remove("testfile.mango"); 
 }
