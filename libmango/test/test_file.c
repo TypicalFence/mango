@@ -141,6 +141,32 @@ START_TEST(test_save_json) {
 }
 END_TEST
 
+// Open
+START_TEST(test_open) {
+    MangoFile file;
+    MangoImage img;
+
+    file = new_mango_file();
+    mangofile_add_image_by_path(file, "test.jpg");
+    
+    img = mangofile_get_image(file, 0);
+    char * checksum_before = mangoimgmeta_checksum(mangoimg_get_meta(img));
+
+    mangofile_save(file, "testfile.mango");
+    
+    file = NULL;
+    img = NULL;
+
+    file = mangofile_open("testfile.mango");
+    img = mangofile_get_image(file, 0);
+    char * checksum_after = mangoimgmeta_checksum(mangoimg_get_meta(img));
+    
+    ck_assert(strcmp(checksum_before, checksum_after) == 1);
+    
+    remove("testfile.mango"); 
+}
+END_TEST
+
 Suite * file_suite(void) {
     Suite *s;
     TCase *tc_core;
@@ -165,6 +191,7 @@ Suite * file_suite(void) {
     // IO
     tcase_add_test(tc_io, test_save);
     tcase_add_test(tc_io, test_save_json);
+    tcase_add_test(tc_io, test_open);
 
     // add cases to suites
     suite_add_tcase(s, tc_core);
