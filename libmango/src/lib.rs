@@ -20,7 +20,7 @@ pub extern "C" fn new_mango_file() -> *mut MangoFile {
 }
 
 #[no_mangle]
-pub extern "C" fn free_mangofile(pointer: *mut MangoFile) {
+pub extern "C" fn mangofile_free(pointer: *mut MangoFile) {
     if pointer.is_null() {
         return;
     }
@@ -46,6 +46,21 @@ pub extern "C" fn mangofile_add_image_by_path(pointer: *mut MangoFile, path: *co
 }
 
 #[no_mangle]
+pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, img_pointer: *mut MangoImage) {
+    let mut file = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+    let mut img = unsafe {
+        assert!(!img_pointer.is_null());
+        &mut *img_pointer
+    };
+
+    file.add_image(img.clone());
+
+}
+
+#[no_mangle]
 pub extern "C" fn mangofile_get_image(pointer: *mut MangoFile, index: usize) -> *mut MangoImage {
     let mut file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
@@ -54,6 +69,38 @@ pub extern "C" fn mangofile_get_image(pointer: *mut MangoFile, index: usize) -> 
     let img = file.get_image_mut(index);
     let p_mut: *mut MangoImage = img;
     p_mut
+}
+
+#[no_mangle]
+pub extern "C" fn mangofile_set_image(file_pointer: *mut MangoFile, img_pointer: *mut MangoImage, index: usize) -> usize {
+    let mut file: &mut MangoFile = unsafe {
+        assert!(!file_pointer.is_null());
+        &mut *file_pointer
+    };
+
+    let mut img: &mut MangoImage = unsafe {
+        assert!(!img_pointer.is_null());
+        &mut *img_pointer
+    };
+
+    let mut imgs = file.get_images();
+    if index == 0 || index <= imgs.len() -1 {
+        imgs[index] = img.clone();
+        return 1;
+    }
+
+    0
+}
+
+#[no_mangle]
+pub extern "C" fn mangofile_get_image_count(pointer: *mut MangoFile) -> usize {
+    let mut file: &mut MangoFile = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    let imgs = file.get_images();
+    imgs.len()
 }
 
 
@@ -143,6 +190,7 @@ pub extern "C" fn mangofile_open(path_pointer: *mut c_char) -> *mut MangoFile {
 
     std::ptr::null_mut()
 }
+
 //----------------------------------------------------------------------------------------
 // Mango File Metadata
 //----------------------------------------------------------------------------------------
@@ -313,6 +361,18 @@ pub extern "C" fn mangometa_set_translation(pointer: *mut MangoMetadata, value_p
 //----------------------------------------------------------------------------------------
 // Mango Image
 //----------------------------------------------------------------------------------------
+#[no_mangle]
+pub extern "C" fn mangoimg_free(pointer: *mut MangoImage) {
+    // make sure memory will only be freed once
+    if pointer.is_null() {
+        return;
+    }
+
+    unsafe {
+        Box::from_raw(pointer);
+    }
+}
+
 #[no_mangle]
 pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoImage {
     if !value_pointer.is_null() {
