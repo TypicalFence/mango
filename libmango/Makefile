@@ -5,7 +5,7 @@ TEST_SRC := $(shell find ./test -name '*.c')
 
 build: rust
 
-clean: rust_clean examples_clean test_clean
+clean: rust_clean examples_clean test_clean docs_clean
 
 rust:
 	cargo build
@@ -31,4 +31,9 @@ test_clean:
 test/run_tests: rust $(TEST_SRC)
 	gcc -o test/run_tests $(TEST_SRC) -Isrc -L. -l:./target/debug/libmango.so $(shell pkg-config --cflags --libs check)
 
+documentation:
+	cd docs && doxygen
+
+docs_clean:
+	rm -rf docs/html
 
