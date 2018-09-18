@@ -6,6 +6,7 @@ mod util;
 use std::path::Path;
 use std::ffi::{CStr, CString};
 use libc::c_char;
+use libc::c_uint;
 use std::ptr;
 use mangofmt::MangoFile;
 use mangofmt::MangoImage;
@@ -556,3 +557,46 @@ pub extern "C" fn mangoimgmeta_checksum(pointer: *mut MangoImageMetadata) -> *mu
         return CString::new("OH NO!".to_string()).unwrap().into_raw();
     }
 }
+
+#[no_mangle]
+pub  extern "C" fn mangoimgmeta_mime(pointer: *mut MangoImageMetadata) -> *mut c_char {
+    let meta: &mut MangoImageMetadata = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    let mime_str = util::from_mime(meta.mime);
+
+    CString::new(mime_str).unwrap().into_raw()
+}
+
+#[no_mangle]
+pub extern "C" fn mangoimgmeta_filename(pointer: *mut MangoImageMetadata) -> *mut c_char {
+    let meta: &mut MangoImageMetadata = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    CString::new(meta.filename.clone()).unwrap().into_raw()
+}
+
+
+/*
+#[no_mangle]
+pub extern "C" fn mangoimgmeta_iv(pointer: *mut MangoImageMetadata) -> *mut c_uint {
+    let meta: &mut MangoImageMetadata = unsafe {
+        assert!(!pointer.is_null());
+        &mut *pointer
+    };
+
+    let iv = meta.iv.unwrap();
+    let c_iv_vec: Vec<c_uint> = Vec::new();
+
+    // convert to c_uint
+    for byte in iv {
+        c_iv_vec.push(byte as c_uint);
+    }
+
+    c_iv_vec.as_slice().into_raw()
+}
+*/
