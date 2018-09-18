@@ -2,3 +2,7 @@
     width: 85%;
     margin: 0 auto !important;
 }
+
+ .memname tr {
+    float: left;
+ }
