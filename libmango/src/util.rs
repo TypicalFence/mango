@@ -1,5 +1,6 @@
 use mangofmt::CompressionType;
 use mangofmt::EncryptionType;
+use mangofmt::Mime;
 
 pub fn to_comp_type(value: String) -> Option<CompressionType> {
     match value.as_ref() {
@@ -18,5 +19,12 @@ pub fn from_enc_type(value: EncryptionType) -> String {
     match value {
         EncryptionType::AES256 => "AES256".to_string(),
         EncryptionType::AES128 => "AES128".to_string(),
+    }
+}
+
+pub fn from_mime(value: Mime) -> String {
+    match value {
+        Mime::JPEG => "JPEG".to_string(),
+        Mime::PNG => "PNG".to_string(),
     }
 }

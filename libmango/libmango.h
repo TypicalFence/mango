@@ -52,9 +52,8 @@ extern char * mangoimg_get_base64_image_data(MangoImage);
 extern char * mangoimgmeta_compression(MangoImageMeta);
 extern char * mangoimgmeta_encryption(MangoImageMeta);
 extern char * mangoimgmeta_checksum(MangoImageMeta);
-// TODO
-// extern char * mangoimgmeta_mime(MangoImageMeta);)
-// extern char * mangoimgmeta_filename(MangoImageMeta);)
+extern char * mangoimgmeta_mime(MangoImageMeta);
+extern char * mangoimgmeta_filename(MangoImageMeta);
 // extern int  * mangoimgmeta_iv(MangoImageMeta);)
 
 // --------------------------
