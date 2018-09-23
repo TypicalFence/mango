@@ -581,22 +581,8 @@ pub extern "C" fn mangoimgmeta_filename(pointer: *mut MangoImageMetadata) -> *mu
 }
 
 
-/*
 #[no_mangle]
-pub extern "C" fn mangoimgmeta_iv(pointer: *mut MangoImageMetadata) -> *mut c_uint {
-    let meta: &mut MangoImageMetadata = unsafe {
-        assert!(!pointer.is_null());
-        &mut *pointer
-    };
-
-    let iv = meta.iv.unwrap();
-    let c_iv_vec: Vec<c_uint> = Vec::new();
-
-    // convert to c_uint
-    for byte in iv {
-        c_iv_vec.push(byte as c_uint);
-    }
-
-    c_iv_vec.as_slice().into_raw()
+pub extern "C" fn mangoimgmeta_iv(meta: &MangoImageMetadata) -> *const u8 {
+    meta.iv.as_ref().map_or(std::ptr::null_mut(), |iv| iv.as_ptr())
 }
-*/
+
