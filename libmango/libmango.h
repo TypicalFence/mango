@@ -114,7 +114,7 @@ extern char * mangoimgmeta_encryption(MangoImageMeta);
 extern char * mangoimgmeta_checksum(MangoImageMeta);
 extern char * mangoimgmeta_mime(MangoImageMeta);
 extern char * mangoimgmeta_filename(MangoImageMeta);
-// extern int  * mangoimgmeta_iv(MangoImageMeta);)
+extern int  * mangoimgmeta_iv(MangoImageMeta);
 
 // --------------------------
 // Mango Meta
