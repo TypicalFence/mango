@@ -100,9 +100,9 @@ extern int mangoimg_uncompress(MangoImage);
 extern MangoImageMeta mangoimg_get_meta(MangoImage);
 extern ImageData mangoimg_get_image_data(MangoImage);
 extern char * mangoimg_get_base64_image_data(MangoImage);
+extern int mangoimg_encrypt(MangoImage, char *, char *);
+extern int mangoimg_decrypt(MangoImage, char *);
 // TODO
-// extern int mangoimg_encrypt(MangoImage, char *);
-// extern int mangoimg_decryopt(MangoImage);
 // extern void save(char *);
 
 

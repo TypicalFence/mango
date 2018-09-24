@@ -15,6 +15,15 @@ pub fn from_comp_type(value: CompressionType) -> String {
     }
 }
 
+
+pub fn to_enc_type(value: String) -> Option<EncryptionType> {
+    match value.as_ref() {
+        "AES128" => Some(EncryptionType::AES128),
+        "AES256" => Some(EncryptionType::AES256),
+        _ => None
+    }
+}
+
 pub fn from_enc_type(value: EncryptionType) -> String {
     match value {
         EncryptionType::AES256 => "AES256".to_string(),

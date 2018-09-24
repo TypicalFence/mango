@@ -513,6 +513,42 @@ pub extern "C" fn mangoimg_uncompress(pointer: *mut MangoImage) -> i8 {
     }
 }
 
+#[no_mangle]
+pub extern "C" fn mangoimg_encrypt(image: &mut MangoImage, enc_type: *const c_char, password: *const c_char) -> i8 {
+    let pw = unsafe { CStr::from_ptr(password).to_str() };
+
+    if pw.is_ok() {
+        let enc_type_r = unsafe { CStr::from_ptr(enc_type).to_str() };
+
+        if enc_type_r.is_ok() {
+            let enc = util::to_enc_type(enc_type_r.unwrap().to_string());
+            if enc.is_some() {
+                return match image.encrypt_mut(enc.unwrap(), pw.unwrap().to_string()) {
+                    true => 1,
+                    false => 2,
+                }
+            }
+        }
+    }
+
+    2
+}
+
+#[no_mangle]
+pub extern "C" fn mangoimg_decrypt(image: &mut MangoImage, password: *const c_char) -> i8 {
+    let pw = unsafe { CStr::from_ptr(password).to_str() };
+
+    if pw.is_ok() {
+        return match image.decrypt_mut(pw.unwrap().to_string()) {
+            true => 1,
+            false => 2,
+        }
+    }
+
+    2
+}
+
+
 //----------------------------------------------------------------------------------------
 // Mango Imagemetadata
 //----------------------------------------------------------------------------------------
@@ -584,5 +620,10 @@ pub extern "C" fn mangoimgmeta_filename(pointer: *mut MangoImageMetadata) -> *mu
 #[no_mangle]
 pub extern "C" fn mangoimgmeta_iv(meta: &MangoImageMetadata) -> *const u8 {
     meta.iv.as_ref().map_or(std::ptr::null_mut(), |iv| iv.as_ptr())
+}
+
+#[no_mangle]
+pub extern "C" fn mangoimgmeta_iv_size(meta: &MangoImageMetadata) -> *const u16 {
+    meta.iv.as_ref().map_or(0 as *const u16, |iv| iv.len() as *const u16)
 }
 

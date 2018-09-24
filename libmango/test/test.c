@@ -8,6 +8,8 @@ int main(void) {
 
     sr = srunner_create(make_file_suite());
 
+    srunner_add_suite(sr, make_image_suite());
+
     srunner_run_all(sr, CK_VERBOSE);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
