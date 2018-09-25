@@ -8,6 +8,8 @@ use std::ffi::{CStr, CString};
 use libc::c_char;
 use libc::c_uint;
 use std::ptr;
+use std::io;
+
 use mangofmt::MangoFile;
 use mangofmt::MangoImage;
 use mangofmt::meta::MangoMetadata;
@@ -548,6 +550,23 @@ pub extern "C" fn mangoimg_decrypt(image: &mut MangoImage, password: *const c_ch
     2
 }
 
+#[no_mangle]
+pub extern "C" fn mangoimg_save(image: &MangoImage, filename: *const c_char) -> i8 {
+    let name = unsafe { CStr::from_ptr(filename).to_str() };
+    if name.is_ok() {
+        return match image.save(&name.unwrap().to_string()) {
+            Ok(()) => 0,
+            Err(err) => {
+                match err.kind() {
+                    io::ErrorKind::PermissionDenied => 1,
+                    _ => -1
+                }
+            }
+        }
+    }
+
+    -1
+}
 
 //----------------------------------------------------------------------------------------
 // Mango Imagemetadata
