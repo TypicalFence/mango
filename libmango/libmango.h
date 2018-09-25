@@ -16,12 +16,14 @@ typedef struct ImageData {
 extern MangoFile new_mango_file(); // TODO rename to mangofile_new
 extern void mangofile_new(MangoFile);
 extern void mangofile_add_image(MangoFile, MangoImage);
+// TODO add return code
 extern void mangofile_add_image_by_path(MangoFile, char *);
 extern MangoImage mangofile_get_image(MangoFile, int);
-extern MangoImage mangofile_set_image(MangoFile, int);
+extern int  mangofile_set_image(MangoFile, int);
 extern int mangofile_get_image_count(MangoFile);
 extern MangoMeta mangofile_get_meta(MangoFile);
 
+// TODO add error codes
 /**
  * Saves a MangoFile to the file system.
  * 
@@ -94,6 +96,7 @@ extern MangoFile mangofile_open(char *);
 // Mango Image
 // --------------------------
 extern void mangoimg_free(MangoImage);
+// TODO add error code
 extern MangoImage mangoimg_from_path(char *);
 extern int mangoimg_compress(MangoImage, char *);
 extern int mangoimg_uncompress(MangoImage);
@@ -102,9 +105,7 @@ extern ImageData mangoimg_get_image_data(MangoImage);
 extern char * mangoimg_get_base64_image_data(MangoImage);
 extern int mangoimg_encrypt(MangoImage, char *, char *);
 extern int mangoimg_decrypt(MangoImage, char *);
-// TODO
-// extern void save(char *);
-
+extern int save(MangoImage, char *);
 
 // --------------------------
 // Mango Image Meta
