@@ -5,10 +5,9 @@ mod util;
 
 use std::path::Path;
 use std::ffi::{CStr, CString};
-use libc::c_char;
-use libc::c_uint;
-use std::ptr;
 use std::io;
+use std::fs;
+use libc::c_char;
 
 use mangofmt::MangoFile;
 use mangofmt::MangoImage;
@@ -35,7 +34,7 @@ pub extern "C" fn mangofile_free(pointer: *mut MangoFile) {
 
 #[no_mangle]
 pub extern "C" fn mangofile_add_image_by_path(pointer: *mut MangoFile, path: *const c_char) {
-    let mut file = unsafe {
+    let file = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -50,11 +49,12 @@ pub extern "C" fn mangofile_add_image_by_path(pointer: *mut MangoFile, path: *co
 
 #[no_mangle]
 pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, img_pointer: *mut MangoImage) {
-    let mut file = unsafe {
+    let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
-    let mut img = unsafe {
+
+    let img = unsafe {
         assert!(!img_pointer.is_null());
         &mut *img_pointer
     };
@@ -65,10 +65,11 @@ pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, img_pointer: *mut
 
 #[no_mangle]
 pub extern "C" fn mangofile_get_image(pointer: *mut MangoFile, index: usize) -> *mut MangoImage {
-    let mut file: &mut MangoFile = unsafe {
+    let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
+
     let img = file.get_image_mut(index);
     let p_mut: *mut MangoImage = img;
     p_mut
@@ -76,12 +77,12 @@ pub extern "C" fn mangofile_get_image(pointer: *mut MangoFile, index: usize) -> 
 
 #[no_mangle]
 pub extern "C" fn mangofile_set_image(file_pointer: *mut MangoFile, img_pointer: *mut MangoImage, index: usize) -> usize {
-    let mut file: &mut MangoFile = unsafe {
+    let file: &mut MangoFile = unsafe {
         assert!(!file_pointer.is_null());
         &mut *file_pointer
     };
 
-    let mut img: &mut MangoImage = unsafe {
+    let img: &mut MangoImage = unsafe {
         assert!(!img_pointer.is_null());
         &mut *img_pointer
     };
@@ -97,7 +98,7 @@ pub extern "C" fn mangofile_set_image(file_pointer: *mut MangoFile, img_pointer:
 
 #[no_mangle]
 pub extern "C" fn mangofile_get_image_count(pointer: *mut MangoFile) -> usize {
-    let mut file: &mut MangoFile = unsafe {
+    let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -109,7 +110,7 @@ pub extern "C" fn mangofile_get_image_count(pointer: *mut MangoFile) -> usize {
 
 #[no_mangle]
 pub extern "C" fn mangofile_get_meta(pointer: *mut MangoFile) -> *mut MangoMetadata {
-    let mut file: &mut MangoFile = unsafe {
+    let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -121,7 +122,7 @@ pub extern "C" fn mangofile_get_meta(pointer: *mut MangoFile) -> *mut MangoMetad
 // Save
 #[no_mangle]
 pub extern "C" fn mangofile_save(pointer: *mut MangoFile, path_pointer: *mut c_char) {
-    let mut file: &mut MangoFile = unsafe {
+    let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -136,7 +137,7 @@ pub extern "C" fn mangofile_save(pointer: *mut MangoFile, path_pointer: *mut c_c
 
 #[no_mangle]
 pub extern "C" fn mangofile_save_cbor(pointer: *mut MangoFile, path_pointer: *mut c_char) {
-    let mut file: &mut MangoFile = unsafe {
+    let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -151,10 +152,11 @@ pub extern "C" fn mangofile_save_cbor(pointer: *mut MangoFile, path_pointer: *mu
 
 #[no_mangle]
 pub extern "C" fn mangofile_save_bson(pointer: *mut MangoFile, path_pointer: *mut c_char) {
-    let mut file: &mut MangoFile = unsafe {
+    let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
+
     if !path_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(path_pointer) };
         if let Ok(value) = c_str.to_str() {
@@ -165,7 +167,7 @@ pub extern "C" fn mangofile_save_bson(pointer: *mut MangoFile, path_pointer: *mu
 
 #[no_mangle]
 pub extern "C" fn mangofile_save_json(pointer: *mut MangoFile, path_pointer: *mut c_char) {
-    let mut file: &mut MangoFile = unsafe {
+    let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -381,9 +383,6 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoIm
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
         if let Ok(value) = c_str.to_str() {
-            use std::fs;
-            use std::error::Error;
-            let data = "Some data!";
             fs::write("/tmp/foo", value).expect("Unable to write file");
 
             use mangofmt::ImageFile;
@@ -425,7 +424,7 @@ pub unsafe extern "C" fn mango_imagedata_free(bytes: ImageData) {
 
 #[no_mangle]
 pub extern "C" fn mangoimg_get_image_data(pointer: *mut MangoImage) -> ImageData {
-	let mut img: &mut MangoImage = unsafe {
+	let img: &mut MangoImage = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -464,7 +463,7 @@ use mangofmt::MangoImageMetadata;
 
 #[no_mangle]
 pub extern "C" fn mangoimg_get_meta(pointer: *mut MangoImage) -> *mut MangoImageMetadata {
-    let mut img: &mut MangoImage = unsafe {
+    let img: &mut MangoImage = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -477,7 +476,7 @@ pub extern "C" fn mangoimg_get_meta(pointer: *mut MangoImage) -> *mut MangoImage
 
 #[no_mangle]
 pub extern "C" fn mangoimg_compress(pointer: *mut MangoImage, value_pointer: *mut c_char) -> i8 {
-    let mut img: &mut MangoImage = unsafe {
+    let img: &mut MangoImage = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -504,7 +503,7 @@ pub extern "C" fn mangoimg_compress(pointer: *mut MangoImage, value_pointer: *mu
 
 #[no_mangle]
 pub extern "C" fn mangoimg_uncompress(pointer: *mut MangoImage) -> i8 {
-    let mut img: &mut MangoImage = unsafe {
+    let img: &mut MangoImage = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
