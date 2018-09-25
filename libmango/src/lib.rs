@@ -33,8 +33,8 @@ pub extern "C" fn mangofile_free(pointer: *mut MangoFile) {
 }
 
 #[no_mangle]
-pub extern "C" fn mangofile_add_image_by_path(pointer: *mut MangoFile, path: *const c_char) {
-    let file = unsafe {
+pub extern "C" fn mangofile_add_image_by_path(pointer: *mut MangoFile, path: *const c_char) -> i8 {
+    let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -44,7 +44,17 @@ pub extern "C" fn mangofile_add_image_by_path(pointer: *mut MangoFile, path: *co
     };
 
     let path_str  = c_str.to_str().unwrap();
-    file.add_image_by_path(Path::new(&path_str.to_owned()));
+    let error = file.add_image_by_path(Path::new(&path_str.to_owned()));
+
+    match error {
+        Ok(()) => 0,
+        Err(err) => {
+            match err.kind() {
+                io::ErrorKind::PermissionDenied => 1,
+                _ => -1,
+            }
+        }
+    }
 }
 
 #[no_mangle]

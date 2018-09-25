@@ -16,8 +16,7 @@ typedef struct ImageData {
 extern MangoFile new_mango_file(); // TODO rename to mangofile_new
 extern void mangofile_new(MangoFile);
 extern void mangofile_add_image(MangoFile, MangoImage);
-// TODO add return code
-extern void mangofile_add_image_by_path(MangoFile, char *);
+extern int mangofile_add_image_by_path(MangoFile, char *);
 extern MangoImage mangofile_get_image(MangoFile, int);
 extern int  mangofile_set_image(MangoFile, int);
 extern int mangofile_get_image_count(MangoFile);
