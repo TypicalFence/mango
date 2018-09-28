@@ -95,8 +95,7 @@ extern MangoFile mangofile_open(char *);
 // Mango Image
 // --------------------------
 extern void mangoimg_free(MangoImage);
-// TODO add error code
-extern MangoImage mangoimg_from_path(char *);
+extern MangoImage mangoimg_from_path(char *, int *);
 extern int mangoimg_compress(MangoImage, char *);
 extern int mangoimg_uncompress(MangoImage);
 extern MangoImageMeta mangoimg_get_meta(MangoImage);

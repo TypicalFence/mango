@@ -11,8 +11,12 @@
 START_TEST(test_create) {
     MangoImage img;
     MangoImageMeta meta;
+    
+    int * fuck = NULL;
 
-    img = mangoimg_from_path("test.jpg");
+    img = mangoimg_from_path("test.jpg", fuck);
+
+    ck_assert(fuck == 0);
     
     meta = mangoimg_get_meta(img);
     
@@ -26,7 +30,8 @@ END_TEST
 START_TEST(test_decrypt) {
     MangoImage img;
     
-    img = mangoimg_from_path("test.jpg");
+    int * fuck = NULL;
+    img = mangoimg_from_path("test.jpg", fuck);
     
     // encrypt
     mangoimg_encrypt(img, "AES128", "1234567812345678");
