@@ -389,7 +389,7 @@ pub extern "C" fn mangoimg_free(pointer: *mut MangoImage) {
 }
 
 #[no_mangle]
-pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoImage {
+pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, mut error_code:  *mut i16) -> *mut MangoImage {
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
         if let Ok(value) = c_str.to_str() {
@@ -401,7 +401,13 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char) -> *mut MangoIm
             if file.is_ok() {
                 let mut img = file.unwrap().to_mango_image();
                 //println!("{}", img.clone().get_meta().checksum);
+                error_code = 1 as *mut i16;
                 return Box::into_raw(Box::new(img));
+            } else {
+                error_code = match file.err().unwrap().kind() {
+                    io::ErrorKind::NotFound => 1,
+                    _ => -1
+                } as *mut i16;
             }
         }
     }
