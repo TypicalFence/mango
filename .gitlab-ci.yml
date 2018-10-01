@@ -1,0 +1,48 @@
+image: "rust:latest"
+
+stages:
+  - build
+  - test
+
+before_script:
+  # install dependencies
+  - apt-get update -yqq
+  - apt-get install -yqq --no-install-recommends build-essential
+  - apt-get install -yqq check libssl-dev imagemagick-common
+  # generate test data
+  - ./gen_test_img.sh
+  - ./cp_test_files.sh
+
+# /mangofmt
+mangofmt:
+  stage: build
+  script:
+    - rustc --version && cargo --version      # Print version info for debugging
+    - cd mangofmt
+    - cargo build
+
+mangofmt:
+    stage: test
+    script:
+      - rustc --version && cargo --version      # Print version info for debugging
+      - cd mangofmt
+      - cargo test --all --verbose
+
+# /libmango
+libmango:
+    stage: build
+
+    script:
+      - cd libmango
+      - make build
+    
+libmango:
+    stage: test
+
+    script:
+      - cd libmango
+      - echo "compile test"
+      - make test/run_tests
+      - echo "run tests"
+      - make test
+ 
