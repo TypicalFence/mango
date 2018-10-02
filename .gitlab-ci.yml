@@ -14,14 +14,14 @@ before_script:
   - ./cp_test_files.sh
 
 # /mangofmt
-mangofmt:
+mangofmt-build:
   stage: build
   script:
     - rustc --version && cargo --version      # Print version info for debugging
     - cd mangofmt
     - cargo build
 
-mangofmt:
+mangofmt-test:
     stage: test
     script:
       - rustc --version && cargo --version      # Print version info for debugging
@@ -29,14 +29,14 @@ mangofmt:
       - cargo test --all --verbose
 
 # /libmango
-libmango:
+libmango-build:
     stage: build
 
     script:
       - cd libmango
       - make build
     
-libmango:
+libmango-build:
     stage: test
 
     script:
