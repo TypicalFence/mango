@@ -36,7 +36,7 @@ libmango-build:
       - cd libmango
       - make build
     
-libmango-build:
+libmango-test:
     stage: test
 
     script:
