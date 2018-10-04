@@ -1,6 +1,7 @@
 use mangofmt::CompressionType;
 use mangofmt::EncryptionType;
 use mangofmt::Mime;
+use mangofmt::file::{MangoFileError, ErrorKind};
 
 pub fn to_comp_type(value: String) -> Option<CompressionType> {
     match value.as_ref() {
@@ -35,5 +36,15 @@ pub fn from_mime(value: Mime) -> String {
     match value {
         Mime::JPEG => "JPEG".to_string(),
         Mime::PNG => "PNG".to_string(),
+    }
+}
+
+pub fn handle_mangofile_error(error: MangoFileError) -> i16 {
+    match error.get_kind() {
+        ErrorKind::DecodeError => 1,
+        ErrorKind::EncodeError => 1,
+        ErrorKind::ReadError => 2,
+        ErrorKind::WriteError => 2,
+        ErrorKind::PermissionError => 3,
     }
 }
