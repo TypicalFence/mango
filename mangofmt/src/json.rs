@@ -3,7 +3,7 @@ use std::io::prelude::*;
 use serde_json;
 use image::{MangoImage, Mime};
 use meta::MangoImageMetadata;
-use file::MangoFile;
+use file::{MangoFile, ErrorKind, MangoFileError};
 use super::{CompressionType, EncryptionType};
 use std::fs::File;
 use std::path::Path;
@@ -25,25 +25,36 @@ impl JsonMangoFile {
         self.images.clone()
     }
 
-    pub fn open(p: &Path) -> Result<MangoFile, Box<Error>> {
-        let file = File::open(p)?;
+    pub fn open(p: &Path) -> Result<MangoFile, MangoFileError> {
+        let file = File::open(p);
+        if file.is_err() {
+            return Err(MangoFileError::convert_io_open(file.err().unwrap()));
+        }
 
-        let img: JsonMangoFile = serde_json::from_reader(file)?;
+        let json_result = serde_json::from_reader(file.unwrap());
+        if json_result.is_err() {
+            return Err(MangoFileError::with_cause(ErrorKind::DecodeError,
+                                                  "couldn't decode JSON to MangoFile",
+                                                  json_result.err().unwrap()));
+        }
 
+        // convert JsonMangoFile to MangoFile
         let mut mango_imgs = Vec::new();
 
-        for image in img.get_images() {
+        let json_file: JsonMangoFile = json_result.unwrap();
+
+        for image in json_file.get_images() {
             mango_imgs.push(Base64Image::to_mango(image));
         }
 
         let mut mango_file = MangoFile::new();
         mango_file.set_images(mango_imgs);
-        mango_file.set_meta(img.meta);
+        mango_file.set_meta(json_file.meta);
 
         Ok(mango_file)
     }
 
-    pub fn save(p: &Path, file: &MangoFile) -> Result<(), std::io::Error> {
+    pub fn save(p: &Path, file: &MangoFile) -> Result<(), MangoFileError> {
 
         let mut base64_imgs = Vec::new();
 
@@ -51,10 +62,26 @@ impl JsonMangoFile {
             base64_imgs.push(Base64Image::from_mango(image));
         }
 
-        let json_string =
-            serde_json::to_string_pretty(&JsonMangoFile::new(file.get_meta(), base64_imgs))?;
-        let mut f = File::create(p)?;
-        f.write_all(json_string.as_bytes())?;
+        let json_string = serde_json::to_string_pretty(&JsonMangoFile::new(file.get_meta(),
+                                                                           base64_imgs));
+
+        if json_string.is_err() {
+            return Err(MangoFileError::with_cause(ErrorKind::EncodeError,
+                                                  "couldn't encode JSON to MangoFile",
+                                                  json_string.err().unwrap()));
+        }
+
+        let mut f = File::create(p);
+
+        if f.is_err() {
+            return Err(MangoFileError::convert_io_save(f.err().unwrap()));
+        }
+
+        let write = f.unwrap().write_all(json_string.unwrap().as_bytes());
+        if write.is_err() {
+            return Err(MangoFileError::convert_io_save(write.err().unwrap()));
+        }
+
         Ok(())
     }
 }
