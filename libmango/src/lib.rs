@@ -131,7 +131,7 @@ pub extern "C" fn mangofile_get_meta(pointer: *mut MangoFile) -> *mut MangoMetad
 
 // Save
 #[no_mangle]
-pub extern "C" fn mangofile_save(pointer: *mut MangoFile, path_pointer: *mut c_char) {
+pub extern "C" fn mangofile_save(pointer: *mut MangoFile, path_pointer: *mut c_char) -> i16 {
     let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
@@ -140,9 +140,16 @@ pub extern "C" fn mangofile_save(pointer: *mut MangoFile, path_pointer: *mut c_c
     if !path_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(path_pointer) };
         if let Ok(value) = c_str.to_str() {
-            file.save(std::path::Path::new(value))
+            let result = file.save(std::path::Path::new(value));
+            if  result.is_err() {
+                return util::handle_mangofile_error(result.err().unwrap());
+            }
+        } else {
+            return -1
         }
     }
+
+    0
 }
 
 #[no_mangle]
@@ -155,7 +162,7 @@ pub extern "C" fn mangofile_save_cbor(pointer: *mut MangoFile, path_pointer: *mu
     if !path_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(path_pointer) };
         if let Ok(value) = c_str.to_str() {
-            file.save_cbor(std::path::Path::new(value))
+            file.save_cbor(std::path::Path::new(value));
         }
     }
 }
@@ -170,7 +177,7 @@ pub extern "C" fn mangofile_save_bson(pointer: *mut MangoFile, path_pointer: *mu
     if !path_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(path_pointer) };
         if let Ok(value) = c_str.to_str() {
-            file.save_bson(std::path::Path::new(value))
+            file.save_bson(std::path::Path::new(value));
         }
     }
 }
@@ -185,7 +192,7 @@ pub extern "C" fn mangofile_save_json(pointer: *mut MangoFile, path_pointer: *mu
     if !path_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(path_pointer) };
         if let Ok(value) = c_str.to_str() {
-            file.save_json(std::path::Path::new(value))
+            file.save_json(std::path::Path::new(value));
         }
     }
 }
@@ -389,7 +396,7 @@ pub extern "C" fn mangoimg_free(pointer: *mut MangoImage) {
 }
 
 #[no_mangle]
-pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, mut error_code:  *mut i16) -> *mut MangoImage {
+pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, mut _error_code:  *mut i16) -> *mut MangoImage {
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
         if let Ok(value) = c_str.to_str() {
@@ -401,10 +408,10 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, mut error_code:
             if file.is_ok() {
                 let mut img = file.unwrap().to_mango_image();
                 //println!("{}", img.clone().get_meta().checksum);
-                error_code = 1 as *mut i16;
+                _error_code = 1 as *mut i16;
                 return Box::into_raw(Box::new(img));
             } else {
-                error_code = match file.err().unwrap().kind() {
+                _error_code = match file.err().unwrap().kind() {
                     io::ErrorKind::NotFound => 1,
                     _ => -1
                 } as *mut i16;

@@ -54,6 +54,10 @@ impl MangoFileError {
         Self { kind, msg, cause: Some(cause.into()) }
     }
 
+    pub fn get_kind(self) -> ErrorKind {
+        self.kind
+    }
+
     pub fn convert_io_open(error: io::Error) -> Self {
         match error.kind() {
             io::ErrorKind::NotFound => MangoFileError::with_cause(ErrorKind::ReadError, "not found", error),
@@ -191,7 +195,7 @@ impl MangoFile {
     }
 
     /// Saves a .mango file
-    pub fn save(&self, p: &Path) -> Result<(), Box<Error>> {
+    pub fn save(&self, p: &Path) -> Result<(), MangoFileError> {
         // use cbor as the default format
         // (lowest overhead)
         self.save_cbor(p)?;
