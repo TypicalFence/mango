@@ -16,7 +16,7 @@ mod compression;
 mod encryption;
 pub mod meta;
 mod image;
-mod file;
+pub mod file;
 mod json;
 
 pub use compression::CompressionType;
