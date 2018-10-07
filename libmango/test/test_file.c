@@ -44,7 +44,7 @@ START_TEST(test_set_title) {
 
     mangometa_set_title(meta, "test");
 
-    ck_assert(strcmp(mangometa_get_title(meta), "test")== 0);
+    ck_assert(strcmp(mangometa_get_title(meta), "test") == 0);
 }
 END_TEST
 
@@ -156,8 +156,11 @@ START_TEST(test_open) {
     
     file = NULL;
     img = NULL;
+    
+    int * open_error = NULL;
+    file = mangofile_open("testfile.mango", open_error);
+    ck_assert_int_eq(0, open_error);
 
-    file = mangofile_open("testfile.mango");
     img = mangofile_get_image(file, 0);
     char * checksum_after = mangoimgmeta_checksum(mangoimg_get_meta(img));
     

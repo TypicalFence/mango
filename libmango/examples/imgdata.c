@@ -2,7 +2,7 @@
 #include "../libmango.h"
 
 int main(int argc, char *argv[]) {
-    MangoImage img  = mangoimg_from_path(argv[1]);
+    MangoImage img  = mangoimg_from_path(argv[1], NULL);
 
     ImageData data = mangoimg_get_image_data(img);
 

@@ -12,12 +12,11 @@ START_TEST(test_create) {
     MangoImage img;
     MangoImageMeta meta;
     
-    int * fuck = NULL;
+    int * error = NULL;
 
-    img = mangoimg_from_path("test.jpg", fuck);
+    img = mangoimg_from_path("test.jpg", error);
+    ck_assert_int_eq(0, error);
 
-    ck_assert(fuck == 0);
-    
     meta = mangoimg_get_meta(img);
     
     // strcmp returns 0 if the strings are equal
@@ -30,8 +29,9 @@ END_TEST
 START_TEST(test_decrypt) {
     MangoImage img;
     
-    int * fuck = NULL;
-    img = mangoimg_from_path("test.jpg", fuck);
+    int * error  = NULL;
+    img = mangoimg_from_path("test.jpg", error);
+    ck_assert_int_eq(0, error);
     
     // encrypt
     mangoimg_encrypt(img, "AES128", "1234567812345678");
