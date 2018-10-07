@@ -358,6 +358,28 @@ pub extern "C" fn mangometa_set_source(pointer: *mut MangoMetadata, value_pointe
 }
 
 #[no_mangle]
+pub extern "C" fn mangometa_get_language(meta: &mut MangoMetadata) -> *mut c_char {
+    match meta.language.clone() {
+        Some(lang) => {
+            CString::new(util::from_lang(lang)).unwrap().into_raw()
+        },
+        None => std::ptr::null_mut(),
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn mangometa_set_language(meta: &mut MangoMetadata, value_pointer: *mut c_char) {
+    if !value_pointer.is_null() {
+        let c_str = unsafe { CStr::from_ptr(value_pointer) };
+        if let Ok(value) = c_str.to_str() {
+            meta.language = util::to_lang(value);
+        }
+    } else {
+        meta.language = None;
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn mangometa_get_translation(pointer: *mut MangoMetadata) -> *mut c_char {
     let meta: &mut MangoMetadata = unsafe {
         assert!(!pointer.is_null());
@@ -399,9 +421,7 @@ pub struct IntOption {
 
 #[no_mangle]
 pub extern "C" fn mangometa_get_volume(meta: &mut MangoMetadata) -> IntOption {
-    let metaa: &mut MangoMetadata = meta;
-
-    match &metaa.volume {
+    match &meta.volume {
         Some(value) => IntOption{ value: value.clone().into(), present: 1 /* true */ },
         None => IntOption { value: 0, present: 0 /* flase */ },
     }
@@ -416,6 +436,39 @@ pub extern "C" fn mangometa_set_volume(meta: &mut MangoMetadata, value_pointer: 
     }
 }
 
+#[no_mangle]
+pub extern "C" fn mangometa_get_chapter(meta: &mut MangoMetadata) -> IntOption {
+    match &meta.chapter {
+        Some(value) => IntOption{ value: value.clone().into(), present: 1 /* true */ },
+        None => IntOption { value: 0, present: 0 /* flase */ },
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn mangometa_set_chapter(meta: &mut MangoMetadata, value_pointer: *mut c_short) {
+    if !value_pointer.is_null() {
+        unsafe { meta.chapter = Some(*value_pointer); }
+    } else {
+        meta.chapter = None;
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn mangometa_get_year(meta: &mut MangoMetadata) -> IntOption {
+    match &meta.year {
+        Some(value) => IntOption{ value: value.clone().into(), present: 1 /* true */ },
+        None => IntOption { value: 0, present: 0 /* flase */ },
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn mangometa_set_year(meta: &mut MangoMetadata, value_pointer: *mut c_short) {
+    if !value_pointer.is_null() {
+        unsafe { meta.year = Some(*value_pointer); }
+    } else {
+        meta.year = None;
+    }
+}
 
 //----------------------------------------------------------------------------------------
 // Mango Image

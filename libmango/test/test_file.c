@@ -100,6 +100,77 @@ START_TEST(test_set_source) {
 }
 END_TEST
 
+START_TEST(test_volume) {
+    MangoFile file;
+    file = new_mango_file();
+
+    MangoMeta meta = mangofile_get_meta(file);
+
+    IntOption opt1 = mangometa_get_volume(meta);
+    ck_assert(!opt1.present);
+    
+    short value = 3;
+    mangometa_set_volume(meta, &value);
+
+    IntOption opt2 = mangometa_get_volume(meta);
+    ck_assert(opt2.present);
+    ck_assert(opt2.value == 3);
+}
+END_TEST
+
+START_TEST(test_chapter) {
+    MangoFile file;
+    file = new_mango_file();
+
+    MangoMeta meta = mangofile_get_meta(file);
+
+    IntOption opt1 = mangometa_get_chapter(meta);
+    ck_assert(!opt1.present);
+    
+    short value = 3;
+    mangometa_set_chapter(meta, &value);
+
+    IntOption opt2 = mangometa_get_chapter(meta);
+    ck_assert(opt2.present);
+    ck_assert(opt2.value == 3);
+}
+END_TEST
+
+START_TEST(test_year) {
+    MangoFile file;
+    file = new_mango_file();
+
+    MangoMeta meta = mangofile_get_meta(file);
+
+    IntOption opt1 = mangometa_get_year(meta);
+    ck_assert(!opt1.present);
+    
+    short value = 2006;
+    mangometa_set_year(meta, &value);
+
+    IntOption opt2 = mangometa_get_year(meta);
+    ck_assert(opt2.present);
+    ck_assert(opt2.value == 2006);
+}
+END_TEST
+
+START_TEST(test_lang) {
+    MangoFile file;
+    file = new_mango_file();
+
+    MangoMeta meta = mangofile_get_meta(file);
+
+    char * lang1 = mangometa_get_language(meta);
+    ck_assert_ptr_null(lang1);
+    
+    char * value = "EN";
+    mangometa_set_language(meta, value);
+
+    char * lang2 = mangometa_get_language(meta);
+    ck_assert(strcmp(lang2, "EN") == 0);
+}
+END_TEST
+
 // Save
 START_TEST(test_save) {
     MangoFile file;
@@ -171,25 +242,6 @@ START_TEST(test_open) {
 }
 END_TEST
 
- 
-START_TEST(test_volume) {
-    MangoFile file;
-    file = new_mango_file();
-
-    MangoMeta meta = mangofile_get_meta(file);
-
-    IntOption opt1 = mangometa_get_volume(meta);
-    ck_assert(!opt1.present);
-    
-    short value = 3;
-    mangometa_set_volume(meta, &value);
-
-    IntOption opt2 = mangometa_get_volume(meta);
-    ck_assert(opt2.present);
-    ck_assert(opt2.value == 3);
-}
-END_TEST
-
 Suite * file_suite(void) {
     Suite *s;
     TCase *tc_core;
@@ -211,6 +263,9 @@ Suite * file_suite(void) {
     tcase_add_test(tc_core, test_set_source);
     tcase_add_test(tc_core, test_set_translation);
     tcase_add_test(tc_core, test_volume);
+    tcase_add_test(tc_core, test_chapter);
+    tcase_add_test(tc_core, test_year);
+    tcase_add_test(tc_core, test_lang);
 
     // IO
     tcase_add_test(tc_io, test_save);
