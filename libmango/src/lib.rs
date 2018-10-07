@@ -202,20 +202,20 @@ pub extern "C" fn mangofile_save_json(file: &mut MangoFile, path_ptr: *mut c_cha
 // Open
 #[no_mangle]
 #[allow(unused_variables, unused_assignments)]
-pub extern "C" fn mangofile_open(path_pointer: *mut c_char, mut error_code: *mut i16) -> *mut MangoFile {
+pub extern "C" fn mangofile_open(path_pointer: *mut c_char, error_code: *mut std::os::raw::c_int) -> *mut MangoFile {
     if !path_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(path_pointer) };
         if let Ok(path) = c_str.to_str() {
             let file = MangoFile::open(Path::new(path));
             if file.is_ok() {
-                error_code = 0 as *mut i16;
+                unsafe { *error_code = 0; }
                 return Box::into_raw(Box::new(file.unwrap()));
             } else {
-                error_code = util::handle_mangofile_error(file.err().unwrap()) as *mut i16;
+                unsafe {*error_code = util::handle_mangofile_error(file.err().unwrap()).into(); }
             }
         } else {
             // set error code to -1 because something was wrong with the parameters given
-            error_code = (0 - 1) as *mut i16; // can't write -1 :< 
+            unsafe { *error_code = -1; }
         }
     }
 
@@ -405,7 +405,7 @@ pub extern "C" fn mangoimg_free(pointer: *mut MangoImage) {
 }
 
 #[no_mangle]
-pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, mut _error_code:  *mut i16) -> *mut MangoImage {
+pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, error_code:  *mut std::os::raw::c_int) -> *mut MangoImage {
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
         if let Ok(value) = c_str.to_str() {
@@ -417,13 +417,15 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, mut _error_code
             if file.is_ok() {
                 let mut img = file.unwrap().to_mango_image();
                 //println!("{}", img.clone().get_meta().checksum);
-                _error_code = 1 as *mut i16;
+                unsafe { *error_code = 0; }
                 return Box::into_raw(Box::new(img));
             } else {
-                _error_code = match file.err().unwrap().kind() {
-                    io::ErrorKind::NotFound => 1,
-                    _ => -1
-                } as *mut i16;
+                unsafe {
+                    *error_code = match file.err().unwrap().kind() {
+                        io::ErrorKind::NotFound => 1,
+                        _ => -1
+                    };
+                }
             }
         }
     }
