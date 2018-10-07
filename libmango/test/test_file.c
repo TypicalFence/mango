@@ -161,7 +161,7 @@ START_TEST(test_lang) {
     MangoMeta meta = mangofile_get_meta(file);
 
     char * lang1 = mangometa_get_language(meta);
-    ck_assert_ptr_null(lang1);
+    ck_assert(lang1 == NULL);
     
     char * value = "EN";
     mangometa_set_language(meta, value);
