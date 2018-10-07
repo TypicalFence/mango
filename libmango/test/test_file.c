@@ -157,8 +157,8 @@ START_TEST(test_open) {
     file = NULL;
     img = NULL;
     
-    int * open_error = NULL;
-    file = mangofile_open("testfile.mango", open_error);
+    int open_error = -2;
+    file = mangofile_open("testfile.mango", &open_error);
     ck_assert_int_eq(0, open_error);
 
     img = mangofile_get_image(file, 0);

@@ -12,9 +12,9 @@ START_TEST(test_create) {
     MangoImage img;
     MangoImageMeta meta;
     
-    int * error = NULL;
+    int error = -2;
 
-    img = mangoimg_from_path("test.jpg", error);
+    img = mangoimg_from_path("test.jpg", &error);
     ck_assert_int_eq(0, error);
 
     meta = mangoimg_get_meta(img);
@@ -29,8 +29,8 @@ END_TEST
 START_TEST(test_decrypt) {
     MangoImage img;
     
-    int * error  = NULL;
-    img = mangoimg_from_path("test.jpg", error);
+    int error  = -2;
+    img = mangoimg_from_path("test.jpg", &error);
     ck_assert_int_eq(0, error);
     
     // encrypt
