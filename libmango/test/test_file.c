@@ -171,6 +171,25 @@ START_TEST(test_open) {
 }
 END_TEST
 
+ 
+START_TEST(test_volume) {
+    MangoFile file;
+    file = new_mango_file();
+
+    MangoMeta meta = mangofile_get_meta(file);
+
+    IntOption opt1 = mangometa_get_volume(meta);
+    ck_assert(!opt1.present);
+    
+    short value = 3;
+    mangometa_set_volume(meta, &value);
+
+    IntOption opt2 = mangometa_get_volume(meta);
+    ck_assert(opt2.present);
+    ck_assert(opt2.value == 3);
+}
+END_TEST
+
 Suite * file_suite(void) {
     Suite *s;
     TCase *tc_core;
@@ -191,6 +210,7 @@ Suite * file_suite(void) {
 
     tcase_add_test(tc_core, test_set_source);
     tcase_add_test(tc_core, test_set_translation);
+    tcase_add_test(tc_core, test_volume);
 
     // IO
     tcase_add_test(tc_io, test_save);

@@ -7,6 +7,7 @@ use std::path::Path;
 use std::ffi::{CStr, CString};
 use std::io;
 use std::fs;
+use std::os::raw::{c_int, c_short};
 use libc::c_char;
 
 use mangofmt::MangoFile;
@@ -388,6 +389,33 @@ pub extern "C" fn mangometa_set_translation(pointer: *mut MangoMetadata, value_p
         meta.translation = None;
     }
 }
+
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct IntOption {
+    pub value: c_int,
+    pub present: c_int,
+}
+
+#[no_mangle]
+pub extern "C" fn mangometa_get_volume(meta: &mut MangoMetadata) -> IntOption {
+    let metaa: &mut MangoMetadata = meta;
+
+    match &metaa.volume {
+        Some(value) => IntOption{ value: value.clone().into(), present: 1 /* true */ },
+        None => IntOption { value: 0, present: 0 /* flase */ },
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn mangometa_set_volume(meta: &mut MangoMetadata, value_pointer: *mut c_short) {
+    if !value_pointer.is_null() {
+        unsafe { meta.volume = Some(*value_pointer); }
+    } else {
+        meta.volume = None;
+    }
+}
+
 
 //----------------------------------------------------------------------------------------
 // Mango Image
