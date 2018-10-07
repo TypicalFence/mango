@@ -24,7 +24,7 @@ void main(void) {
     img = NULL;
     
     // open the created file
-    file = mangofile_open("testfile.mango");
+    file = mangofile_open("testfile.mango", NULL);
     
     // get checksum
     img = mangofile_get_image(file, 0);

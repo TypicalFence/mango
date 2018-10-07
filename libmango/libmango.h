@@ -22,7 +22,6 @@ extern int  mangofile_set_image(MangoFile, int);
 extern int mangofile_get_image_count(MangoFile);
 extern MangoMeta mangofile_get_meta(MangoFile);
 
-// TODO add error codes
 /**
  * Saves a MangoFile to the file system.
  * 
@@ -39,7 +38,7 @@ extern MangoMeta mangofile_get_meta(MangoFile);
  * All formats should use the file ending ".mango" 
  * and can be opened with \link mangofile_open \endlink. 
  */
-extern void mangofile_save(MangoFile, char *);
+extern int mangofile_save(MangoFile, char *);
 
 /**
  * Saves a MangoFile in the cbor format to the file system.
@@ -53,7 +52,7 @@ extern void mangofile_save(MangoFile, char *);
  * 
  * You should save your file with ending ".mango".
  */
-extern void mangofile_save_cbor(MangoFile, char *);
+extern int mangofile_save_cbor(MangoFile, char *);
 
 /**
  * Saves a MangoFile in the bson format to the file system.
@@ -64,7 +63,7 @@ extern void mangofile_save_cbor(MangoFile, char *);
  * 
  * You should save your file with ending ".mango".
  */
-extern void mangofile_save_bson(MangoFile, char *);
+extern int mangofile_save_bson(MangoFile, char *);
 
 /**
  * Saves a MangoFile in the json format to the file system.
@@ -81,7 +80,7 @@ extern void mangofile_save_bson(MangoFile, char *);
  * 
  * You should save your file with ending ".mango".
  */
-extern void mangofile_save_json(MangoFile, char *);
+extern int mangofile_save_json(MangoFile, char *);
 
 /**
  * opens a MangoFile fromo the file system.
@@ -89,7 +88,7 @@ extern void mangofile_save_json(MangoFile, char *);
  * \note The internal format of the MangoFile does not matter.
  * This function will detect the format and open it accordingly. 
  */
-extern MangoFile mangofile_open(char *);
+extern MangoFile mangofile_open(char *, int *);
 
 // --------------------------
 // Mango Image

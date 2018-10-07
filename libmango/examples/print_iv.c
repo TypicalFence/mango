@@ -4,7 +4,7 @@
 void main(void) {
     MangoImage img;
 
-    img = mangoimg_from_path("test.jpg");
+    img = mangoimg_from_path("test.jpg", NULL);
     mangoimg_encrypt(img, "AES128", "1234567812345678");
     
     int * iv = mangoimgmeta_iv(mangoimg_get_meta(img));

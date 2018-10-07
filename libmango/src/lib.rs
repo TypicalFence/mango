@@ -131,14 +131,10 @@ pub extern "C" fn mangofile_get_meta(pointer: *mut MangoFile) -> *mut MangoMetad
 
 // Save
 #[no_mangle]
-pub extern "C" fn mangofile_save(pointer: *mut MangoFile, path_pointer: *mut c_char) -> i16 {
-    let file: &mut MangoFile = unsafe {
-        assert!(!pointer.is_null());
-        &mut *pointer
-    };
+pub extern "C" fn mangofile_save(file: &mut MangoFile, path_ptr: *mut c_char) -> i16 {
+    if !path_ptr.is_null() {
+        let c_str = unsafe { CStr::from_ptr(path_ptr) };
 
-    if !path_pointer.is_null() {
-        let c_str = unsafe { CStr::from_ptr(path_pointer) };
         if let Ok(value) = c_str.to_str() {
             let result = file.save(std::path::Path::new(value));
             if  result.is_err() {
@@ -153,60 +149,73 @@ pub extern "C" fn mangofile_save(pointer: *mut MangoFile, path_pointer: *mut c_c
 }
 
 #[no_mangle]
-pub extern "C" fn mangofile_save_cbor(pointer: *mut MangoFile, path_pointer: *mut c_char) {
-    let file: &mut MangoFile = unsafe {
-        assert!(!pointer.is_null());
-        &mut *pointer
-    };
-
-    if !path_pointer.is_null() {
-        let c_str = unsafe { CStr::from_ptr(path_pointer) };
+pub extern "C" fn mangofile_save_cbor(file: &mut MangoFile, path_ptr: *mut c_char) -> i16 {
+    if !path_ptr.is_null() {
+        let c_str = unsafe { CStr::from_ptr(path_ptr) };
         if let Ok(value) = c_str.to_str() {
-            file.save_cbor(std::path::Path::new(value));
+            let result = file.save_cbor(std::path::Path::new(value));
+            if result.is_err() {
+                return util::handle_mangofile_error(result.err().unwrap());
+            }
+        } else {
+            return -1;
         }
     }
+
+    0
 }
 
 #[no_mangle]
-pub extern "C" fn mangofile_save_bson(pointer: *mut MangoFile, path_pointer: *mut c_char) {
-    let file: &mut MangoFile = unsafe {
-        assert!(!pointer.is_null());
-        &mut *pointer
-    };
-
-    if !path_pointer.is_null() {
-        let c_str = unsafe { CStr::from_ptr(path_pointer) };
+pub extern "C" fn mangofile_save_bson(file: &mut MangoFile, path_ptr: *mut c_char) -> i16 {
+    if !path_ptr.is_null() {
+        let c_str = unsafe { CStr::from_ptr(path_ptr) };
         if let Ok(value) = c_str.to_str() {
-            file.save_bson(std::path::Path::new(value));
+            let result = file.save_bson(std::path::Path::new(value));
+            if result.is_err() {
+                return util::handle_mangofile_error(result.err().unwrap());
+            }
         }
+    } else {
+        return -1;
     }
+
+    0
 }
 
 #[no_mangle]
-pub extern "C" fn mangofile_save_json(pointer: *mut MangoFile, path_pointer: *mut c_char) {
-    let file: &mut MangoFile = unsafe {
-        assert!(!pointer.is_null());
-        &mut *pointer
-    };
-
-    if !path_pointer.is_null() {
-        let c_str = unsafe { CStr::from_ptr(path_pointer) };
+pub extern "C" fn mangofile_save_json(file: &mut MangoFile, path_ptr: *mut c_char) -> i16 {
+    if !path_ptr.is_null() {
+        let c_str = unsafe { CStr::from_ptr(path_ptr) };
         if let Ok(value) = c_str.to_str() {
-            file.save_json(std::path::Path::new(value));
+            let result = file.save_json(std::path::Path::new(value));
+            if result.is_err() {
+                return util::handle_mangofile_error(result.err().unwrap());
+            }
         }
+    } else {
+        return -1;
     }
+
+    0
 }
 
 // Open
 #[no_mangle]
-pub extern "C" fn mangofile_open(path_pointer: *mut c_char) -> *mut MangoFile {
+#[allow(unused_variables, unused_assignments)]
+pub extern "C" fn mangofile_open(path_pointer: *mut c_char, mut error_code: *mut i16) -> *mut MangoFile {
     if !path_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(path_pointer) };
         if let Ok(path) = c_str.to_str() {
             let file = MangoFile::open(Path::new(path));
             if file.is_ok() {
+                error_code = 0 as *mut i16;
                 return Box::into_raw(Box::new(file.unwrap()));
+            } else {
+                error_code = util::handle_mangofile_error(file.err().unwrap()) as *mut i16;
             }
+        } else {
+            // set error code to -1 because something was wrong with the parameters given
+            error_code = (0 - 1) as *mut i16; // can't write -1 :< 
         }
     }
 

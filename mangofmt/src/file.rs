@@ -230,7 +230,7 @@ impl MangoFile {
         Ok(())
     }
 
-    pub fn save_json(&self, p:&Path) -> Result<(), Box<Error>> {
+    pub fn save_json(&self, p:&Path) -> Result<(), MangoFileError> {
         JsonMangoFile::save(p, self)?;
         Ok(())
     }
