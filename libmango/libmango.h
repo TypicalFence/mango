@@ -1,4 +1,6 @@
+#include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef void * MangoFile;
 typedef void * MangoImage;
@@ -10,11 +12,16 @@ typedef struct ImageData {
     size_t length;
 } ImageData;
 
+typedef struct IntOption {
+    int value;
+    int present;
+} IntOption;
+
 //---------------------------
 // Mango File
 // --------------------------
 extern MangoFile new_mango_file(); // TODO rename to mangofile_new
-extern void mangofile_new(MangoFile);
+extern void mangofile_free(MangoFile);
 extern void mangofile_add_image(MangoFile, MangoImage);
 extern int mangofile_add_image_by_path(MangoFile, char *);
 extern MangoImage mangofile_get_image(MangoFile, int);
@@ -131,6 +138,9 @@ extern void mangometa_set_source(MangoMeta, char *);
 
 extern char * mangometa_get_translation(MangoMeta);
 extern void mangometa_set_translation(MangoMeta, char *);
+
+extern IntOption mangometa_get_volume(MangoMeta);
+extern void mangometa_set_volume(MangoMeta, short *);
 
 // TODO
 // lang
