@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 typedef void * MangoFile;
 typedef void * MangoImage;
@@ -139,11 +138,15 @@ extern void mangometa_set_source(MangoMeta, char *);
 extern char * mangometa_get_translation(MangoMeta);
 extern void mangometa_set_translation(MangoMeta, char *);
 
+extern char * mangometa_get_language(MangoMeta);
+extern void mangometa_set_language(MangoMeta, char *);
+
 extern IntOption mangometa_get_volume(MangoMeta);
 extern void mangometa_set_volume(MangoMeta, short *);
 
-// TODO
-// lang
-// volume
-// chapter
-// year
+extern IntOption mangometa_get_chapter(MangoMeta);
+extern void mangometa_set_chapter(MangoMeta, short *);
+
+extern IntOption mangometa_get_year(MangoMeta);
+extern void mangometa_set_year(MangoMeta, short *);
+
