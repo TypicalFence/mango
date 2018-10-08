@@ -1,3 +1,4 @@
+use std::ffi::CString;
 use mangofmt::CompressionType;
 use mangofmt::EncryptionType;
 use mangofmt::Mime;
@@ -75,4 +76,19 @@ pub fn from_lang(lang: Language) -> String {
     };
 
     String::from(lang_str)
+}
+
+
+pub fn filter_nul_bytes(string: String) -> CString {
+    match CString::new(string) {
+        Ok(v) => v,
+        Err(err) => {
+            let index = err.nul_position();
+            let mut data = err.into_vec();
+            data.remove(index);
+            filter_nul_bytes(String::from_utf8(data).unwrap())
+        }
+        
+    }
+    
 }

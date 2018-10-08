@@ -12,6 +12,7 @@ def test_set_meta():
     mango_file.meta_data.author = "someone"
     assert mango_file.meta_data.author == "someone"
 
+
 def test_save_meta():
     mango_file = MangoFile()
     mango_file.meta_data.author = "someone"
@@ -23,16 +24,6 @@ def test_save_meta():
 
     assert mango_file.meta_data.author == "someone"
     os.remove("save_meta.mango")
-
-# TODO ehh?
-def test_file():
-    m = MangoFile()
-    m.add_image_by_path("test.jpg")
-    img = m.get_image(0)
-    img.compress(CompressionType.GZIP)
-    sum1 = img.meta_data.checksum
-    sum2 = m.get_image(0).meta_data.checksum
-    assert sum1 == sum2
 
 def test_save():
     file = MangoFile()
@@ -82,6 +73,8 @@ def test_save_bson():
     assert os.path.isfile("file_save_bson.mango")
     os.remove("file_save_bson.mango")
 
+
+
 def test_open():
     file = MangoFile()
     meta = file.meta_data
@@ -91,7 +84,6 @@ def test_open():
 
     file.save("file_open.mango")
 
-    os.remove("file_open.mango")
-
     ofile = MangoFile.open("file_open.mango")
     assert ofile.meta_data.author == file.meta_data.author
+    os.remove("file_open.mango")

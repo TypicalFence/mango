@@ -13,3 +13,6 @@ test: rust
 
 test_single: rust
 	LD_LIBRARY_PATH=../libmango/target/debug pytest -v
+
+debug:
+	LD_LIBRARY_PATH=../libmango/target/debug gdb --args  python3 -m pytest -v

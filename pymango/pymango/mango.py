@@ -1,8 +1,9 @@
 import base64
 import ctypes
+from ctypes import *
 from pymango.c import libmango
 from pymango.enums import CompressionType, EncryptionType
-
+from pymango.error import DecodeError, ReadError
 
 class MangoFile(object):
     def __init__(self, pointer=None):
@@ -22,6 +23,23 @@ class MangoFile(object):
     @property
     def image_count(self):
         return libmango.mangofile_get_image_count(self._pointer)
+
+    @staticmethod
+    def open(path):
+        error = c_int(-10)
+        pointer = libmango.mangofile_open(path.encode("utf-8"), byref(error))
+        
+        if error.value != 0:
+            if error.value == 1:
+                raise DecodeError
+            elif error.value == 2:
+                raise ReadError
+            elif error.value == 3:
+                raise FileNotFoundError
+            else:
+                raise Exception("Unknown Error")
+        
+        return MangoFile(pointer)
 
     def get_image(self, index):
         if index < self.image_count and index >= 0:
@@ -63,11 +81,6 @@ class MangoFile(object):
 
     def save_json(self, path):
         libmango.mangofile_save_json(self._pointer, path.encode("utf-8"))
-
-    @staticmethod
-    def open(path):
-        pointer = libmango.mangofile_open(path.encode("utf-8"), None)
-        return MangoFile(pointer)
 
 class MangoMetaData(object):
     def __init__(self, pointer):
@@ -112,8 +125,22 @@ class MangoImage(object):
     def __init__(self, pointer):
         self._pointer = pointer
 
+    def __del__(self):
+        libmango.mangoimg_free(self._pointer)
+        
+    @staticmethod
     def from_path(path):
-        return MangoImage(libmango.mangoimg_from_path(path.encode("utf-8")))
+        error = c_int(-10)
+        pointer = libmango.mangoimg_from_path(path.encode("utf-8"), byref(error))
+
+        if error.value != 0:
+            print(error)
+            if error.value == 1:
+                raise FileNotFoundError
+            else:
+                raise Exception("Unknown Error")
+
+        return MangoImage(pointer)
 
     @property
     def meta_data(self):
