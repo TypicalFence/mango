@@ -24,7 +24,7 @@ extern void mangofile_free(MangoFile);
 extern void mangofile_add_image(MangoFile, MangoImage);
 extern int mangofile_add_image_by_path(MangoFile, char *);
 extern MangoImage mangofile_get_image(MangoFile, int);
-extern int  mangofile_set_image(MangoFile, int);
+extern int  mangofile_set_image(MangoFile, MangoImage, int);
 extern int mangofile_get_image_count(MangoFile);
 extern MangoMeta mangofile_get_meta(MangoFile);
 

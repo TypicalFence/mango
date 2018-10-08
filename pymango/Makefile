@@ -8,5 +8,8 @@ clean:
 	cargo clean
 	pip3 uninstall pymango
 
-test:
+test: rust 
+	LD_LIBRARY_PATH=../libmango/target/debug pytest -v -n1
+
+test_single: rust
 	LD_LIBRARY_PATH=../libmango/target/debug pytest -v

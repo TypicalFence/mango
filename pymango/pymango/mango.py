@@ -5,20 +5,69 @@ from pymango.enums import CompressionType, EncryptionType
 
 
 class MangoFile(object):
-    def __init__(self):
-        self._pointer = libmango.new_mango_file()
+    def __init__(self, pointer=None):
+        if pointer is None:
+            self._pointer = libmango.new_mango_file()
+        else:
+            self._pointer = pointer
+
+
+    def __del__(self):
+        libmango.mangofile_free(self._pointer)
 
     @property
     def meta_data(self):
         return MangoMetaData(libmango.mangofile_get_meta(self._pointer))
 
+    @property
+    def image_count(self):
+        return libmango.mangofile_get_image_count(self._pointer)
+
     def get_image(self, index):
-        pointer = libmango.mangofile_get_image(self._pointer, index)
-        return MangoImage(pointer)
+        if index < self.image_count and index >= 0:
+            pointer = libmango.mangofile_get_image(self._pointer, index)
+            return MangoImage(pointer)
+        else:
+            raise IndexError
+
+    def set_image(self, img, index):
+        if index < self.image_count and index >= 0:
+            success = libmango.mangofile_set_image(self._pointer, img._pointer, index)
+
+            if success == 1:
+                return True
+            elif success == 0:
+                return False
+            else:
+                raise IndexError
+        else:
+            raise IndexError
+
+    def add_image(self, img):
+        # TODO check type of path
+        libmango.mangofile_add_image(self._pointer, img._pointer)
 
     def add_image_by_path(self, path):
         # TODO check type of path
         libmango.mangofile_add_image_by_path(self._pointer, path.encode("utf-8"))
+
+    # TODO add error handle
+    def save(self, path):
+        libmango.mangofile_save(self._pointer, path.encode("utf-8"))
+
+    def save_cbor(self, path):
+        libmango.mangofile_save_cbor(self._pointer, path.encode("utf-8"))
+
+    def save_bson(self, path):
+        libmango.mangofile_save_bson(self._pointer, path.encode("utf-8"))
+
+    def save_json(self, path):
+        libmango.mangofile_save_json(self._pointer, path.encode("utf-8"))
+
+    @staticmethod
+    def open(path):
+        pointer = libmango.mangofile_open(path.encode("utf-8"), None)
+        return MangoFile(pointer)
 
 class MangoMetaData(object):
     def __init__(self, pointer):
@@ -62,7 +111,7 @@ class MangoMetaData(object):
 class MangoImage(object):
     def __init__(self, pointer):
         self._pointer = pointer
-    
+
     def from_path(path):
         return MangoImage(libmango.mangoimg_from_path(path.encode("utf-8")))
 
@@ -78,9 +127,9 @@ class MangoImage(object):
             value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
         except:
             value = None
-        
+
         if value is not None:
-            value = base64.b64decode(value) 
+            value = base64.b64decode(value)
 
         return value
 
@@ -110,7 +159,7 @@ class MangoImageMetadata(object):
             return CompressionType(comp_type)
         else:
             return None
-    
+
     @property
     def encryption(self):
         enc_type = libmango.mangoimgmeta_encryption(self._pointer)
