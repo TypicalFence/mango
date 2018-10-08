@@ -99,7 +99,7 @@ libmango.mangoimg_compress.restype = c_bool
 libmango.mangoimg_uncompress.argtypes = (POINTER(RustMangoImage),)
 libmango.mangoimg_uncompress.restype = c_bool
 
-libmango.mangoimg_from_path.argtypes = (c_char_p,)
+libmango.mangoimg_from_path.argtypes = (c_char_p, POINTER(c_int))
 libmango.mangoimg_from_path.restype = POINTER(RustMangoImage)
 
 # -----------------------------------------------------------------------------

@@ -712,19 +712,8 @@ pub extern "C" fn mangoimgmeta_encryption(pointer: *mut MangoImageMetadata) -> *
 }
 
 #[no_mangle]
-pub extern "C" fn mangoimgmeta_checksum(pointer: *mut MangoImageMetadata) -> *mut c_char {
-    let meta: &mut MangoImageMetadata = unsafe {
-        assert!(!pointer.is_null());
-        &mut *pointer
-    };
-    use std::fs;
-    fs::write("/tmp/sum", meta.checksum.clone()).expect("Unable to write file");
-    // TODO fix this
-    if meta.checksum.len() > 0 {
-        return CString::new(meta.checksum.clone()).unwrap().into_raw();
-    } else {
-        return CString::new("OH NO!".to_string()).unwrap().into_raw();
-    }
+pub extern "C" fn mangoimgmeta_checksum(meta: &mut MangoImageMetadata) -> *mut c_char {
+    util::filter_nul_bytes(meta.checksum.clone()).into_raw()
 }
 
 #[no_mangle]
