@@ -577,12 +577,7 @@ pub extern "C" fn mangoimg_get_base64_image_data(pointer: *mut MangoImage) -> *m
 use mangofmt::MangoImageMetadata;
 
 #[no_mangle]
-pub extern "C" fn mangoimg_get_meta(pointer: *mut MangoImage) -> *mut MangoImageMetadata {
-    let img: &mut MangoImage = unsafe {
-        assert!(!pointer.is_null());
-        &mut *pointer
-    };
-
+pub extern "C" fn mangoimg_get_meta(img: &mut MangoImage) -> *mut MangoImageMetadata {
     let meta = img.get_meta_mut();
     let p_mut: *mut MangoImageMetadata = meta;
     p_mut
