@@ -18,7 +18,7 @@ class RustMangoImageMetadata(Structure):
 class ImageData(Structure):
 	_fields_ = [("pointer", POINTER(c_ubyte)),
 				("length", c_size_t)]
-	
+
 	def __exit__(self, exc_type, exc_value, traceback):
             libmango.mango_imagedata_free(self)
 
@@ -28,15 +28,43 @@ class ImageData(Structure):
 # MangoFile new_mango_file();
 libmango.new_mango_file.restype = POINTER(RustMangoFile)
 
+libmango.mangofile_free.argtypes = (POINTER(RustMangoFile),)
+
+# Image Manipulation
+libmango.mangofile_add_image.argtypes = (POINTER(RustMangoFile), POINTER(RustMangoImage))
+libmango.mangofile_add_image.restype = None
+
+libmango.mangofile_add_image_by_path.argtypes = (POINTER(RustMangoFile), c_char_p)
+libmango.mangofile_add_image_by_path.restype = c_int
+
+libmango.mangofile_get_image.argtypes = (POINTER(RustMangoFile), c_uint)
+libmango.mangofile_get_image.restype = POINTER(RustMangoImage)
+
+libmango.mangofile_set_image.argtypes = (POINTER(RustMangoFile), POINTER(RustMangoImage), c_int)
+libmango.mangofile_set_image.restype =  c_int
+
+libmango.mangofile_get_image_count.argtypes = (POINTER(RustMangoFile),)
+libmango.mangofile_get_image_count.restype = c_int
+
 libmango.mangofile_get_meta.argtypes = (POINTER(RustMangoFile),)
 libmango.mangofile_get_meta.restype = POINTER(RustMangoMetadata)
 
-libmango.mangofile_add_image_by_path.argtypes = (POINTER(RustMangoFile), c_char_p)
-#libmangi.mangofile_add_image_by_path.restype = 
+# Save
+libmango.mangofile_save.argtypes = (POINTER(RustMangoFile), c_char_p)
+libmango.mangofile_save.restype = c_int
 
-# MangoImage mangofile_get_image(MangoFile, int);
-libmango.mangofile_get_image.argtypes = (POINTER(RustMangoFile), c_uint)
-libmango.mangofile_get_image.restype = POINTER(RustMangoImage)
+libmango.mangofile_save_cbor.argtypes = (POINTER(RustMangoFile), c_char_p)
+libmango.mangofile_save_cbor.restype = c_int
+
+libmango.mangofile_save_bson.argtypes = (POINTER(RustMangoFile), c_char_p)
+libmango.mangofile_save_bson.restype = c_int
+
+libmango.mangofile_save_json.argtypes = (POINTER(RustMangoFile), c_char_p)
+libmango.mangofile_save_json.restype = c_int
+
+# Open
+libmango.mangofile_open.argtypes = (c_char_p, POINTER(c_int))
+libmango.mangofile_open.restype = POINTER(RustMangoFile)
 
 # -----------------------------------------------------------------------------
 # Mango Metadata

@@ -45,4 +45,14 @@ libmango-test:
       - make test/run_tests
       - echo "run tests"
       - make test
- 
+
+
+ # /pymango
+pymango-test:
+    stage: test
+
+    script:
+      - apt install -yqq python3 python3-pip
+      - pip3 install pytest pytest pytest-xdist
+      - cd pymango
+      - make test
