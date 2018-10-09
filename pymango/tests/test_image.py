@@ -3,6 +3,9 @@ from pymango import MangoImage, EncryptionType, CompressionType
 def test_open():
     img = MangoImage.from_path("test.jpg")
 
+def test_filename():
+    img = MangoImage.from_path("test.jpg")
+    assert img.meta_data.filename == "test.jpg"
 
 def test_checksum():
     import subprocess

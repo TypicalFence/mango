@@ -199,7 +199,7 @@ class MangoImageMetadata(object):
     def checksum(self):
         ptr = libmango.mangoimgmeta_checksum(self._pointer)
         try:
-            value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
+            value = ptr.decode('utf-8')
         except:
             print("holy fucking shit")
             value = None
@@ -210,3 +210,11 @@ class MangoImageMetadata(object):
         return value
 
         return checksum
+
+    @property
+    def filename(self):
+        ptr = libmango.mangoimgmeta_filename(self._pointer)
+        if ptr is not None:
+            return ptr.decode("utf-8")
+        else:
+            return None
