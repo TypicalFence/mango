@@ -1,3 +1,4 @@
+import subprocess
 from pymango import MangoImage, EncryptionType, CompressionType
 
 def test_open():
@@ -9,6 +10,18 @@ def test_filename():
 
 def test_checksum():
     import subprocess
+    img = MangoImage.from_path("test.jpg")
+    meta = img.meta_data
+    img_sum = meta.checksum
+    sys_proc = subprocess.run(["sha256sum", "test.jpg"], stdout=subprocess.PIPE)
+    sys_sum = sys_proc.stdout.decode("utf-8").split(" ")[0]
+
+    print(img_sum)
+    print(sys_sum)
+    assert img_sum == sys_sum
+
+def test_checksum_onelinner():
+    import subprocess
     img_sum = MangoImage.from_path("test.jpg").meta_data.checksum
     sys_proc = subprocess.run(["sha256sum", "test.jpg"], stdout=subprocess.PIPE)
     sys_sum = sys_proc.stdout.decode("utf-8").split(" ")[0]
@@ -16,6 +29,7 @@ def test_checksum():
     print(img_sum)
     print(sys_sum)
     assert img_sum == sys_sum
+
 
 def test_encryption_none():
     img_enc = MangoImage.from_path("test.jpg").meta_data.encryption

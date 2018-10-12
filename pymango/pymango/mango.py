@@ -18,7 +18,7 @@ class MangoFile(object):
 
     @property
     def meta_data(self):
-        return MangoMetaData(libmango.mangofile_get_meta(self._pointer))
+        return MangoMetaData(libmango.mangofile_get_meta(self._pointer), self)
 
     @property
     def image_count(self):
@@ -28,7 +28,7 @@ class MangoFile(object):
     def open(path):
         error = c_int(-10)
         pointer = libmango.mangofile_open(path.encode("utf-8"), byref(error))
-        
+
         if error.value != 0:
             if error.value == 1:
                 raise DecodeError
@@ -38,13 +38,13 @@ class MangoFile(object):
                 raise FileNotFoundError
             else:
                 raise Exception("Unknown Error")
-        
+
         return MangoFile(pointer)
 
     def get_image(self, index):
         if index < self.image_count and index >= 0:
             pointer = libmango.mangofile_get_image(self._pointer, index)
-            return MangoImage(pointer)
+            return MangoImage(pointer, self)
         else:
             raise IndexError
 
@@ -83,8 +83,9 @@ class MangoFile(object):
         libmango.mangofile_save_json(self._pointer, path.encode("utf-8"))
 
 class MangoMetaData(object):
-    def __init__(self, pointer):
+    def __init__(self, pointer, parent):
         self._pointer = pointer
+        self._parent = parent
 
     @property
     def title(self):
@@ -122,12 +123,13 @@ class MangoMetaData(object):
 
 
 class MangoImage(object):
-    def __init__(self, pointer):
+    def __init__(self, pointer, parent=None):
         self._pointer = pointer
+        self._parent = parent
 
     def __del__(self):
         libmango.mangoimg_free(self._pointer)
-        
+
     @staticmethod
     def from_path(path):
         error = c_int(-10)
@@ -145,7 +147,7 @@ class MangoImage(object):
     @property
     def meta_data(self):
         pointer = libmango.mangoimg_get_meta(self._pointer)
-        return MangoImageMetadata(pointer)
+        return MangoImageMetadata(pointer, self)
 
     @property
     def image_data(self):
@@ -176,8 +178,9 @@ class MangoImage(object):
         libmango.mangoimg_uncompress(self._pointer)
 
 class MangoImageMetadata(object):
-    def __init__(self, pointer):
+    def __init__(self, pointer, parent):
         self._pointer = pointer
+        self._parent = parent
 
     @property
     def compression(self):
