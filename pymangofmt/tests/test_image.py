@@ -1,5 +1,5 @@
 import subprocess
-from pymango import MangoImage, EncryptionType, CompressionType
+from mangofmt import MangoImage, EncryptionType, CompressionType
 
 def test_open():
     img = MangoImage.from_path("test.jpg")
