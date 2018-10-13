@@ -1,5 +1,5 @@
 import os
-from pymango import MangoImage, EncryptionType, CompressionType, MangoFile
+from mangofmt import MangoImage, EncryptionType, CompressionType, MangoFile
 
 
 def test_meta_is_none():

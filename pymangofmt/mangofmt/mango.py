@@ -1,9 +1,9 @@
 import base64
 import ctypes
 from ctypes import *
-from pymango.c import libmango
-from pymango.enums import CompressionType, EncryptionType
-from pymango.error import DecodeError, ReadError
+from mangofmt.c import libmango
+from mangofmt.enums import CompressionType, EncryptionType
+from mangofmt.error import DecodeError, ReadError
 
 class MangoFile(object):
     def __init__(self, pointer=None):
