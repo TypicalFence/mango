@@ -81,6 +81,7 @@ libmango.mangometa_get_author.restype = c_void_p
 libmango.mangometa_set_title.argtypes = (POINTER(RustMangoMetadata), c_char_p)
 libmango.mangometa_set_title.restype = None
 
+
 # -----------------------------------------------------------------------------
 # Mango Image
 # -----------------------------------------------------------------------------
@@ -121,6 +122,8 @@ libmango.mangoimgmeta_encryption.restype = c_char_p
 libmango.mangoimgmeta_filename.argtypes = (POINTER(RustMangoImageMetadata),)
 libmango.mangoimgmeta_filename.restype = c_char_p
 
+libmango.mangoimgmeta_mime.argtypes = (POINTER(RustMangoImageMetadata),)
+libmango.mangoimgmeta_mime.restype = c_char_p
 
 # char * mangoimgmeta_checksum(MangoImageMeta);
 libmango.mangoimgmeta_checksum.argtypes = (POINTER(RustMangoImageMetadata),)
