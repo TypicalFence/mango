@@ -8,6 +8,11 @@ def test_filename():
     img = MangoImage.from_path("test.jpg")
     assert img.meta_data.filename == "test.jpg"
 
+def test_mime():
+    img = MangoImage.from_path("test.jpg")
+    assert img.meta_data.mime == "JPEG"
+
+
 def test_checksum():
     import subprocess
     img = MangoImage.from_path("test.jpg")
@@ -29,7 +34,6 @@ def test_checksum_onelinner():
     print(img_sum)
     print(sys_sum)
     assert img_sum == sys_sum
-
 
 def test_encryption_none():
     img_enc = MangoImage.from_path("test.jpg").meta_data.encryption
