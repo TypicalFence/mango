@@ -44,11 +44,11 @@ impl MangoImage {
     pub fn get_image_data(&self) -> Vec<u8> {
         self.data.clone()
     }
-	
+
 	pub fn get_base64_image_data(&self) -> String {
 		base64::encode(&self.data.clone())
 	}
-	
+
     pub fn compress(&self, comp: CompressionType) -> Option<MangoImage> {
         if self.meta.encryption.is_none()  && self.meta.compression.is_none() {
             return Some(compression::compress(comp, self));
@@ -155,7 +155,7 @@ mod test {
         let mut img = MangoImage::from_file(&mut file);
         let clean_data = img.get_image_data();
 
-        img.encrypt_mut(EncryptionType::AES128, String::from("1234567812345678"));
+        img.encrypt_mut(EncryptionType::AES256, String::from("1234567812345678"));
         assert_eq!(img.get_meta().encryption.is_some(), true);
         assert_ne!(img.get_image_data(), clean_data);
         img.decrypt_mut(String::from("1234567812345678"));

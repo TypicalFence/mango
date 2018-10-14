@@ -1,4 +1,3 @@
-use std;
 use std::io::prelude::*;
 use serde_json;
 use image::{MangoImage, Mime};
