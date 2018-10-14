@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class CompressionType(Enum):
     GZIP = "GZIP"
 
