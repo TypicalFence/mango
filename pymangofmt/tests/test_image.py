@@ -47,3 +47,21 @@ def test_uncompress():
     img.compress(CompressionType.GZIP)
     img.uncompress()
     assert img_data == img.image_data
+
+def test_encrypt():
+    img = MangoImage.from_path("test.jpg")
+    img_data = img.image_data
+    img.encrypt(EncryptionType.AES128, "1234567812345678")
+    assert not img_data == img.image_data
+
+def test_decrypt():
+    img = MangoImage.from_path("test.jpg")
+    img_data = img.image_data
+
+    enc = img.encrypt(EncryptionType.AES128, "1234567812345678")
+    assert enc == True
+
+    dec = img.decrypt("1234567812345678")
+    assert dec == True
+
+    assert img_data == img.image_data
