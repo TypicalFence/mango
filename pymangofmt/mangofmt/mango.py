@@ -177,6 +177,24 @@ class MangoImage(object):
     def uncompress(self):
         libmango.mangoimg_uncompress(self._pointer)
 
+    def encrypt(self, etype, password):
+        enc_type = None
+
+        if isinstance(etype, EncryptionType):
+            enc_type = etype.value
+        elif isinstance(etype, str):
+            enc_type = etype
+        else:
+            raise TypeError
+        print(enc_type)
+        return libmango.mangoimg_encrypt(self._pointer,
+                                         enc_type.encode("utf-8"),
+                                         password.encode("utf-8"))
+
+    def decrypt(self, password):
+        return libmango.mangoimg_decrypt(self._pointer, password.encode("utf-8"))
+
+
 class MangoImageMetadata(object):
     def __init__(self, pointer, parent):
         self._pointer = pointer
@@ -204,7 +222,6 @@ class MangoImageMetadata(object):
         try:
             value = ptr.decode('utf-8')
         except:
-            print("holy fucking shit")
             value = None
         finally:
             # TODO free pointer here desu
@@ -221,3 +238,12 @@ class MangoImageMetadata(object):
             return ptr.decode("utf-8")
         else:
             return None
+
+    @property
+    def mime(self):
+        ptr = libmango.mangoimgmeta_mime(self._pointer)
+        if ptr is not None:
+            return ptr.decode("utf-8")
+        else:
+            return None
+

@@ -8,6 +8,11 @@ def test_filename():
     img = MangoImage.from_path("test.jpg")
     assert img.meta_data.filename == "test.jpg"
 
+def test_mime():
+    img = MangoImage.from_path("test.jpg")
+    assert img.meta_data.mime == "JPEG"
+
+
 def test_checksum():
     import subprocess
     img = MangoImage.from_path("test.jpg")
@@ -30,7 +35,6 @@ def test_checksum_onelinner():
     print(sys_sum)
     assert img_sum == sys_sum
 
-
 def test_encryption_none():
     img_enc = MangoImage.from_path("test.jpg").meta_data.encryption
     assert img_enc is None
@@ -46,4 +50,22 @@ def test_uncompress():
     img_data = img.image_data
     img.compress(CompressionType.GZIP)
     img.uncompress()
+    assert img_data == img.image_data
+
+def test_encrypt():
+    img = MangoImage.from_path("test.jpg")
+    img_data = img.image_data
+    img.encrypt(EncryptionType.AES128, "1234567812345678")
+    assert not img_data == img.image_data
+
+def test_decrypt():
+    img = MangoImage.from_path("test.jpg")
+    img_data = img.image_data
+
+    enc = img.encrypt(EncryptionType.AES128, "1234567812345678")
+    assert enc == True
+
+    dec = img.decrypt("1234567812345678")
+    assert dec == True
+
     assert img_data == img.image_data
