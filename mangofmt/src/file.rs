@@ -366,7 +366,7 @@ mod tests {
         let mut file = MangoFile::new();
         let mut img = MangoImage::from_file(&mut ImageFile::open(Path::new("test.jpg")).unwrap());
         img.compress_mut(CompressionType::GZIP);
-        img.encrypt_mut(EncryptionType::AES128, "1234567812345678".to_lowercase());
+        img.encrypt_mut(EncryptionType::AES256, String::from("1234567812345678"));
         file.add_image(img);
         file
     }
