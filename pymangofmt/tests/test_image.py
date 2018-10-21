@@ -1,3 +1,4 @@
+import pytest
 import subprocess
 from mangofmt import MangoImage, EncryptionType, CompressionType
 
@@ -69,3 +70,13 @@ def test_decrypt():
     assert dec == True
 
     assert img_data == img.image_data
+
+def test_save():
+    img = MangoImage.from_path("test.jpg")
+    img.save("save_test.jpg")
+
+def test_save_permission():
+    img = MangoImage.from_path("test.jpg")
+
+    with pytest.raises(PermissionError):
+        img.save("/test.jpg")

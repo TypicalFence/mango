@@ -109,6 +109,10 @@ libmango.mangoimg_decrypt.restype = c_bool
 libmango.mangoimg_from_path.argtypes = (c_char_p, POINTER(c_int))
 libmango.mangoimg_from_path.restype = POINTER(RustMangoImage)
 
+libmango.mangoimg_save.argtypes = (POINTER(RustMangoImage), c_char_p)
+libmango.mangoimg_save.restype = c_int
+
+
 # -----------------------------------------------------------------------------
 # Mango Image Metadata
 # -----------------------------------------------------------------------------
