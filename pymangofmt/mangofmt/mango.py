@@ -162,6 +162,13 @@ class MangoImage(object):
 
         return value
 
+    def save(self, path):
+        code = libmango.mangoimg_save(self._pointer, path.encode("utf8"))
+
+        if code == 1:
+            raise PermissionError
+
+
     def compress(self, ctype):
         comp_type = None
 
