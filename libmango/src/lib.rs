@@ -3,6 +3,7 @@ extern crate libc;
 
 mod util;
 
+use std::slice;
 use std::path::Path;
 use std::ffi::{CStr, CString};
 use std::io;
@@ -13,6 +14,23 @@ use libc::c_char;
 use mangofmt::MangoFile;
 use mangofmt::MangoImage;
 use mangofmt::meta::MangoMetadata;
+
+//----------------------------------------------------------------------------------------
+// Helper Structs
+//----------------------------------------------------------------------------------------
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct ImageData {
+    pub pointer: *mut u8,
+    pub length: usize,
+}
+
+#[derive(Clone, Copy)]
+#[repr(C)]
+pub struct IntOption {
+    pub value: c_int,
+    pub present: c_int,
+}
 
 //----------------------------------------------------------------------------------------
 // Mango File
@@ -412,12 +430,6 @@ pub extern "C" fn mangometa_set_translation(pointer: *mut MangoMetadata, value_p
     }
 }
 
-#[derive(Clone, Copy)]
-#[repr(C)]
-pub struct IntOption {
-    pub value: c_int,
-    pub present: c_int,
-}
 
 #[no_mangle]
 pub extern "C" fn mangometa_get_volume(meta: &mut MangoMetadata) -> IntOption {
@@ -514,16 +526,6 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, error_code:  *m
     std::ptr::null_mut()
 }
 
-
-#[derive(Clone, Copy)]
-#[repr(C)]
-pub struct ImageData {
-    pub pointer: *mut u8,
-    pub length: usize,
-}
-
-use std::slice;
-
 #[no_mangle]
 pub unsafe extern "C" fn mango_imagedata_free(bytes: ImageData) {
     let ImageData { pointer, length } = bytes;
@@ -562,7 +564,6 @@ pub extern "C" fn mangoimg_get_image_data(pointer: *mut MangoImage) -> ImageData
         length,
 	  }
 }
-
 
 #[no_mangle]
 pub extern "C" fn mangoimg_get_base64_image_data(pointer: *mut MangoImage) -> *mut c_char {

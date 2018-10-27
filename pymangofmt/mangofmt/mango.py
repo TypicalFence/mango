@@ -254,3 +254,16 @@ class MangoImageMetadata(object):
         else:
             return None
 
+    @property
+    def iv(self):
+        ptr = libmango.mangoimgmeta_iv(self._pointer)
+        size = libmango.mangoimgmeta_iv_size(self._pointer)
+
+        iv = []
+
+        for i in range(0, size):
+            iv.append(ptr[i])
+
+        return iv
+
+
