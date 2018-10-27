@@ -133,4 +133,9 @@ libmango.mangoimgmeta_mime.restype = c_char_p
 libmango.mangoimgmeta_checksum.argtypes = (POINTER(RustMangoImageMetadata),)
 libmango.mangoimgmeta_checksum.restype = c_char_p
 
+libmango.mangoimgmeta_iv.argtypes = (POINTER(RustMangoImageMetadata),)
+libmango.mangoimgmeta_iv.restype = POINTER(c_int)
+
+libmango.mangoimgmeta_iv_size.argtypes = (POINTER(RustMangoImageMetadata),)
+libmango.mangoimgmeta_iv_size.restype = c_int
 

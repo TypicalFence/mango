@@ -1,3 +1,4 @@
+import os
 import pytest
 import subprocess
 from mangofmt import MangoImage, EncryptionType, CompressionType
@@ -75,8 +76,20 @@ def test_save():
     img = MangoImage.from_path("test.jpg")
     img.save("save_test.jpg")
 
+@pytest.mark.skipif(os.geteuid() == 0, reason="can't be tested as root")
 def test_save_permission():
     img = MangoImage.from_path("test.jpg")
 
     with pytest.raises(PermissionError):
         img.save("/test.jpg")
+
+def test_iv():
+    img = MangoImage.from_path("test.jpg")
+    img.encrypt(EncryptionType.AES128, "lol")
+    meta = img.meta_data
+    iv = meta.iv
+
+    # is a list of random ints
+    assert isinstance(iv, list)
+    assert len(iv) > 0
+    assert isinstance(iv[0], int)
