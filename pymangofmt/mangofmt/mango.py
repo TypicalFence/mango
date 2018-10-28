@@ -2,7 +2,7 @@ import base64
 import ctypes
 from ctypes import *
 from mangofmt.c import libmango
-from mangofmt.enums import CompressionType, EncryptionType
+from mangofmt.enums import CompressionType, EncryptionType, Language
 from mangofmt.error import DecodeError, ReadError
 
 class MangoFile(object):
@@ -170,6 +170,34 @@ class MangoMetaData(object):
     @translation.setter
     def translation(self, value):
         libmango.mangometa_set_translation(self._pointer, value.encode("utf-8"))
+
+    @property
+    def language(self):
+        ptr = libmango.mangometa_get_language(self._pointer)
+
+        try:
+            lang = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
+        except:
+            lang = None
+        finally:
+            # TODO free pointer
+            pass
+
+        if lang is not None:
+            return Language(lang)
+        else:
+            return None
+
+    @language.setter
+    def language(self, lang_enum):
+        lang = None
+
+        if isinstance(lang_enum, Language):
+            lang = lang_enum.value
+        else:
+            raise TypeError
+
+        libmango.mangometa_set_language(self._pointer, lang.encode("utf-8"))
 
     @property
     def volume(self):
