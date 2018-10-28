@@ -22,10 +22,13 @@ class ImageData(Structure):
 	def __exit__(self, exc_type, exc_value, traceback):
             libmango.mango_imagedata_free(self)
 
+class IntOption(Structure):
+    _fields_ = [("value", c_int),
+                ("present", c_int)]
+
 # -----------------------------------------------------------------------------
 # Mango File
 # -----------------------------------------------------------------------------
-# MangoFile new_mango_file();
 libmango.new_mango_file.restype = POINTER(RustMangoFile)
 
 libmango.mangofile_free.argtypes = (POINTER(RustMangoFile),)
@@ -69,18 +72,61 @@ libmango.mangofile_open.restype = POINTER(RustMangoFile)
 # -----------------------------------------------------------------------------
 # Mango Metadata
 # -----------------------------------------------------------------------------
+# title
 libmango.mangometa_get_title.argtypes = (POINTER(RustMangoMetadata),)
 libmango.mangometa_get_title.restype = c_void_p
 
 libmango.mangometa_set_title.argtypes = (POINTER(RustMangoMetadata), c_char_p)
 libmango.mangometa_set_title.restype = None
 
+# author
 libmango.mangometa_get_author.argtypes = (POINTER(RustMangoMetadata),)
 libmango.mangometa_get_author.restype = c_void_p
 
-libmango.mangometa_set_title.argtypes = (POINTER(RustMangoMetadata), c_char_p)
-libmango.mangometa_set_title.restype = None
+libmango.mangometa_set_author.argtypes = (POINTER(RustMangoMetadata), c_char_p)
+libmango.mangometa_set_author.restype = None
 
+# publisher
+libmango.mangometa_get_publisher.argtypes = (POINTER(RustMangoMetadata),)
+libmango.mangometa_get_publisher.restype = c_void_p
+
+libmango.mangometa_set_publisher.argtypes = (POINTER(RustMangoMetadata), c_char_p)
+libmango.mangometa_set_publisher.restype = None
+
+# source
+libmango.mangometa_get_source.argtypes = (POINTER(RustMangoMetadata),)
+libmango.mangometa_get_source.restype = c_void_p
+
+libmango.mangometa_set_source.argtypes = (POINTER(RustMangoMetadata), c_char_p)
+libmango.mangometa_set_source.restype = None
+
+# translation
+libmango.mangometa_get_translation.argtypes = (POINTER(RustMangoMetadata),)
+libmango.mangometa_get_translation.restype = c_void_p
+
+libmango.mangometa_set_translation.argtypes = (POINTER(RustMangoMetadata), c_char_p)
+libmango.mangometa_set_translation.restype = None
+
+# volume
+libmango.mangometa_get_volume.argtypes = (POINTER(RustMangoMetadata),)
+libmango.mangometa_get_volume.restype = IntOption
+
+libmango.mangometa_set_volume.argtypes = (POINTER(RustMangoMetadata), POINTER(c_int))
+libmango.mangometa_set_volume.restype = None
+
+# chapter
+libmango.mangometa_get_chapter.argtypes = (POINTER(RustMangoMetadata),)
+libmango.mangometa_get_chapter.restype = IntOption
+
+libmango.mangometa_set_chapter.argtypes = (POINTER(RustMangoMetadata), POINTER(c_int))
+libmango.mangometa_set_chapter.restype = None
+
+# chapter
+libmango.mangometa_get_year.argtypes = (POINTER(RustMangoMetadata),)
+libmango.mangometa_get_year.restype = IntOption
+
+libmango.mangometa_set_year.argtypes = (POINTER(RustMangoMetadata), POINTER(c_int))
+libmango.mangometa_set_year.restype = None
 
 # -----------------------------------------------------------------------------
 # Mango Image
@@ -112,11 +158,9 @@ libmango.mangoimg_from_path.restype = POINTER(RustMangoImage)
 libmango.mangoimg_save.argtypes = (POINTER(RustMangoImage), c_char_p)
 libmango.mangoimg_save.restype = c_int
 
-
 # -----------------------------------------------------------------------------
 # Mango Image Metadata
 # -----------------------------------------------------------------------------
-# char * mangoimgmeta_compression(MangoImageMeta);
 libmango.mangoimgmeta_compression.argtypes = (POINTER(RustMangoImageMetadata),)
 libmango.mangoimgmeta_compression.restype = c_char_p
 

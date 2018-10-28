@@ -11,12 +11,6 @@ typedef struct ImageData {
     size_t length;
 } ImageData;
 
-typedef struct MangoIV {
-  uint8_t* pointer;
-  size_t length;
-} MangoIV;
-
-
 typedef struct IntOption {
     int value;
     int present;

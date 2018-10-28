@@ -73,8 +73,6 @@ def test_save_bson():
     assert os.path.isfile("file_save_bson.mango")
     os.remove("file_save_bson.mango")
 
-
-
 def test_open():
     file = MangoFile()
     meta = file.meta_data
