@@ -12,7 +12,6 @@ class MangoFile(object):
         else:
             self._pointer = pointer
 
-
     def __del__(self):
         libmango.mangofile_free(self._pointer)
 
@@ -120,6 +119,93 @@ class MangoMetaData(object):
     @author.setter
     def author(self, value):
         libmango.mangometa_set_author(self._pointer, value.encode("utf-8"))
+
+    @property
+    def publisher(self):
+        ptr = libmango.mangometa_get_publisher(self._pointer)
+        try:
+            value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
+        except:
+            value = None
+        finally:
+            # TODO free pointer here desu
+            pass
+
+        return value
+
+    @publisher.setter
+    def publisher(self, value):
+        libmango.mangometa_set_publisher(self._pointer, value.encode("utf-8"))
+
+    @property
+    def source(self):
+        ptr = libmango.mangometa_get_source(self._pointer)
+        try:
+            value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
+        except:
+            value = None
+        finally:
+            # TODO free pointer here desu
+            pass
+
+        return value
+
+    @source.setter
+    def source(self, value):
+        libmango.mangometa_set_source(self._pointer, value.encode("utf-8"))
+
+    @property
+    def translation(self):
+        ptr = libmango.mangometa_get_translation(self._pointer)
+        try:
+            value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
+        except:
+            value = None
+        finally:
+            # TODO free pointer here desu
+            pass
+
+        return value
+
+    @translation.setter
+    def translation(self, value):
+        libmango.mangometa_set_translation(self._pointer, value.encode("utf-8"))
+
+    @property
+    def volume(self):
+        option = libmango.mangometa_get_volume(self._pointer)
+        if option.present == 1:
+            return option.value
+        else:
+            return None
+
+    @volume.setter
+    def volume(self, value):
+        libmango.mangometa_set_volume(self._pointer, byref(c_int(value)))
+
+    @property
+    def chapter(self):
+        option = libmango.mangometa_get_chapter(self._pointer)
+        if option.present == 1:
+            return option.value
+        else:
+            return None
+
+    @chapter.setter
+    def chapter(self, value):
+        libmango.mangometa_set_chapter(self._pointer, byref(c_int(value)))
+
+    @property
+    def year(self):
+        option = libmango.mangometa_get_year(self._pointer)
+        if option.present == 1:
+            return option.value
+        else:
+            return None
+
+    @year.setter
+    def year(self, value):
+        libmango.mangometa_set_year(self._pointer, byref(c_int(value)))
 
 
 class MangoImage(object):
