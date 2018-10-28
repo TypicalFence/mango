@@ -24,7 +24,7 @@ sudo make uninstall
 or 
 
 ```
-rm /usr/local/lib/libmango.so
-rm /usr/local/include/libmango.h
+rm /usr/lib/libmango.so
+rm /usr/include/libmango.h
 ```
 

@@ -41,10 +41,10 @@ release:
 	cargo build --release
 
 install: target/release/libmango.so
-	cp target/release/libmango.so /usr/local/lib/
-	cp libmango.h /usr/local/include/
+	cp target/release/libmango.so /usr/lib/
+	cp libmango.h /usr/include/
 
 uninstall:
-	rm /usr/local/lib/libmango.so
-	rm /usr/local/include/libmango.h
+	rm /usr/lib/libmango.so
+	rm /usr/include/libmango.h
 
