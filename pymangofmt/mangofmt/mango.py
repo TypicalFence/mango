@@ -4,6 +4,7 @@ from ctypes import *
 from mangofmt.c import libmango
 from mangofmt.enums import CompressionType, EncryptionType, Language
 from mangofmt.error import DecodeError, ReadError
+from mangofmt.error import EncodeError, WriteError
 
 class MangoFile(object):
     def __init__(self, pointer=None):
@@ -68,18 +69,30 @@ class MangoFile(object):
         # TODO check type of path
         libmango.mangofile_add_image_by_path(self._pointer, path.encode("utf-8"))
 
-    # TODO add error handle
+    def _save_error_handling(self, code):
+       if code == 1:
+           raise EncodeError
+       elif code == 2:
+           raise WriteError
+       elif code == 3:
+           raise PermissionError
+
     def save(self, path):
-        libmango.mangofile_save(self._pointer, path.encode("utf-8"))
+        error = libmango.mangofile_save(self._pointer, path.encode("utf-8"))
+        self._save_error_handling(error)
 
     def save_cbor(self, path):
-        libmango.mangofile_save_cbor(self._pointer, path.encode("utf-8"))
+        error = libmango.mangofile_save_cbor(self._pointer, path.encode("utf-8"))
+        self._save_error_handling(error)
 
     def save_bson(self, path):
-        libmango.mangofile_save_bson(self._pointer, path.encode("utf-8"))
+        error = libmango.mangofile_save_bson(self._pointer, path.encode("utf-8"))
+        self._save_error_handling(error)
+
 
     def save_json(self, path):
-        libmango.mangofile_save_json(self._pointer, path.encode("utf-8"))
+        error = libmango.mangofile_save_json(self._pointer, path.encode("utf-8"))
+        self._save_error_handling(error)
 
 class MangoMetaData(object):
     def __init__(self, pointer, parent):
