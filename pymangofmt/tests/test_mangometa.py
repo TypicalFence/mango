@@ -1,4 +1,4 @@
-from mangofmt import MangoImage, EncryptionType, CompressionType, MangoFile
+from mangofmt import MangoFile, EncryptionType, CompressionType, Language
 
 def test_title():
     mango = MangoFile()
@@ -55,3 +55,10 @@ def test_year():
     assert meta.year == None
     meta.year = 2
     assert meta.year == 2
+
+def test_language():
+    mango = MangoFile()
+    meta = mango.meta_data
+    assert meta.language == None
+    meta.language = Language.EN
+    assert meta.language == Language.EN

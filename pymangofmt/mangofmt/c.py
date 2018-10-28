@@ -128,6 +128,10 @@ libmango.mangometa_get_year.restype = IntOption
 libmango.mangometa_set_year.argtypes = (POINTER(RustMangoMetadata), POINTER(c_int))
 libmango.mangometa_set_year.restype = None
 
+# language
+libmango.mangometa_get_language.argtypes = (POINTER(RustMangoMetadata),)
+libmango.mangometa_get_language.restype = c_void_p
+
 # -----------------------------------------------------------------------------
 # Mango Image
 # -----------------------------------------------------------------------------
