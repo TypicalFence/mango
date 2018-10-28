@@ -2,7 +2,7 @@ SHELL := /usr/bin/env bash
 EXAMPLE_SRC :=  $(shell find ./examples -name '*.c')
 EXAMPLES := $(shell find ./examples -name '*.c' |  sed  's/\.c//g' | sed 's/s\//s\/build\//g')
 TEST_SRC := $(shell find ./test -name '*.c')
-
+   
 build: rust
 
 clean: rust_clean examples_clean test_clean docs_clean
@@ -36,4 +36,15 @@ documentation:
 
 docs_clean:
 	rm -rf docs/html
+
+release:
+	cargo build --release
+
+install: target/release/libmango.so
+	cp target/release/libmango.so /usr/local/lib/
+	cp libmango.h /usr/local/include/
+
+uninstall:
+	rm /usr/local/lib/libmango.so
+	rm /usr/local/include/libmango.h
 
