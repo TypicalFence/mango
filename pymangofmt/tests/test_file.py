@@ -85,3 +85,29 @@ def test_open():
     ofile = MangoFile.open("file_open.mango")
     assert ofile.meta_data.author == file.meta_data.author
     os.remove("file_open.mango")
+
+
+def test_get_image():
+    import hashlib
+    file = MangoFile()
+    file.add_image_by_path("test.jpg")
+    img = file.get_image(0)
+    print(img.meta_data.checksum)
+    my_bytes = img.image_data
+    my_hash = img.meta_data.checksum
+
+    assert hashlib.sha256(my_bytes).hexdigest() == my_hash
+
+def test_get_images():
+    import hashlib
+    file = MangoFile()
+    file.add_image_by_path("test.jpg")
+    file.add_image_by_path("test.jpg")
+    file.add_image_by_path("test.jpg")
+
+    for image in file.images:
+        my_bytes = image.image_data
+        my_hash = image.meta_data.checksum
+        assert hashlib.sha256(my_bytes).hexdigest() == my_hash
+        print(my_hash)
+
