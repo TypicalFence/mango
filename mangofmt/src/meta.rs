@@ -12,7 +12,7 @@ use json::base64Option;
 
 fn get_checksum(file: &mut File) -> String {
     let mut data = Vec::new();
-file.read_to_end(&mut data);
+    file.read_to_end(&mut data);
     let mut hasher = Sha256::default();
     hasher.input(&data);
     let checksum = hasher.result();
@@ -76,12 +76,14 @@ pub struct MangoImageMetadata {
 
 impl MangoImageMetadata {
     pub fn from_file_metadata(data: ImageFileMetadata) -> Self {
+        let filename: String = data.path.split("/")
+            .collect::<Vec<&str>>().last().unwrap().to_string();
+
          Self {
             compression: None,
             encryption: None,
             iv: None,
-            //TODO fix filename
-            filename: data.path,
+            filename: filename,
             checksum: data.checksum,
             mime: data.mime,
         }
