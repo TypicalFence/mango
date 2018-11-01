@@ -24,6 +24,11 @@ class MangoFile(object):
     def image_count(self):
         return libmango.mangofile_get_image_count(self._pointer)
 
+    @property
+    def images(self):
+        for index in range(0, self.image_count):
+            yield self.get_image(index)
+
     @staticmethod
     def open(path):
         error = c_int(-10)
@@ -53,6 +58,8 @@ class MangoFile(object):
             success = libmango.mangofile_set_image(self._pointer, img._pointer, index)
 
             if success == 1:
+                # TODO maybe set our self as parent of img?
+                # memeory management
                 return True
             elif success == 0:
                 return False
@@ -255,7 +262,8 @@ class MangoImage(object):
         self._parent = parent
 
     def __del__(self):
-        libmango.mangoimg_free(self._pointer)
+        if self._parent is None:
+            libmango.mangoimg_free(self._pointer)
 
     @staticmethod
     def from_path(path):
