@@ -346,7 +346,7 @@ class MangoImageMetadata(object):
     def compression(self):
         comp_type = libmango.mangoimgmeta_compression(self._pointer)
         if comp_type is not None:
-            return CompressionType(comp_type)
+            return CompressionType(comp_type.decode("utf-8"))
         else:
             return None
 
