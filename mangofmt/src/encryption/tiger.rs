@@ -1,4 +1,8 @@
-use tiger_digest::{Tiger, Digest};
+#[cfg(feature = "aes")]
+extern crate tiger_digest;
+
+#[cfg(feature = "aes")]
+use self::tiger_digest::{Tiger, Digest};
 
 pub fn tiger_128(key: String) -> Vec<u8> {
     // generate a Tiger/128 hash
