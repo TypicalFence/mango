@@ -1,5 +1,4 @@
 extern crate base64;
-extern crate flate2;
 extern crate sha2;
 extern crate hex;
 extern crate serde;

@@ -1,9 +1,9 @@
-use std::io::{Write, Read};
+#[cfg(feature = "gzip")]
+mod gzip;
+
+use std::fmt;
 use std::clone::Clone;
-use flate2;
-use flate2::write::GzEncoder;
-use flate2::read::GzDecoder;
-use image::MangoImage;
+use MangoImage;
 
 #[derive(Serialize, Deserialize)]
 pub enum CompressionType {
@@ -18,9 +18,6 @@ impl Clone for CompressionType {
     }
 }
 
-
-use std::fmt;
-
 impl fmt::Display for CompressionType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -29,39 +26,29 @@ impl fmt::Display for CompressionType {
     }
 }
 
+impl CompressionType {
+    pub fn is_supported(self) -> bool {
+        match self {
+            #[cfg(feature = "gzip")]
+            CompressionType::GZIP => true,
+            _ => false,
+        }
+    }
+}
 
 pub fn compress(ctype: CompressionType, image: &MangoImage) -> MangoImage {
     match ctype {
-        CompressionType::GZIP => gzip_compress(image)
+        #[cfg(feature = "gzip")]
+        CompressionType::GZIP => gzip::compress(image),
+        _ => image.clone(),
     }
 }
 
 pub fn uncompress(ctype: CompressionType, image: &MangoImage) -> MangoImage {
     match ctype {
-        CompressionType::GZIP => gzip_uncompress(image)
+        #[cfg(feature = "gzip")]
+        CompressionType::GZIP => gzip::uncompress(image),
+        _ => image.clone(),
     }
 }
 
-fn gzip_compress(image: &MangoImage) -> MangoImage {
-    let image_vec = &image.get_image_data();
-    let mut e = GzEncoder::new(Vec::new(), flate2::Compression::Best);
-    e.write_all(&image_vec).unwrap();
-    let compressed = e.finish().unwrap();
-
-    let mut new_meta = image.get_meta();
-    new_meta.compression = Some(CompressionType::GZIP);
-
-    MangoImage::new(compressed, new_meta)
-}
-
-fn gzip_uncompress(image: &MangoImage) -> MangoImage {
-    let image_data = &image.get_image_data();
-    let mut decoder = GzDecoder::new(image_data.as_slice()).unwrap();
-    let mut raw_data = Vec::new();
-    decoder.read_to_end(&mut raw_data);
-
-    let mut new_meta = image.get_meta();
-    new_meta.compression = None;
-
-    MangoImage::new(raw_data, new_meta)
-}
