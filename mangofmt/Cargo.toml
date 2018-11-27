@@ -5,11 +5,12 @@ authors = ["Alex Fence <alexfence.code@gmail.com>"]
 
 ["features"]
 aes = ["openssl", "tiger-digest"]
-default = ["aes"]
+gzip = ["flate2"]
+default = []
 
 [dependencies]
 base64 = "0.6.0"
-flate2 = "0.2.19"
+flate2 = { version = "0.2.19", optional = true }
 sha2 = "0.6.0"
 hex = "0.2.0"
 serde = "1.0.10"

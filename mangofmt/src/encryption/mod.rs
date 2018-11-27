@@ -30,6 +30,18 @@ impl fmt::Display for EncryptionType {
     }
 }
 
+impl EncryptionType {
+    pub fn is_supported(self) -> bool {
+        match self {
+            #[cfg(feature = "aes")]
+            EncryptionType::AES128 => true,
+            #[cfg(feature = "aes")]
+            EncryptionType::AES256 => true,
+            _ => false,
+        }
+    }
+}
+
 pub fn encrypt(etype: EncryptionType, img: MangoImage, key: String) -> MangoImage {
     match etype {
         #[cfg(feature = "aes")]
@@ -50,7 +62,5 @@ pub fn decrypt(etype: EncryptionType, img: MangoImage, key: String, iv: &[u8]) -
         _ => img,
     }
 }
-
-
 
 
