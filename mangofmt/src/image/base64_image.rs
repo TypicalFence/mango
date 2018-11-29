@@ -148,6 +148,7 @@ mod test {
     use super::{MangoImage, ImageFile, EncryptionType, CompressionType};
 
     #[test]
+    #[cfg(feature = "aes")]
     fn mut_crypt() {
         let p = std::path::Path::new("test.jpg");
         let mut file = ImageFile::open(p).unwrap();
@@ -155,7 +156,7 @@ mod test {
         let mut img = MangoImage::from_file(&mut file);
         let clean_data = img.get_image_data();
 
-        img.encrypt_mut(EncryptionType::AES256, String::from("1234567812345678"));
+        img.encrypt_mut(EncryptionType::AES128, String::from("1234567812345678"));
         assert_eq!(img.get_meta().encryption.is_some(), true);
         assert_ne!(img.get_image_data(), clean_data);
         img.decrypt_mut(String::from("1234567812345678"));
@@ -164,6 +165,7 @@ mod test {
     }
 
     #[test]
+    #[cfg(feature = "gzip")]
     fn mut_compress() {
         let p = std::path::Path::new("test.jpg");
         let mut file = ImageFile::open(p).unwrap();

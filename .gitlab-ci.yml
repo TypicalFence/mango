@@ -26,7 +26,7 @@ mangofmt-test:
     script:
       - rustc --version && cargo --version      # Print version info for debugging
       - cd mangofmt
-      - cargo test --all --verbose
+      - cargo test --all-features  --all --verbose
 
 # /libmango
 libmango-build:
