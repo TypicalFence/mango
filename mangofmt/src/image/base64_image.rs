@@ -51,7 +51,10 @@ impl MangoImage {
 
     pub fn compress(&self, comp: CompressionType) -> Option<MangoImage> {
         if self.meta.encryption.is_none()  && self.meta.compression.is_none() {
-            return Some(compression::compress(comp, self));
+            return match compression::compress(comp, self) {
+                Ok(value) => Some(value),
+                Err(e) => None,
+            };
         }
 
         None
@@ -74,7 +77,10 @@ impl MangoImage {
 
         if meta.compression.is_some() && meta.encryption.is_none() {
             let comp = meta.clone().compression.unwrap();
-            return Some(compression::uncompress(comp, self));
+            return match compression::uncompress(comp, self) {
+                Ok(value) => Some(value),
+                Err(e) => None,
+            };
         }
 
         None
@@ -94,7 +100,10 @@ impl MangoImage {
 
     pub fn encrypt(self, etype: EncryptionType, key: String) -> Option<MangoImage> {
         if self.meta.encryption.is_none() {
-            return Some(encryption::encrypt(etype, self, key));
+            return match encryption::encrypt(etype, self, key) {
+                Ok(val) => Some(val),
+                Err(e) => None
+            }
         }
 
         None
@@ -116,7 +125,10 @@ impl MangoImage {
         if self.meta.encryption.is_some() && self.meta.iv.is_some() {
             let iv = self.meta.iv.clone().unwrap();
             let etype = self.meta.encryption.clone().unwrap();
-            return Some(encryption::decrypt(etype, self, key, &iv));
+            return match encryption::decrypt(etype, self, key, &iv) {
+                Ok(value) => Some(value),
+                Err(e) => None
+            }
         }
 
         None

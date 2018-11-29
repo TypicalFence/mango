@@ -5,7 +5,39 @@ mod openssl_mods;
 
 use std::fmt;
 use MangoImage;
+use std::error;
 
+//------------------------------------------------------------------------------
+//  Custom Error
+//------------------------------------------------------------------------------
+#[derive(Debug, Clone)]
+pub enum EncryptionError {
+    UnsupportedType,
+    ExecutionError
+}
+
+impl fmt::Display for EncryptionError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "oh no something went wrong with the encryption")
+    }
+}
+
+impl error::Error for EncryptionError {
+    fn description(&self) -> &str {
+        match self {
+            EncryptionError::UnsupportedType => "The Encryption Type is not supported",
+            EncryptionError::ExecutionError => "while en/decrypting a error occurred",
+        }
+    }
+
+    fn cause(&self) -> Option<&error::Error> {
+        None
+    }
+}
+
+//------------------------------------------------------------------------------
+//  Encryption Types
+//------------------------------------------------------------------------------
 #[derive(Serialize, Deserialize)]
 pub enum EncryptionType {
     AES256,
@@ -42,24 +74,24 @@ impl EncryptionType {
     }
 }
 
-pub fn encrypt(etype: EncryptionType, img: MangoImage, key: String) -> MangoImage {
+pub fn encrypt(etype: EncryptionType, img: MangoImage, key: String) -> Result<MangoImage, EncryptionError> {
     match etype {
         #[cfg(feature = "aes")]
-        EncryptionType::AES128 => openssl_mods::aes::encrypt_aes128(img, key),
+        EncryptionType::AES128 => Ok(openssl_mods::aes::encrypt_aes128(img, key)),
         #[cfg(feature = "aes")]
-        EncryptionType::AES256 => openssl_mods::aes::encrypt_aes256(img, key),
-        _ => img,
+        EncryptionType::AES256 => Ok(openssl_mods::aes::encrypt_aes256(img, key)),
+        _ => Err(EncryptionError::UnsupportedType),
     }
 }
 
 
-pub fn decrypt(etype: EncryptionType, img: MangoImage, key: String, iv: &[u8]) -> MangoImage {
+pub fn decrypt(etype: EncryptionType, img: MangoImage, key: String, iv: &[u8]) -> Result<MangoImage, EncryptionError> {
     match etype {
         #[cfg(feature = "aes")]
-        EncryptionType::AES128 => openssl_mods::aes::decrypt_aes128(img, key, iv),
+        EncryptionType::AES128 => Ok(openssl_mods::aes::decrypt_aes128(img, key, iv)),
         #[cfg(feature = "aes")]
-        EncryptionType::AES256 => openssl_mods::aes::decrypt_aes256(img, key, iv),
-        _ => img,
+        EncryptionType::AES256 => Ok(openssl_mods::aes::decrypt_aes256(img, key, iv)),
+        _ => Err(EncryptionError::UnsupportedType),
     }
 }
 
