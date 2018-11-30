@@ -8,7 +8,7 @@ build: rust
 clean: rust_clean examples_clean test_clean docs_clean
 
 rust:
-	cargo build
+	cargo build --features "gzip, aes"
 
 rust_clean:
 	cargo clean
