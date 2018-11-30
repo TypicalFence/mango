@@ -3,8 +3,12 @@ name = "libmango"
 version = "0.1.0"
 authors = ["Alex Fence <alexfence.code@gmail.com>"]
 
+[features]
+aes = ["mangofmt/aes"]
+gzip = ["mangofmt/gzip"]
+
 [dependencies]
-"mangofmt" = { path = "../mangofmt"}
+mangofmt = { path = "../mangofmt"}
 libc = "0.2.26"
 
 [lib]

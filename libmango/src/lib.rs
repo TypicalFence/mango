@@ -33,6 +33,38 @@ pub struct IntOption {
 }
 
 //----------------------------------------------------------------------------------------
+// Support Checks
+//----------------------------------------------------------------------------------------
+#[no_mangle]
+pub extern "C" fn encryption_is_supported(enc_type: *const c_char) -> bool {
+    let enc_type_str = unsafe { CStr::from_ptr(enc_type).to_str() };
+
+    if enc_type_str.is_ok() {
+        let e_type = util::to_enc_type(enc_type_str.unwrap().to_string());
+        return match e_type {
+            Some(value) => value.is_supported(),
+            None => false,
+        }
+    }
+
+    false
+}
+
+#[no_mangle]
+pub extern "C" fn compression_is_supported(comp_type: *const c_char) -> bool {
+    let comp_type_str = unsafe { CStr::from_ptr(comp_type).to_str() };
+
+    if comp_type_str.is_ok() {
+        let c_type = util::to_enc_type(comp_type_str.unwrap().to_string());
+        return match c_type {
+            Some(value) => value.is_supported(),
+            None => false,
+        }
+    }
+
+    false
+}
+//----------------------------------------------------------------------------------------
 // Mango File
 //----------------------------------------------------------------------------------------
 #[no_mangle]
