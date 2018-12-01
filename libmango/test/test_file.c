@@ -254,7 +254,10 @@ Suite * file_suite(void) {
     tc_io = tcase_create("IO");
 
     // Core
-    tcase_add_test(tc_core, test_compress);
+
+    if (mango_compression_is_supported("GZIP")) {
+        tcase_add_test(tc_core, test_compress);
+    }
     tcase_add_test(tc_core, test_set_null);
     tcase_add_test(tc_core, test_set_title);
     tcase_add_test(tc_core, test_set_author);

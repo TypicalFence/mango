@@ -2,13 +2,14 @@ SHELL := /usr/bin/env bash
 EXAMPLE_SRC :=  $(shell find ./examples -name '*.c')
 EXAMPLES := $(shell find ./examples -name '*.c' |  sed  's/\.c//g' | sed 's/s\//s\/build\//g')
 TEST_SRC := $(shell find ./test -name '*.c')
-   
+FEATURES=gzip, aes
+
 build: rust
 
 clean: rust_clean examples_clean test_clean docs_clean
 
 rust:
-	cargo build --features "gzip, aes"
+	cargo build --features "$(FEATURES)"
 
 rust_clean:
 	cargo clean

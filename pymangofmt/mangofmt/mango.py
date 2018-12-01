@@ -371,8 +371,6 @@ class MangoImageMetadata(object):
 
         return value
 
-        return checksum
-
     @property
     def filename(self):
         ptr = libmango.mangoimgmeta_filename(self._pointer)

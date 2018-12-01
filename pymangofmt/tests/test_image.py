@@ -41,12 +41,14 @@ def test_encryption_none():
     img_enc = MangoImage.from_path("test.jpg").meta_data.encryption
     assert img_enc is None
 
+@pytest.mark.skipif(not CompressionType.GZIP.is_supported(), reason="no GZIP support")
 def test_compress():
     img = MangoImage.from_path("test.jpg")
     img_data = img.image_data
     img.compress(CompressionType.GZIP)
     assert not img_data == img.image_data
 
+@pytest.mark.skipif(not CompressionType.GZIP.is_supported(), reason="no GZIP support")
 def test_uncompress():
     img = MangoImage.from_path("test.jpg")
     img_data = img.image_data
@@ -54,12 +56,14 @@ def test_uncompress():
     img.uncompress()
     assert img_data == img.image_data
 
+@pytest.mark.skipif(not EncryptionType.AES128.is_supported(), reason="no AES128 support")
 def test_encrypt():
     img = MangoImage.from_path("test.jpg")
     img_data = img.image_data
     img.encrypt(EncryptionType.AES128, "1234567812345678")
     assert not img_data == img.image_data
 
+@pytest.mark.skipif(not EncryptionType.AES128.is_supported(), reason="no AES128 support")
 def test_decrypt():
     img = MangoImage.from_path("test.jpg")
     img_data = img.image_data
@@ -83,6 +87,7 @@ def test_save_permission():
     with pytest.raises(PermissionError):
         img.save("/test.jpg")
 
+@pytest.mark.skipif(not EncryptionType.AES128.is_supported(), reason="no AES128 support")
 def test_iv():
     img = MangoImage.from_path("test.jpg")
     img.encrypt(EncryptionType.AES128, "lol")
