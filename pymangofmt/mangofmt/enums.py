@@ -5,7 +5,6 @@ class CompressionType(Enum):
     GZIP = "GZIP"
 
     def is_supported(self):
-        print(self)
         return libmango.mango_compression_is_supported(self.value.encode("utf-8"))
 
 class EncryptionType(Enum):
