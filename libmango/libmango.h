@@ -16,6 +16,10 @@ typedef struct IntOption {
     int present;
 } IntOption;
 
+
+extern int mango_encryption_is_supported(char *);
+extern int mango_compression_is_supported(char *);
+
 //---------------------------
 // Mango File
 // --------------------------

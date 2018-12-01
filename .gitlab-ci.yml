@@ -19,7 +19,7 @@ mangofmt-build:
   script:
     - rustc --version && cargo --version      # Print version info for debugging
     - cd mangofmt
-    - cargo build
+    - cargo build --all-features
 
 mangofmt-test:
     stage: test
@@ -44,7 +44,10 @@ libmango-test:
       - echo "compile test"
       - make test/run_tests
       - echo "run tests"
-      - make test
+      - make test FEATURES="gzip, aes"
+        # run the tests by hand to make sure that they are run
+        # for some odd reason it doesn't run always  
+      - ./test/run_tests
 
 
  # /pymango

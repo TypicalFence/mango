@@ -26,6 +26,12 @@ class IntOption(Structure):
     _fields_ = [("value", c_int),
                 ("present", c_int)]
 
+libmango.mango_encryption_is_supported.argtypes = (c_char_p,)
+libmango.mango_encryption_is_supported.restype = c_bool
+
+libmango.mango_compression_is_supported.argtypes = (c_char_p,)
+libmango.mango_compression_is_supported.restype = c_bool
+
 # -----------------------------------------------------------------------------
 # Mango File
 # -----------------------------------------------------------------------------

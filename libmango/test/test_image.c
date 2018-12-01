@@ -25,7 +25,6 @@ START_TEST(test_create) {
 END_TEST
 
 
-
 START_TEST(test_decrypt) {
     MangoImage img;
     
@@ -35,6 +34,10 @@ START_TEST(test_decrypt) {
     
     // encrypt
     mangoimg_encrypt(img, "AES128", "1234567812345678");
+    MangoFile f = new_mango_file();
+    mangofile_add_image(f, img);
+    mangofile_save(f, "lol.mango");
+
     char* enc_type_en = mangoimgmeta_encryption(mangoimg_get_meta(img));
     ck_assert(strcmp(enc_type_en, "AES128") == 0);
 
@@ -56,7 +59,10 @@ Suite * image_suite(void) {
 
     // Core
     tcase_add_test(tc_core, test_create);
-    tcase_add_test(tc_core, test_decrypt);
+    
+    if (mango_encryption_is_supported("AES256")) {
+        tcase_add_test(tc_core, test_decrypt);
+    }
 
     // add cases to suites
     suite_add_tcase(s, tc_core);
