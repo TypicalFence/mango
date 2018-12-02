@@ -144,7 +144,7 @@ impl MangoFile {
     }
 
     pub fn open_bson(p: &Path) -> Result<MangoFile, MangoFileError> {
-        let mut file = File::open(p);
+        let file = File::open(p);
 
         if file.is_err() {
             return Err(MangoFileError::convert_io_open(file.err().unwrap()));
@@ -174,14 +174,16 @@ impl MangoFile {
     }
 
     pub fn open_cbor(p: &Path) -> Result<MangoFile, MangoFileError> {
-        let mut file = File::open(p);
+        let file = File::open(p);
 
         if file.is_err() {
             return Err(MangoFileError::convert_io_open(file.err().unwrap()));
         }
 
         let mut bytes = Vec::new();
-        file.unwrap().read_to_end(&mut bytes);
+        if file.unwrap().read_to_end(&mut bytes).is_err() {
+            return Err(MangoFileError::new(ErrorKind::ReadError, "could not read file"));
+        };
 
         let mangofile = serde_cbor::from_slice(&bytes);
 
@@ -241,7 +243,7 @@ impl MangoFile {
             return Err(MangoFileError::with_cause(ErrorKind::EncodeError, "couldn't encode to CBOR", bytes.err().unwrap()));
         }
 
-        let mut file = File::create(p);
+        let file = File::create(p);
         if file.is_err() {
             return Err(MangoFileError::convert_io_save(file.err().unwrap()));
         }
@@ -320,14 +322,15 @@ impl MangoFile {
 #[cfg(test)]
 mod tests {
     use super::MangoFile;
-    use encryption;
     use std::path::Path;
 
     fn create() {
         let mut file = MangoFile::new();
         file.get_meta_mut().title = Some("test".to_string());
-        file.add_image_by_path(Path::new("test.jpg"));
-        file.save(Path::new("test.json"));
+        let added = file.add_image_by_path(Path::new("test.jpg"));
+        assert!(added.is_ok());
+        let save = file.save(Path::new("test.json"));
+        assert!(save.is_ok());
     }
 
     #[test]
@@ -339,6 +342,7 @@ mod tests {
 
     // TODO move tests below to base64_image.rs
     #[test]
+    #[cfg(feature = "aes")]
     fn encrypt() {
         let mut file = MangoFile::new();
         file.add_image_by_path(Path::new("test.jpg"));
@@ -353,9 +357,12 @@ mod tests {
     #[test]
     fn save() {
         let mut file = MangoFile::new();
-        file.add_image_by_path(Path::new("test.jpg"));
+        let added = file.add_image_by_path(Path::new("test.jpg"));
+        assert!(added.is_ok());
+
         let image = file.get_image_mut(0);
-        image.save("test_unencrypted.jpg");
+        let save = image.save("test_unencrypted.jpg");
+        assert!(save.is_ok());
     }
 
     fn get_full_file() -> MangoFile {
@@ -374,18 +381,22 @@ mod tests {
     #[test]
     fn save_cbor() {
         let file = get_full_file();
-        file.save_cbor(Path::new("save.cbor"));
+        let save = file.save_cbor(Path::new("save.cbor"));
+        assert!(save.is_ok());
+
     }
 
     #[test]
     fn  save_json() {
         let file = get_full_file();
-        file.save_json(Path::new("save.json"));
+        let save = file.save_json(Path::new("save.json"));
+        assert!(save.is_ok());
     }
 
     #[test]
     fn  save_bson() {
         let file = get_full_file();
-        file.save_bson(Path::new("save.bson"));
+        let save = file.save_bson(Path::new("save.bson"));
+        assert!(save.is_ok());
     }
 }

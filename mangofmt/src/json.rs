@@ -6,7 +6,6 @@ use file::{MangoFile, ErrorKind, MangoFileError};
 use super::{CompressionType, EncryptionType};
 use std::fs::File;
 use std::path::Path;
-use std::error::Error;
 use meta::MangoMetadata;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -20,7 +19,7 @@ impl JsonMangoFile {
         Self { meta, images }
     }
 
-    pub fn get_images(&self) -> Vec<Base64Image> {
+    fn get_images(&self) -> Vec<Base64Image> {
         self.images.clone()
     }
 
@@ -70,7 +69,7 @@ impl JsonMangoFile {
                                                   json_string.err().unwrap()));
         }
 
-        let mut f = File::create(p);
+        let f = File::create(p);
 
         if f.is_err() {
             return Err(MangoFileError::convert_io_save(f.err().unwrap()));
@@ -89,7 +88,7 @@ impl JsonMangoFile {
 struct Base64ImageMetadata {
     pub compression: Option<CompressionType>,
     pub encryption: Option<EncryptionType>,
-    #[serde(with = "base64Option")]
+    #[serde(with = "base64option")]
     pub iv: Option<Vec<u8>>,
     pub filename: String,
     pub checksum: String,
@@ -122,7 +121,7 @@ impl Base64ImageMetadata {
 
 #[derive(Serialize, Deserialize, Clone)]
 struct Base64Image {
-    #[serde(with = "base64Encoding")]
+    #[serde(with = "base64encoding")]
     pub data: Vec<u8>,
     pub meta: Base64ImageMetadata,
 }
@@ -140,7 +139,7 @@ impl Base64Image {
     }
 }
 
-pub mod base64Encoding {
+pub mod base64encoding {
     use base64;
     use serde::{Serializer, de, Deserialize, Deserializer};
 
@@ -160,7 +159,7 @@ pub mod base64Encoding {
     }
 }
 
-pub mod base64Option {
+pub mod base64option {
     use base64;
     use serde::{Serializer, de, Deserialize, Deserializer};
 
@@ -168,7 +167,7 @@ pub mod base64Option {
     where
         S: Serializer,
     {
-        if (bytes.is_some()) {
+        if bytes.is_some() {
             let b = bytes.clone().unwrap();
             serializer.serialize_some(&base64::encode(&b).replace("\r\n", ""))
         } else {
@@ -181,7 +180,7 @@ pub mod base64Option {
         D: Deserializer<'de>,
     {
         let s = <Option<String>>::deserialize(deserializer)?;
-        if (s.is_some()) {
+        if s.is_some() {
             let bytes = base64::decode(&s.unwrap()).map_err(de::Error::custom)?;
             Ok(Some(bytes))
         } else {

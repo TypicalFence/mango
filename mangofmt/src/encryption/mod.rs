@@ -63,6 +63,8 @@ impl fmt::Display for EncryptionType {
 }
 
 impl EncryptionType {
+
+    #[allow(unreachable_patterns)]
     pub fn is_supported(self) -> bool {
         match self {
             #[cfg(feature = "aes")]
@@ -74,6 +76,8 @@ impl EncryptionType {
     }
 }
 
+#[allow(unreachable_patterns)]
+#[allow(unused_variables)]
 pub fn encrypt(etype: EncryptionType, img: MangoImage, key: String) -> Result<MangoImage, EncryptionError> {
     match etype {
         #[cfg(feature = "aes")]
@@ -85,6 +89,8 @@ pub fn encrypt(etype: EncryptionType, img: MangoImage, key: String) -> Result<Ma
 }
 
 
+#[allow(unreachable_patterns)]
+#[allow(unused_variables)]
 pub fn decrypt(etype: EncryptionType, img: MangoImage, key: String, iv: &[u8]) -> Result<MangoImage, EncryptionError> {
     match etype {
         #[cfg(feature = "aes")]

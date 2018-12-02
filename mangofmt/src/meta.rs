@@ -8,15 +8,19 @@ use hex::ToHex;
 use compression::CompressionType;
 use encryption::EncryptionType;
 use image::Mime;
-use json::base64Option;
+use json::base64option;
 
-fn get_checksum(file: &mut File) -> String {
+fn get_checksum(file: &mut File) -> Option<String> {
     let mut data = Vec::new();
-    file.read_to_end(&mut data);
+
+    if file.read_to_end(&mut data).is_err() {
+        return None;
+    }
+
     let mut hasher = Sha256::default();
     hasher.input(&data);
     let checksum = hasher.result();
-    checksum.to_hex()
+    Some(checksum.to_hex())
 }
 
 #[derive(Serialize, Deserialize)]
@@ -30,17 +34,22 @@ impl ImageFileMetadata {
     pub fn new(path: &Path) -> Option<ImageFileMetadata> {
         match File::open(&path) {
             Ok(mut file) => {
-                let checksum = get_checksum(&mut file);
-                match Mime::get_from_path(path) {
-                    Ok(mime) => {
-                        let path = path.to_str().unwrap().to_string();
-                        Some(ImageFileMetadata {
-                            path,
-                            checksum,
-                            mime,
-                        })
+                let checksum_opt = get_checksum(&mut file);
+                if checksum_opt.is_some() {
+                    let checksum = checksum_opt.unwrap();
+                    match Mime::get_from_path(path) {
+                        Ok(mime) => {
+                            let path = path.to_str().unwrap().to_string();
+                            Some(ImageFileMetadata {
+                                path,
+                                checksum,
+                                mime,
+                            })
+                        }
+                        Err(_e) => None,
                     }
-                    Err(_e) => None,
+                } else {
+                    None
                 }
             }
             Err(_e) => None,
@@ -66,7 +75,7 @@ impl Clone for ImageFileMetadata {
 pub struct MangoImageMetadata {
     pub compression: Option<CompressionType>,
     pub encryption: Option<EncryptionType>,
-    #[serde(with = "base64Option")]
+    #[serde(with = "base64option")]
     pub iv: Option<Vec<u8>>,
     pub filename: String,
     pub checksum: String,

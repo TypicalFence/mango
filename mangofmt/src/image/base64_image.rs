@@ -25,7 +25,12 @@ impl MangoImage {
 
     pub fn from_file(file_image: &mut ImageFile) -> MangoImage {
         let mut vec = Vec::new();
-        file_image.get_file().read_to_end(&mut vec);
+
+        // we can assume that ImageFile struct returns a valid File struct
+        // therefore we can ignore the following result (probably)
+        #[allow(unused_must_use)]
+        file_image.get_file().read_to_end(&mut vec).is_err();
+
         let new_meta = file_image.get_meta();
         MangoImage::new(
             vec,
@@ -145,7 +150,7 @@ impl MangoImage {
 #[cfg(test)]
 mod test {
     use std;
-    use super::{MangoImage, ImageFile, EncryptionType, CompressionType};
+    use super::{MangoImage, ImageFile};
 
     #[test]
     #[cfg(feature = "aes")]
@@ -187,7 +192,7 @@ mod test {
         let p = std::path::Path::new("test.jpg");
         let mut file = ImageFile::open(p).unwrap();
 
-        let mut img = MangoImage::from_file(&mut file);
+        let img = MangoImage::from_file(&mut file);
         //img.meta.checksum
         assert_eq!(img.meta.checksum.len() > 0, true)
     }
