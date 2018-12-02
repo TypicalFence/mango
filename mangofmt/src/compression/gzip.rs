@@ -5,6 +5,7 @@ use self::flate2::write::GzEncoder;
 use self::flate2::read::GzDecoder;
 use image::MangoImage;
 use super::CompressionType;
+use super::CompressionError;
 
 pub fn compress(image: &MangoImage) -> MangoImage {
     let image_vec = &image.get_image_data();
@@ -18,14 +19,20 @@ pub fn compress(image: &MangoImage) -> MangoImage {
     MangoImage::new(compressed, new_meta)
 }
 
-pub fn uncompress(image: &MangoImage) -> MangoImage {
+pub fn uncompress(image: &MangoImage) -> Result<MangoImage, CompressionError> {
     let image_data = &image.get_image_data();
-    let mut decoder = GzDecoder::new(image_data.as_slice()).unwrap();
-    let mut raw_data = Vec::new();
-    decoder.read_to_end(&mut raw_data);
+    if let Ok(mut decoder) = GzDecoder::new(image_data.as_slice()) {
+        let mut raw_data = Vec::new();
 
-    let mut new_meta = image.get_meta();
-    new_meta.compression = None;
+        if decoder.read_to_end(&mut raw_data).is_err() {
+            return Err(CompressionError::ExecutionError);
+        };
 
-    MangoImage::new(raw_data, new_meta)
+        let mut new_meta = image.get_meta();
+        new_meta.compression = None;
+
+        Ok(MangoImage::new(raw_data, new_meta))
+    } else {
+        return Err(CompressionError::ExecutionError);
+    }
 }

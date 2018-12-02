@@ -59,6 +59,7 @@ impl fmt::Display for CompressionType {
 }
 
 impl CompressionType {
+    #[allow(unreachable_patterns)]
     pub fn is_supported(self) -> bool {
         match self {
             #[cfg(feature = "gzip")]
@@ -68,6 +69,8 @@ impl CompressionType {
     }
 }
 
+#[allow(unreachable_patterns)]
+#[allow(unused_variables)]
 pub fn compress(ctype: CompressionType, image: &MangoImage) -> Result<MangoImage, CompressionError> {
     match ctype {
         #[cfg(feature = "gzip")]
@@ -76,10 +79,12 @@ pub fn compress(ctype: CompressionType, image: &MangoImage) -> Result<MangoImage
     }
 }
 
+#[allow(unreachable_patterns)]
+#[allow(unused_variables)]
 pub fn uncompress(ctype: CompressionType, image: &MangoImage) -> Result<MangoImage, CompressionError> {
     match ctype {
         #[cfg(feature = "gzip")]
-        CompressionType::GZIP => Ok(gzip::uncompress(image)),
+        CompressionType::GZIP => gzip::uncompress(image),
         _ => Err(CompressionError::UnsupportedType),
     }
 }
