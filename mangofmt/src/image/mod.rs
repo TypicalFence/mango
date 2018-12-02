@@ -1,7 +1,7 @@
 mod mime;
 mod image_file;
-mod base64_image;
+mod mango_image;
 
 pub use self::mime::Mime;
 pub use self::image_file::ImageFile;
-pub use self::base64_image::MangoImage;
+pub use self::mango_image::MangoImage;
