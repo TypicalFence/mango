@@ -151,6 +151,9 @@ impl MangoImage {
 mod test {
     use std;
     use super::{MangoImage, ImageFile};
+    use encryption::EncryptionType;
+    use compression::CompressionType;
+
 
     #[test]
     #[cfg(feature = "aes")]
@@ -182,7 +185,7 @@ mod test {
         assert_eq!(img.get_meta().compression.is_some(), true);
         assert_ne!(img.get_image_data(), clean_data);
         img.uncompress_mut();
-        img.save("lol.jpg");
+        assert!(img.save("lol.jpg").is_ok());
         assert_eq!(img.get_meta().compression.is_none(), true);
         assert_eq!(img.get_image_data(), clean_data);
     }
