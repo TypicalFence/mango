@@ -323,6 +323,7 @@ impl MangoFile {
 mod tests {
     use super::MangoFile;
     use std::path::Path;
+    use encryption;
 
     fn create() {
         let mut file = MangoFile::new();
