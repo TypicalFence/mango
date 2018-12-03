@@ -39,7 +39,7 @@ docs_clean:
 	rm -rf docs/html
 
 release:
-	cargo build --release
+	cargo build --release --features "$(FEATURES)"
 
 install: target/release/libmango.so
 	cp target/release/libmango.so /usr/lib/
