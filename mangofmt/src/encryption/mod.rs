@@ -4,7 +4,7 @@ mod tiger;
 mod openssl_mods;
 
 use std::fmt;
-use MangoImage;
+use image::MangoImage;
 use std::error;
 
 //------------------------------------------------------------------------------
@@ -38,10 +38,35 @@ impl error::Error for EncryptionError {
 //------------------------------------------------------------------------------
 //  Encryption Types
 //------------------------------------------------------------------------------
+/// All "supported" types of encryptions.
+/// 
+/// # Important
+///
+/// All EncryptionTypes are optional and have to be compiled in by passing a --feature flag to
+/// cargo.
+///
+/// Each variant specifies what feature it belongs to and important implementation details, should you
+/// want to decrypt/encrypt image data without the use of this crate.
+///
+/// You can check if the support was compiled in with the [is_supported
+/// method](#method.is_supported).
 #[derive(Serialize, Deserialize)]
 pub enum EncryptionType {
-    AES256,
+    /// **Feature:** aes
+    ///
+    /// It requires openssl to be installed on the system.
+    ///
+    /// The key will be hashed with a Tiger/128 hash, which consists of the first 128 bits of a
+    /// Tiger/192 hash, check 
+    /// [this](http://www.cs.technion.ac.il/~biham/Reports/Tiger/tiger/node2.html) 
+    /// out for information.
     AES128,
+    /// **Feature:** aes
+    ///
+    /// It requires openssl to be installed on the system.
+    ///
+    /// The key will be hashed with a SHA256 hash.
+    AES256,
 }
 
 impl Clone for EncryptionType {
@@ -63,7 +88,8 @@ impl fmt::Display for EncryptionType {
 }
 
 impl EncryptionType {
-
+    
+    /// Returns whether the EncryptionType got compiled in or not.
     #[allow(unreachable_patterns)]
     pub fn is_supported(self) -> bool {
         match self {

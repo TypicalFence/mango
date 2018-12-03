@@ -1,3 +1,5 @@
+//! Everything related to images.
+
 mod mime;
 mod image_file;
 mod mango_image;

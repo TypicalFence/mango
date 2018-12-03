@@ -3,7 +3,7 @@ mod gzip;
 
 use std::fmt;
 use std::clone::Clone;
-use MangoImage;
+use image::MangoImage;
 use std::error;
 
 //------------------------------------------------------------------------------
