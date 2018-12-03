@@ -4,19 +4,21 @@ use std::path::Path;
 use image::MangoImage;
 use meta::ImageFileMetadata;
 
-/// Structure that represents an image file.
+/// Represents an image file.
 ///
 /// In most cases you should not need to use this struct yourself.
-/// I exposed it to the outside just in case.
+/// Its exposed to the outside just in case.
+///
+/// It can mainly opens a File and generates some meta data.
 pub struct ImageFile {
     file: File,
     meta: ImageFileMetadata,
 }
 
 impl ImageFile {
-    /// Returns a new Instance of the Struct.
+    /// Returns a new Instance of the struct.
     ///
-    /// The new instance is based on a file from the filesystem.
+    /// The new instance is based on a file from the file system.
     pub fn open(p: &Path) -> Result<ImageFile, Error> {
         if p.is_file() {
             match File::open(&p) {
@@ -43,7 +45,7 @@ impl ImageFile {
         self.meta.clone()
     }
 
-    /// Converts the ImageFile struct to a Base64Image struct
+    /// Converts the ImageFile struct to a MangoImage struct
     ///
     /// The file itself stays untouched it just converts the data to what
     /// is used inside .mango files.

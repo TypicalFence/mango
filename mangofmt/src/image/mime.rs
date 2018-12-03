@@ -2,6 +2,7 @@ use std::io::{Error, ErrorKind};
 use std::path::Path;
 use std::clone::Clone;
 
+/// Contains all supported image file formats.
 #[derive(Copy, Serialize, Deserialize)]
 pub enum Mime {
     PNG,
@@ -21,6 +22,7 @@ impl Mime {
         }
     }
 
+    /// Determines the mimetype from the file extension of a path
     pub fn get_from_path(p: &Path) -> Result<Mime, Error> {
         if p.is_file() {
             match p.to_str() {
@@ -35,7 +37,7 @@ impl Mime {
                 }
                 None => Err(Error::new(
                     ErrorKind::Other,
-                    "shot, can't convert your path to string",
+                    "can't convert your path to string",
                 )),
             }
         } else {

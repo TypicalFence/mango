@@ -13,12 +13,13 @@ extern crate serde_derive;
 mod compression;
 mod encryption;
 pub mod meta;
-mod image;
+pub mod image;
 pub mod file;
 mod json;
 
-pub use compression::CompressionType;
-pub use encryption::EncryptionType;
+pub use compression::{CompressionType, CompressionError};
+pub use encryption::{EncryptionType, EncryptionError};
 pub use image::{ImageFile, MangoImage, Mime};
 pub use file::MangoFile;
 pub use meta::{ImageFileMetadata, MangoImageMetadata};
+

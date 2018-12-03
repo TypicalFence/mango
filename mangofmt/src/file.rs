@@ -14,6 +14,8 @@ use meta::MangoMetadata;
 //------------------------------------------------------------------------------
 //  Custom Error
 //------------------------------------------------------------------------------
+
+/// Holds all possible Errors for MangoFileErrors
 #[derive(PartialEq, Eq, Debug, Copy, Clone)]
 pub enum ErrorKind {
     EncodeError,
@@ -35,7 +37,7 @@ impl ErrorKind {
     }
 }
 
-
+/// Custom Error for everything concerning MangoFiles
 #[derive(Debug)]
 pub struct MangoFileError {
     kind: ErrorKind,
@@ -100,9 +102,9 @@ impl Error for MangoFileError {
 // MangoFile Struct
 //------------------------------------------------------------------------------
 
-/// Structure that represents a mango file.
+/// Rrepresents a mango file.
 ///
-/// It can be used to create, save and modify the file format.
+/// It can be used to create, save and modify the file of the format.
 #[derive(Serialize, Deserialize)]
 pub struct MangoFile {
     meta: MangoMetadata,
@@ -118,7 +120,7 @@ impl MangoFile {
         }
     }
 
-    // TODO fix error
+    // TODO fix error (also handle read errors)
     /// Opens a existing .mango file
     pub fn open(p: &Path) -> Result<MangoFile, MangoFileError> {
         // try to open the default format cbor
@@ -142,7 +144,11 @@ impl MangoFile {
         Err(MangoFileError::new(ErrorKind::DecodeError,
                                    "file is not a  MangoFile"))
     }
-
+    
+    /// Opens a MangoFile which uses bson as for serialization.
+    ///
+    /// You probably don't want to use this function, if you don't know the serialization format,
+    /// use just [open](#method.open) instead.
     pub fn open_bson(p: &Path) -> Result<MangoFile, MangoFileError> {
         let file = File::open(p);
 
@@ -169,10 +175,18 @@ impl MangoFile {
         Ok(mangofile.unwrap())
     }
 
+    /// Opens a MangoFile which uses json as for serialization.
+    ///
+    /// You probably don't want to use this function, if you don't know the serialization format,
+    /// use just [open](#method.open) instead.
     pub fn open_json(p: &Path) -> Result<MangoFile, MangoFileError> {
         JsonMangoFile::open(&p)
     }
 
+    /// Opens a MangoFile which uses cborn as for serialization.
+    ///
+    /// You probably don't want to use this function, if you don't know the serialization format,
+    /// use just [open](#method.open) instead.
     pub fn open_cbor(p: &Path) -> Result<MangoFile, MangoFileError> {
         let file = File::open(p);
 
@@ -196,14 +210,15 @@ impl MangoFile {
         Ok(mangofile.unwrap())
     }
 
-    /// Saves a .mango file
+    /// Saves a .mango file with the default serialization format. (currently cbor)
     pub fn save(&self, p: &Path) -> Result<(), MangoFileError> {
         // use cbor as the default format
         // (lowest overhead)
         self.save_cbor(p)?;
         Ok(())
     }
-
+    
+    /// Saves a .mango file with the bson serialization format.    
     pub fn save_bson(&self, p: &Path) -> Result<(), MangoFileError> {
         let bson_data = bson::to_bson(&self);
 
@@ -231,12 +246,23 @@ impl MangoFile {
 
         Ok(())
     }
-
+ 
+    /// Saves a .mango file with the json serialization format.
+    ///
+    /// **Important:** you should not use this for anything but debugging,
+    /// because it gets saved to plaintext, and the image data will get encoded with base64.
+    /// This will lead to an huge overhead, resulting in huge file sizes.
+    ///
+    /// But the function is currently here because its nice for debugging because you can easily look
+    /// at json files, and see if everything works how it should.
+    ///
+    /// There are currently no plans to deprecate this serialization format.
     pub fn save_json(&self, p:&Path) -> Result<(), MangoFileError> {
         JsonMangoFile::save(p, self)?;
         Ok(())
     }
 
+    /// Saves a .mango file with the cbor serialization format. (default format)
     pub fn save_cbor(&self, p: &Path) -> Result<(), MangoFileError> {
         let bytes = serde_cbor::to_vec(&self);
         if bytes.is_err() {
