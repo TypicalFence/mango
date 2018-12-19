@@ -1,14 +1,18 @@
 class MangoFileError(Exception):
-   pass
+    pass
+
 
 class EncodeError(MangoFileError):
-   pass
-   
+    pass
+
+
 class DecodeError(MangoFileError):
     pass
-   
+
+
 class ReadError(MangoFileError):
     pass
-    
+
+
 class WriteError(MangoFileError):
     pass

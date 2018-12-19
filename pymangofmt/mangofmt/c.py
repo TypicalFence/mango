@@ -3,17 +3,22 @@ from ctypes import *
 
 libmango = ctypes.cdll.LoadLibrary("libmango.so")
 
+
 class RustMangoFile(Structure):
     pass
+
 
 class RustMangoMetadata(Structure):
     pass
 
+
 class RustMangoImage(Structure):
     pass
 
+
 class RustMangoImageMetadata(Structure):
     pass
+
 
 class ImageData(Structure):
 	_fields_ = [("pointer", POINTER(c_ubyte)),
@@ -22,9 +27,11 @@ class ImageData(Structure):
 	def __exit__(self, exc_type, exc_value, traceback):
             libmango.mango_imagedata_free(self)
 
+
 class IntOption(Structure):
     _fields_ = [("value", c_int),
                 ("present", c_int)]
+
 
 libmango.mango_encryption_is_supported.argtypes = (c_char_p,)
 libmango.mango_encryption_is_supported.restype = c_bool

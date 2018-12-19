@@ -7,6 +7,7 @@ def test_meta_is_none():
 
     assert mango_file.meta_data.author is  None
 
+
 def test_set_meta():
     mango_file = MangoFile()
     mango_file.meta_data.author = "someone"
@@ -25,6 +26,7 @@ def test_save_meta():
     assert mango_file.meta_data.author == "someone"
     os.remove("save_meta.mango")
 
+
 def test_save():
     file = MangoFile()
     meta = file.meta_data
@@ -36,6 +38,7 @@ def test_save():
 
     assert os.path.isfile("file_save.mango")
     os.remove("file_save.mango")
+
 
 def test_save_cbor():
     file = MangoFile()
@@ -49,6 +52,7 @@ def test_save_cbor():
     assert os.path.isfile("file_save_cbor.mango")
     os.remove("file_save_cbor.mango")
 
+
 def test_save_json():
     file = MangoFile()
     meta = file.meta_data
@@ -61,6 +65,7 @@ def test_save_json():
     assert os.path.isfile("file_save_json.mango")
     os.remove("file_save_json.mango")
 
+
 def test_save_bson():
     file = MangoFile()
     meta = file.meta_data
@@ -72,6 +77,7 @@ def test_save_bson():
 
     assert os.path.isfile("file_save_bson.mango")
     os.remove("file_save_bson.mango")
+
 
 def test_open():
     file = MangoFile()
@@ -97,6 +103,7 @@ def test_get_image():
     my_hash = img.meta_data.checksum
 
     assert hashlib.sha256(my_bytes).hexdigest() == my_hash
+
 
 def test_get_images():
     import hashlib
