@@ -6,6 +6,7 @@ from mangofmt.enums import CompressionType, EncryptionType, Language
 from mangofmt.error import DecodeError, ReadError
 from mangofmt.error import EncodeError, WriteError
 
+
 class MangoFile(object):
     def __init__(self, pointer=None):
         if pointer is None:
@@ -47,14 +48,14 @@ class MangoFile(object):
         return MangoFile(pointer)
 
     def get_image(self, index):
-        if index < self.image_count and index >= 0:
+        if self.image_count > index >= 0:
             pointer = libmango.mangofile_get_image(self._pointer, index)
             return MangoImage(pointer, self)
         else:
             raise IndexError
 
     def set_image(self, img, index):
-        if index < self.image_count and index >= 0:
+        if self.image_count > index >= 0:
             success = libmango.mangofile_set_image(self._pointer, img._pointer, index)
 
             if success == 1:
@@ -96,10 +97,10 @@ class MangoFile(object):
         error = libmango.mangofile_save_bson(self._pointer, path.encode("utf-8"))
         self._save_error_handling(error)
 
-
     def save_json(self, path):
         error = libmango.mangofile_save_json(self._pointer, path.encode("utf-8"))
         self._save_error_handling(error)
+
 
 class MangoMetaData(object):
     def __init__(self, pointer, parent):
@@ -302,7 +303,6 @@ class MangoImage(object):
 
         if code == 1:
             raise PermissionError
-
 
     def compress(self, ctype):
         comp_type = None
