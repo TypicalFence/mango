@@ -9,6 +9,7 @@ use std::error;
 //------------------------------------------------------------------------------
 //  Custom Error
 //------------------------------------------------------------------------------
+/// Errors returned by compression functions.
 #[derive(Debug, Clone)]
 pub enum CompressionError {
     UnsupportedType,
@@ -37,8 +38,25 @@ impl error::Error for CompressionError {
 //------------------------------------------------------------------------------
 //  Compression Types
 //------------------------------------------------------------------------------
+/// All "supported" types of compression.
+///
+/// # Important
+///
+/// All CompressionTypes are optional and have to be compiled in by passing a --feature flag to
+/// cargo.
+///
+/// Each variant specifies what feature it belongs to and important implementation details, should you
+/// want to decrypt/encrypt image data without the use of this crate.
+///
+/// You can check if the support was compiled in with the [is_supported
+/// method](#method.is_supported).
 #[derive(Serialize, Deserialize)]
 pub enum CompressionType {
+    /// **Feature:** gzip
+    ///
+    /// It is implemented with the flate2 crate.
+    /// The C code of the flate2 crate should get compiled automatically (magically) via cargo
+    /// and does not need system dependencies, from my understanding of things.
     GZIP,
 }
 

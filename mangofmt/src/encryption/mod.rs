@@ -10,6 +10,7 @@ use std::error;
 //------------------------------------------------------------------------------
 //  Custom Error
 //------------------------------------------------------------------------------
+/// Errors returned by encryption functions.
 #[derive(Debug, Clone)]
 pub enum EncryptionError {
     UnsupportedType,
