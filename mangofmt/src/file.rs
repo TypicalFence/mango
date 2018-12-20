@@ -1,3 +1,5 @@
+//! Contains the MangoFile struct and some related stuff.
+
 use std;
 use std::error::Error;
 use std::path::Path;
@@ -104,7 +106,7 @@ impl Error for MangoFileError {
 
 /// Rrepresents a mango file.
 ///
-/// It can be used to create, save and modify the file of the format.
+/// It can be used to create, save and modify a file of the format.
 #[derive(Serialize, Deserialize)]
 pub struct MangoFile {
     meta: MangoMetadata,

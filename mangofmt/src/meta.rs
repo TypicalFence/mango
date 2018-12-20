@@ -1,3 +1,5 @@
+//! All Metadata Stuff.
+
 use std::default::Default;
 use std::path::Path;
 use std::io::Read;
