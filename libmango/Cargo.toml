@@ -9,7 +9,6 @@ gzip = ["mangofmt/gzip"]
 
 [dependencies]
 mangofmt = { path = "../mangofmt"}
-libc = "0.2.26"
 
 [lib]
 name = "mango"
