@@ -1,6 +1,4 @@
 extern crate mangofmt;
-extern crate libc;
-
 mod util;
 
 use std::slice;
@@ -8,12 +6,12 @@ use std::path::Path;
 use std::ffi::{CStr, CString};
 use std::io;
 use std::fs;
-use std::os::raw::{c_int, c_short};
-use libc::c_char;
+use std::os::raw::{c_int, c_short, c_char};
 
 use mangofmt::MangoFile;
 use mangofmt::MangoImage;
 use mangofmt::meta::MangoMetadata;
+use mangofmt::meta::MangoImageMetadata;
 
 //----------------------------------------------------------------------------------------
 // Helper Structs
@@ -607,7 +605,6 @@ pub extern "C" fn mangoimg_get_base64_image_data(pointer: *mut MangoImage) -> *m
     CString::new(img.get_base64_image_data()).unwrap().into_raw()
 }
 
-use mangofmt::MangoImageMetadata;
 
 #[no_mangle]
 pub extern "C" fn mangoimg_get_meta(img: &mut MangoImage) -> *mut MangoImageMetadata {
