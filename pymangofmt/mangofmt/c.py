@@ -42,7 +42,7 @@ libmango.mango_compression_is_supported.restype = c_bool
 # -----------------------------------------------------------------------------
 # Mango File
 # -----------------------------------------------------------------------------
-libmango.new_mango_file.restype = POINTER(RustMangoFile)
+libmango.mangofile_new.restype = POINTER(RustMangoFile)
 
 libmango.mangofile_free.argtypes = (POINTER(RustMangoFile),)
 

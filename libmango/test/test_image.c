@@ -34,7 +34,7 @@ START_TEST(test_decrypt) {
     
     // encrypt
     mangoimg_encrypt(img, "AES128", "1234567812345678");
-    MangoFile f = new_mango_file();
+    MangoFile f = mangofile_new();
     mangofile_add_image(f, img);
     mangofile_save(f, "lol.mango");
 

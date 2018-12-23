@@ -66,7 +66,7 @@ pub extern "C" fn mango_compression_is_supported(comp_type: *const c_char) -> bo
 // Mango File
 //----------------------------------------------------------------------------------------
 #[no_mangle]
-pub extern "C" fn new_mango_file() -> *mut MangoFile {
+pub extern "C" fn mangofile_new() -> *mut MangoFile {
     Box::into_raw(Box::new(MangoFile::new()))
 }
 

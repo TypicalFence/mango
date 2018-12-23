@@ -10,7 +10,7 @@ from mangofmt.error import EncodeError, WriteError
 class MangoFile(object):
     def __init__(self, pointer=None):
         if pointer is None:
-            self._pointer = libmango.new_mango_file()
+            self._pointer = libmango.mangofile_new()
         else:
             self._pointer = pointer
 
