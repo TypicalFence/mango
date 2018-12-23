@@ -6,7 +6,7 @@ void main(void) {
     MangoImage img;
     
     // create file
-    file = new_mango_file();
+    file = mango_file_new();
     mangofile_add_image_by_path(file, "test.jpg");
 
     // get checksum

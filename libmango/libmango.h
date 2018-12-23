@@ -23,7 +23,7 @@ extern int mango_compression_is_supported(char *);
 //---------------------------
 // Mango File
 // --------------------------
-extern MangoFile new_mango_file(); // TODO rename to mangofile_new
+extern MangoFile mangofile_new();
 extern void mangofile_free(MangoFile);
 extern void mangofile_add_image(MangoFile, MangoImage);
 extern int mangofile_add_image_by_path(MangoFile, char *);

@@ -9,7 +9,7 @@
 START_TEST(test_compress) {
     void *file;
     void *img;
-    file = new_mango_file();
+    file = mangofile_new();
     mangofile_add_image_by_path(file, "test.jpg");
 
     img = mangofile_get_image(file, 0);
@@ -25,7 +25,7 @@ START_TEST(test_set_null) {
     void * file;
     void * meta;
     char * author = NULL;
-    file = new_mango_file();
+    file = mangofile_new();
     meta = mangofile_get_meta(file);
 
     mangometa_set_author(meta, "test");
@@ -39,7 +39,7 @@ START_TEST(test_set_title) {
     void * file;
     void * meta;
 
-    file = new_mango_file();
+    file = mangofile_new();
     meta = mangofile_get_meta(file);
 
     mangometa_set_title(meta, "test");
@@ -52,7 +52,7 @@ START_TEST(test_set_author) {
     void * file;
     void * meta;
 
-    file = new_mango_file();
+    file = mangofile_new();
     meta = mangofile_get_meta(file);
 
     mangometa_set_author(meta, "test");
@@ -65,7 +65,7 @@ START_TEST(test_set_publisher) {
     void * file;
     void * meta;
 
-    file = new_mango_file();
+    file = mangofile_new();
     meta = mangofile_get_meta(file);
 
     mangometa_set_publisher(meta, "test");
@@ -78,7 +78,7 @@ START_TEST(test_set_translation) {
     void * file;
     void * meta;
 
-    file = new_mango_file();
+    file = mangofile_new();
     meta = mangofile_get_meta(file);
 
     mangometa_set_translation(meta, "test");
@@ -91,7 +91,7 @@ START_TEST(test_set_source) {
     void * file;
     void * meta;
 
-    file = new_mango_file();
+    file = mangofile_new();
     meta = mangofile_get_meta(file);
 
     mangometa_set_source(meta, "test");
@@ -102,7 +102,7 @@ END_TEST
 
 START_TEST(test_volume) {
     MangoFile file;
-    file = new_mango_file();
+    file = mangofile_new();
 
     MangoMeta meta = mangofile_get_meta(file);
 
@@ -120,7 +120,7 @@ END_TEST
 
 START_TEST(test_chapter) {
     MangoFile file;
-    file = new_mango_file();
+    file = mangofile_new();
 
     MangoMeta meta = mangofile_get_meta(file);
 
@@ -138,7 +138,7 @@ END_TEST
 
 START_TEST(test_year) {
     MangoFile file;
-    file = new_mango_file();
+    file = mangofile_new();
 
     MangoMeta meta = mangofile_get_meta(file);
 
@@ -156,7 +156,7 @@ END_TEST
 
 START_TEST(test_lang) {
     MangoFile file;
-    file = new_mango_file();
+    file = mangofile_new();
 
     MangoMeta meta = mangofile_get_meta(file);
 
@@ -176,7 +176,7 @@ START_TEST(test_save) {
     MangoFile file;
     MangoImage img;
 
-    file = new_mango_file();
+    file = mangofile_new();
     mangofile_add_image_by_path(file, "test.jpg");
 
     mangofile_save(file, "testfile.mango");
@@ -196,7 +196,7 @@ START_TEST(test_save_json) {
     MangoFile file;
     MangoImage img;
 
-    file = new_mango_file();
+    file = mangofile_new();
     mangofile_add_image_by_path(file, "test.jpg");
 
     mangofile_save_json(file, "testfile.json");
@@ -217,7 +217,7 @@ START_TEST(test_open) {
     MangoFile file;
     MangoImage img;
 
-    file = new_mango_file();
+    file = mangofile_new();
     mangofile_add_image_by_path(file, "test.jpg");
     
     img = mangofile_get_image(file, 0);
