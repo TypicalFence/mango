@@ -1,9 +1,32 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/**
+ * Repesents a MangoFile sturct from the mangofmt rust library.
+ *
+ * A MangoFile contains an instance of ManoMeta and can conatain multiple MangoImages.
+ */
 typedef void * MangoFile;
+
+/**
+ * Repesents a MangoImage sturct from the mangofmt rust library.
+ *
+ * A MangoImage conatains an instance of MangoImageMeta.
+ */
 typedef void * MangoImage;
+
+/**
+ * Repesents a MangoImageMeta sturct from the mangofmt rust library.
+ *
+ * A MangoImageMeta instance always belongs to a MangoImage.
+ */
 typedef void * MangoImageMeta;
+
+/**
+ * Repesents a MangoMeta sturct from the mangofmt rust library.
+ *
+ * A MangoMeta instance always belongs to a MangoFile.
+ */
 typedef void * MangoMeta;
 
 typedef struct ImageData {
@@ -11,6 +34,9 @@ typedef struct ImageData {
     size_t length;
 } ImageData;
 
+/**
+ * This struct maps to a rust Option containing an int.
+ */
 typedef struct IntOption {
     int value;
     int present;
@@ -254,9 +280,9 @@ extern int mangofile_save_json(MangoFile file, char *path);
  */
 extern MangoFile mangofile_open(char * path, int * error);
 
-// ----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Mango Image
-// ----------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 extern void mangoimg_free(MangoImage);
 extern MangoImage mangoimg_from_path(char *, int *);
 extern int mangoimg_compress(MangoImage, char *);
@@ -268,44 +294,187 @@ extern int mangoimg_encrypt(MangoImage, char *, char *);
 extern int mangoimg_decrypt(MangoImage, char *);
 extern int save(MangoImage, char *);
 
-// ----------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Mango Image Meta
-// ----------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
+
+/**
+ * Gets the compression type from a MangoImageMeta.
+ *
+ * \returns the compression type of a MangoImage.
+ */
 extern char * mangoimgmeta_compression(MangoImageMeta);
+
+/**
+ * Gets the encryption type from a MangoImageMeta.
+ *
+ * \returns the encryption type of a MangoImage.
+ */
 extern char * mangoimgmeta_encryption(MangoImageMeta);
+
+/**
+ * Gets the checksum from a MangoImageMeta.
+ *
+ * \returns the checksum of a MangoImage.
+ */
 extern char * mangoimgmeta_checksum(MangoImageMeta);
+
+/**
+ * Gets the mime type  from a MangoImageMeta.
+ *
+ * \returns the mime type of a MangoImage.
+ */
 extern char * mangoimgmeta_mime(MangoImageMeta);
+
+/**
+ * Gets the filename from a MangoImageMeta.
+ *
+ * \returns the filename of a MangoImage.
+ */
 extern char * mangoimgmeta_filename(MangoImageMeta);
+
+/**
+ * Gets the iv from a MangoImageMeta.
+ *
+ * \returns the iv of a MangoImage.
+ */
 extern int  * mangoimgmeta_iv(MangoImageMeta);
+
+/**
+ * Gets the iv size from a MangoImageMeta.
+ *
+ * \returns the size of the  iv of a MangoImage.
+ */
 extern int  * mangoimgmeta_iv_size(MangoImageMeta);
 
-// ----------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Mango Meta
-// ----------------------------------------------------------------------------
-extern char * mangometa_get_title(MangoMeta);
-extern void mangometa_set_title(MangoMeta, char *);
+// ------------------------------------------------------------------------------------------------
 
-extern char * mangometa_get_author(MangoMeta);
+/**
+ * Gets the title from a MangoMeta.
+ *
+ * \returns the title of a MangoFile.
+ */
+extern char * mangometa_get_title(MangoMeta meta);
+
+/**
+ * Sets the title of a MangoMeta.
+ */
+extern void mangometa_set_title(MangoMeta meta, char *value);
+
+/**
+ * Gets the author from a MangoMeta.
+ *
+ * \returns the author of a MangoFile.
+ */
+extern char * mangometa_get_author(MangoMeta meta);
+
+/**
+ * Sets the author of a MangoMeta.
+ */
 extern void mangometa_set_author(MangoMeta, char *);
 
-extern char * mangometa_get_publisher(MangoMeta);
+
+/**
+ * Gets the publisher from a MangoMeta.
+ *
+ * \returns the publisher of a MangoFile.
+ */
+extern char * mangometa_get_publisher(MangoMeta meta);
+
+/**
+ * Sets the publisher of a MangoMeta.
+ */
 extern void mangometa_set_publisher(MangoMeta, char *);
 
-extern char * mangometa_get_source(MangoMeta);
+
+/**
+ * Gets the source from a MangoMeta.
+ *
+ * \returns the source of a MangoFile.
+ */
+extern char * mangometa_get_source(MangoMeta meta);
+
+/**
+ * Sets the source of a MangoMeta.
+ */
 extern void mangometa_set_source(MangoMeta, char *);
 
-extern char * mangometa_get_translation(MangoMeta);
+
+/**
+ * Gets the translation from a MangoMeta.
+ *
+ * \returns the translation of a MangoFile.
+ */
+extern char * mangometa_get_translation(MangoMeta meta);
+
+/**
+ * Sets the translation of a MangoMeta.
+ */
 extern void mangometa_set_translation(MangoMeta, char *);
 
-extern char * mangometa_get_language(MangoMeta);
-extern void mangometa_set_language(MangoMeta, char *);
 
-extern IntOption mangometa_get_volume(MangoMeta);
-extern void mangometa_set_volume(MangoMeta, short *);
+/**
+ * Gets the language from a MangoMeta.
+ *
+ * \returns the language of a MangoFile in a short form of 2-3 uppercase characters.
+ */
+extern char * mangometa_get_language(MangoMeta meta);
 
-extern IntOption mangometa_get_chapter(MangoMeta);
-extern void mangometa_set_chapter(MangoMeta, short *);
+/**
+ * Sets the language of a MangoMeta.
+ *
+ * \param meta
+ * \param value must be a valid Language, please check the mangofmt docs for the Language Enum.
+ */
+extern void mangometa_set_language(MangoMeta meta, char *value);
 
-extern IntOption mangometa_get_year(MangoMeta);
-extern void mangometa_set_year(MangoMeta, short *);
+
+/**
+ * Gets the volume from a MangoMeta.
+ *
+ * \returns what volume a MangoFile contains.
+ */
+extern IntOption mangometa_get_volume(MangoMeta meta);
+
+/**
+ * Sets the volume of a MangoMeta.
+ *
+ * \param meta
+ * \param value can be NULL
+ */
+extern void mangometa_set_volume(MangoMeta meta, short *value);
+
+
+/**
+ * Gets the chapter from a MangoMeta.
+ *
+ * \returns what chapter a MangoFile contains.
+ */
+extern IntOption mangometa_get_chapter(MangoMeta meta);
+
+/**
+ * Sets the chapter of a MangoMeta.
+ *
+ * \param meta
+ * \param value can be NULL
+ */
+extern void mangometa_set_chapter(MangoMeta meta, short *value);
+
+
+/**
+ * Gets the year from a MangoMeta.
+ *
+ * \returns what year a MangoFile is from.
+ */
+extern IntOption mangometa_get_year(MangoMeta meta);
+
+/**
+ * Sets the year of a MangoMeta.
+ *
+ * \param meta
+ * \param value can be NULL
+ */
+extern void mangometa_set_year(MangoMeta meta, short *value);
 
