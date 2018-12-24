@@ -149,6 +149,7 @@ pub extern "C" fn mangofile_set_image(file_pointer: *mut MangoFile, img_pointer:
     let mut imgs = file.get_images();
     if index == 0 || index <= imgs.len() -1 {
         imgs[index] = img.clone();
+        file.set_images(imgs);
         return 1;
     }
 
