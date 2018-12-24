@@ -95,7 +95,17 @@ extern MangoImage mangofile_get_image(MangoFile file, int id);
  *
  * \returns 0 or 1 depending on if it worked.
  */
-extern int  mangofile_set_image(MangoFile file, MangoImage image, int id);
+extern int  mangofile_set_image(MangoFile file, MangoImage image, int index);
+
+/**
+ * Removes an image inside a MangoFile and shifts all images after it to the left.
+ *
+ * \param file
+ * \param id must be an index that exists in the *file*
+ *
+ * \returns 0 or 1 depending on if it worked.
+ */
+extern int  mangofile_remove_image(MangoFile file, int id);
 
 /**
  * Gets the count of all Images of a MangoFile.

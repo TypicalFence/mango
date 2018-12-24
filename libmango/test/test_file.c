@@ -243,7 +243,7 @@ START_TEST(test_open) {
 END_TEST
 
 START_TEST(test_set_image) {
-    void *file;
+    MangoFile file;
 
     file = mangofile_new();
     mangofile_add_image_by_path(file, "test.jpg");
@@ -259,6 +259,23 @@ START_TEST(test_set_image) {
     char * checksum2 = mangoimgmeta_checksum(mangoimg_get_meta(img2));
 
     ck_assert(strcmp(checksum1, checksum2) != 0);
+}
+END_TEST
+
+START_TEST(test_remove_image) {
+    MangoFile file;
+
+    file = mangofile_new();
+    mangofile_add_image_by_path(file, "test.jpg");
+    
+    int img_count1 = mangofile_get_image_count(file);
+
+    mangofile_remove_image(file, 0);
+
+    int img_count2 = mangofile_get_image_count(file);
+
+    ck_assert(img_count1 == 1);
+    ck_assert(img_count2 == 0);
 }
 END_TEST
 
@@ -291,6 +308,7 @@ Suite * file_suite(void) {
     tcase_add_test(tc_core, test_lang);
     
     tcase_add_test(tc_core, test_set_image);
+    tcase_add_test(tc_core, test_remove_image);
 
     // IO
     tcase_add_test(tc_io, test_save);
