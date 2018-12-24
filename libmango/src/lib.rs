@@ -157,6 +157,23 @@ pub extern "C" fn mangofile_set_image(file_pointer: *mut MangoFile, img_pointer:
 }
 
 #[no_mangle]
+pub extern "C" fn mangofile_remove_image(file_pointer: *mut MangoFile, index: usize) -> usize {
+    let file: &mut MangoFile = unsafe {
+        assert!(!file_pointer.is_null());
+        &mut *file_pointer
+    };
+
+    let mut imgs = file.get_images();
+    if (index == 0 && imgs.len() > 0) || index <= imgs.len() -1 {
+        imgs.remove(index);
+        file.set_images(imgs);
+        return 1;
+    }
+
+    0
+}
+
+#[no_mangle]
 pub extern "C" fn mangofile_get_image_count(pointer: *mut MangoFile) -> usize {
     let file: &mut MangoFile = unsafe {
         assert!(!pointer.is_null());
