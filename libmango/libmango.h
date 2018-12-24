@@ -16,21 +16,104 @@ typedef struct IntOption {
     int present;
 } IntOption;
 
+/**
+ * Checks if support for encryption was compiled in.
+ *
+ * \param enc_type the encryption type you want to check.
+ *
+ * \returns 0 or 1 depending on if it is supported or not.
+ */
+extern int mango_encryption_is_supported(char *enc_type);
 
-extern int mango_encryption_is_supported(char *);
-extern int mango_compression_is_supported(char *);
+/**
+ * Checks if support for compression was compiled in.
+ *
+ * \param comp_type the compression type you want to check.
+ *
+ * \returns 0 or 1 depending on if it is supported or not.
+ */
+extern int mango_compression_is_supported(char *comp_type);
 
-//---------------------------
+
+//-------------------------------------------------------------------------------------------------
 // Mango File
-// --------------------------
+// ------------------------------------------------------------------------------------------------
+
+/**
+ * Creates a new MangoFile.
+ *
+ * \returns the newly created MangoFile.
+ */
 extern MangoFile mangofile_new();
-extern void mangofile_free(MangoFile);
-extern void mangofile_add_image(MangoFile, MangoImage);
-extern int mangofile_add_image_by_path(MangoFile, char *);
-extern MangoImage mangofile_get_image(MangoFile, int);
-extern int  mangofile_set_image(MangoFile, MangoImage, int);
-extern int mangofile_get_image_count(MangoFile);
-extern MangoMeta mangofile_get_meta(MangoFile);
+
+/**
+ * Frees the memory of a MangoFile.
+ * 
+ * \param file the file you want to free.
+ */
+extern void mangofile_free(MangoFile file);
+
+/**
+ * Adds a MangoImage to a MangoFile.
+ *
+ * \param file
+ * \param image
+ */
+extern void mangofile_add_image(MangoFile file, MangoImage image);
+
+/**
+ * Adds a image to a MangoFile.
+ *
+ * \param file
+ * \param path
+ *
+ * \returns an error code:
+ * - 0 ok
+ * - 1 permission denied
+ * - -1 unknown error
+ */
+extern int mangofile_add_image_by_path(MangoFile file , char *path);
+
+/**
+ * Gets a MangoImage from the MangoFile by ID.
+ *
+ * \param file
+ * \param id
+ *
+ * \returns the MangoFile requested, might be NULL
+ */
+extern MangoImage mangofile_get_image(MangoFile file, int id);
+
+/**
+ * Sets a MangoImage in a MangoFile with a specific index.
+ * 
+ * \note you can't add a new image to a MangoFile with this function.
+ *
+ * \param file
+ * \param image
+ * \param id must be 0 or less that the image count of *file*
+ *
+ * \returns 0 or 1 depending on if it worked.
+ */
+extern int  mangofile_set_image(MangoFile file, MangoImage image, int id);
+
+/**
+ * Gets the count of all Images of a MangoFile.
+ *
+ * \param file
+ *
+ * \returns image count
+ */
+extern int mangofile_get_image_count(MangoFile file);
+
+/**
+ * Gets the metadata of a MangoFile.
+ *
+ * \param file
+ *
+ * \returns MangoMeta 
+ */
+extern MangoMeta mangofile_get_meta(MangoFile file);
 
 /**
  * Saves a MangoFile to the file system.
@@ -47,8 +130,20 @@ extern MangoMeta mangofile_get_meta(MangoFile);
  *
  * All formats should use the file ending ".mango"
  * and can be opened with \link mangofile_open \endlink.
+ * 
+ * \param file the file to save
+ * \param path the path where the file will get saved to
+ *
+ * \returns an error code containing if the file could have been saved.
+ *
+ * \return The error codes mean the following:
+ * - 0 everything went ok
+ * - 1 encode error
+ * - 2 write error
+ * - 3 permission error
+ * - -1 input parameters weren't okay
  */
-extern int mangofile_save(MangoFile, char *);
+extern int mangofile_save(MangoFile file, char *path);
 
 /**
  * Saves a MangoFile in the cbor format to the file system.
@@ -61,8 +156,20 @@ extern int mangofile_save(MangoFile, char *);
  * - \link mangofile_save_bson \endlink
  *
  * You should save your file with ending ".mango".
+ *
+ * \param file the file to save
+ * \param path the path where the file will get saved to
+ *
+ * \returns an error code containing if the file could have been saved.
+ *
+ * \return The error codes mean the following:
+ * - 0 everything went ok
+ * - 1 encode error
+ * - 2 write error
+ * - 3 permission error
+ * - -1 input parameters weren't okay
  */
-extern int mangofile_save_cbor(MangoFile, char *);
+extern int mangofile_save_cbor(MangoFile file, char *path);
 
 /**
  * Saves a MangoFile in the bson format to the file system.
@@ -72,8 +179,20 @@ extern int mangofile_save_cbor(MangoFile, char *);
  * - \link mangofile_save_cbor \endlink
  *
  * You should save your file with ending ".mango".
+ * 
+ * \param file the file to save
+ * \param path the path where the file will get saved to
+ *
+ * \returns an error code containing if the file could have been saved.
+ *
+ * \return The error codes mean the following:
+ * - 0 everything went ok
+ * - 1 encode error
+ * - 2 write error
+ * - 3 permission error
+ * - -1 input parameters weren't okay
  */
-extern int mangofile_save_bson(MangoFile, char *);
+extern int mangofile_save_bson(MangoFile file, char *path);
 
 /**
  * Saves a MangoFile in the json format to the file system.
@@ -89,20 +208,45 @@ extern int mangofile_save_bson(MangoFile, char *);
  * - \link mangofile_save_cbor \endlink
  *
  * You should save your file with ending ".mango".
+ *
+ * \param file the file to save
+ * \param path the path where the file will get saved to
+ *
+ * \returns an error code containing if the file could have been saved.
+ *
+ * \return The error codes mean the following:
+ * - 0 everything went ok
+ * - 1 encode error
+ * - 2 write error
+ * - 3 permission error
+ * - -1 input parameters weren't okay
  */
-extern int mangofile_save_json(MangoFile, char *);
+extern int mangofile_save_json(MangoFile file, char *path);
 
 /**
- * opens a MangoFile fromo the file system.
+ * opens a MangoFile from the file system.
  *
  * \note The internal format of the MangoFile does not matter.
  * This function will detect the format and open it accordingly.
+ *
+ * \param path the path to the file
+ * \param error 
+ * \parablock
+ * The Error code will be set in the variable passed in:
+ * - 0 everything went ok
+ * - 1 decode error
+ * - 2 read error
+ * - 3 permission error
+ * - -1 input parameters weren't okay 
+ * \endparablock
+ *
+ * \returns the opened MangoFile
  */
-extern MangoFile mangofile_open(char *, int *);
+extern MangoFile mangofile_open(char * path, int * error);
 
-// --------------------------
+// ----------------------------------------------------------------------------
 // Mango Image
-// --------------------------
+// ----------------------------------------------------------------------------
 extern void mangoimg_free(MangoImage);
 extern MangoImage mangoimg_from_path(char *, int *);
 extern int mangoimg_compress(MangoImage, char *);
@@ -114,9 +258,9 @@ extern int mangoimg_encrypt(MangoImage, char *, char *);
 extern int mangoimg_decrypt(MangoImage, char *);
 extern int save(MangoImage, char *);
 
-// --------------------------
+// ----------------------------------------------------------------------------
 // Mango Image Meta
-// --------------------------
+// ----------------------------------------------------------------------------
 extern char * mangoimgmeta_compression(MangoImageMeta);
 extern char * mangoimgmeta_encryption(MangoImageMeta);
 extern char * mangoimgmeta_checksum(MangoImageMeta);
@@ -125,9 +269,9 @@ extern char * mangoimgmeta_filename(MangoImageMeta);
 extern int  * mangoimgmeta_iv(MangoImageMeta);
 extern int  * mangoimgmeta_iv_size(MangoImageMeta);
 
-// --------------------------
+// ----------------------------------------------------------------------------
 // Mango Meta
-// --------------------------
+// ----------------------------------------------------------------------------
 extern char * mangometa_get_title(MangoMeta);
 extern void mangometa_set_title(MangoMeta, char *);
 
