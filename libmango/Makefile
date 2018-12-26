@@ -3,6 +3,9 @@ EXAMPLE_SRC :=  $(shell find ./examples -name '*.c')
 EXAMPLES := $(shell find ./examples -name '*.c' |  sed  's/\.c//g' | sed 's/s\//s\/build\//g')
 TEST_SRC := $(shell find ./test -name '*.c')
 FEATURES=gzip, aes
+PREFIX=/usr/local
+
+.PHONY: build clean rust rust_clean examples examples_clean test test_clean docs docs_clean release install uninstall
 
 build: rust
 
@@ -32,7 +35,7 @@ test_clean:
 test/run_tests: rust $(TEST_SRC)
 	gcc -o test/run_tests $(TEST_SRC) -Isrc -L. -l:./target/debug/libmango.so $(shell pkg-config --cflags --libs check)
 
-documentation:
+docs:
 	cd docs && doxygen
 
 docs_clean:
@@ -42,10 +45,13 @@ release:
 	cargo build --release --features "$(FEATURES)"
 
 install: target/release/libmango.so
-	cp target/release/libmango.so /usr/lib/
-	cp libmango.h /usr/include/
+	./scripts/createPkgConfig.sh $(PREFIX)
+	cp libmango.pc $(PREFIX)/lib/pkgconfig
+	cp target/release/libmango.so $(PREFIX)/lib/
+	cp libmango.h $(PREFIX)/include/
 
 uninstall:
-	rm /usr/lib/libmango.so
-	rm /usr/include/libmango.h
+	rm $(PREFIX)/lib/pkgconfig/libmango.pc
+	rm $(PREFIX)/lib/libmango.so
+	rm $(PREFIX)/include/libmango.h
 
