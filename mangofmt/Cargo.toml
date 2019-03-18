@@ -5,7 +5,7 @@ authors = ["Alex Fence <alexfence.code@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/AlexFence/mango.git"
 description = "file format for manga"
-readme = "README.md"
+readme = "ReadMe.md"
 
 ["features"]
 aes = ["openssl", "tiger-digest"]
