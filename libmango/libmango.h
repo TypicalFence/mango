@@ -1,6 +1,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Repesents a MangoFile sturct from the mangofmt rust library.
  *
@@ -74,6 +78,11 @@ extern MangoFile mangofile_new();
 
 /**
  * Frees the memory of a MangoFile.
+ *
+ * Important here is that this will also free all child elements, like MangoImage, and MangoMeta.
+ * It will also free the MangoImageMeta children of the MangoImage instances.
+ *
+ * hereby is important that if you have an instance of the child element, that you must not free the child before the parent  * and when you free the parent all child references will be gone too. so keep that in mind when writting your code.
  * 
  * \param file the file you want to free.
  */
@@ -283,16 +292,129 @@ extern MangoFile mangofile_open(char * path, int * error);
 // -------------------------------------------------------------------------------------------------
 // Mango Image
 // ------------------------------------------------------------------------------------------------
-extern void mangoimg_free(MangoImage);
-extern MangoImage mangoimg_from_path(char *, int *);
+
+/**
+ * Frees the memory of a MangoImage.
+ * 
+ * \param img the image you want to free.
+ */
+extern void mangoimg_free(MangoImage img);
+
+/**
+ * Creates a new MangoImage Struct out of a file from the harddrive.
+ * 
+ * \info currently only jpg & png are supported formats, more are planed in the future.
+ *
+ * \param path the path to the image file, you should prefer full paths, tho relative paths should work too
+ * \param error 
+ * \parablock
+ * The Error code, it will be set in the variable passed in:
+ * - 0 everything went ok
+ * - 1 file not found
+ * - -1 input parameters (probably) weren't okay or anything that should not have wen't wrong, went wrong.
+ * \endparablock
+
+ * \returns instance of MangoImage, containg the data of the image file.
+ */
+extern MangoImage mangoimg_from_path(char path*, int error *);
+
+/**
+ * Compresses the data of an MangoImage
+ * 
+ * \info Currently only GZIP is supported.
+ * \info You can use \link mango_compression_is_supported \endlink to check if support for a certain type was compiled in.
+ *
+ * \param image
+ * \param type The type of compresseion you want to apply.
+ * 
+ * \todo the return type doesn't appear to be an actual boolean.
+ *
+ * \returns 1 if everything went okay and 2 if some error occurred  
+ */
 extern int mangoimg_compress(MangoImage, char *);
+
+/**
+ * Uncompresses the data of an compressed MangoImage.
+ *
+ * You don't need to specify a compression type, it is stored in the metadata.
+ *
+ * \todo the return type doesn't appear to be an actual boolean
+ * \todo maybe it should also return something if the image wasn't compressed at all
+ *
+ * \param image
+ * 
+ * \returns 1 if everything went okay and 2 if some error occurred  
+ */
 extern int mangoimg_uncompress(MangoImage);
+
+/**
+ * Gets the metadata of a MangImage.
+ *
+ * \param image
+ *
+ * \returns ManoImageMeta
+ */
 extern MangoImageMeta mangoimg_get_meta(MangoImage);
+
+/**
+ * Returns the actual data of the imagefile stored inside of the MangoImage.
+ * 
+ * The ImageData struct has pointer to the data and the size of the data (in bytes), 
+ * use those to read all of those bytes.
+ * 
+ * \param image
+ * 
+ * \returns ImageData struct
+ */
 extern ImageData mangoimg_get_image_data(MangoImage);
+
+/**
+ * Returns the actual data of the image file stored inside of the MangoImage, encoded as an base64 string.
+ * 
+ * You aren't supposed to call this, it creates an overhead, 
+ * this mainly exists because I couldn't get python to do what I want.
+ *
+ * Use mangoimg_get_image_data() instead!
+ *
+ * \returns the image data encoded as base64
+ */
 extern char * mangoimg_get_base64_image_data(MangoImage);
+
+/**
+ * Encrypt the data of an MangoImage
+ * 
+ * \info Currently only "AES128" & "AES256" are supported
+ * \info You can use \link mango_encryption_is_supported \endlink to check if support for a certain type was compiled in.
+ *
+ * \param image
+ * \param type The type of encryption you want to apply.
+ * 
+ * \todo the return type doesn't appear to be an actual boolean.
+ *
+ * \returns 1 if everything went okay and 2 if some error occurred  
+ */
 extern int mangoimg_encrypt(MangoImage, char *, char *);
+
+/**
+ * Decrypt the data of an compressed MangoImage.
+ *
+ * You don't need to specify a type, it's stored in the Metadata
+ *
+ * \todo the return type doesn't appear to be an actual boolean
+ *
+ * \param image
+ * 
+ * \returns 1 if everything went okay and 2 if some error occurred  
+ */
 extern int mangoimg_decrypt(MangoImage, char *);
-extern int save(MangoImage, char *);
+
+/**
+ * Saves the MangoImage to a file.
+ *
+ * \param image the image to save
+ * \param filename the path/filename of the file to be created
+ *
+extern int mangoimg_save(MangoImage, char *);
 
 // ------------------------------------------------------------------------------------------------
 // Mango Image Meta
@@ -477,4 +599,9 @@ extern IntOption mangometa_get_year(MangoMeta meta);
  * \param value can be NULL
  */
 extern void mangometa_set_year(MangoMeta meta, short *value);
+
+
+#ifdef __cplusplus
+}
+#endif
 
