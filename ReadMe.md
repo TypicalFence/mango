@@ -1,9 +1,9 @@
 # Mango
 
 Mango is a very cool file format for manga and comics. Its a rather pointless little experiment, solving a problem that wasn't really there.
-I was always a bit bummed out about the fact, that a format like cbz/cbr doesn't store any metadata and would be easly readable for any cloud storage provrider. In the end its just a archive with a bunch image files.
+I was always a bit bummed out about the fact, that a format like cbz/cbr doesn't store any metadata and would be easily readable for any cloud storage provider. In the end its just a archive with a bunch image files.
 
-The .mango fileformat solves those tssues, that for 99% of everyone isn't even a issue to begin with because it keeps stuff simple.
+The .mango file format solves those issues, that for 99% of everyone isn't even a issue to begin with because it keeps stuff simple.
 
 ## Quick rundown
 .mango files are basically just json, but not really, because that would make them huge due to base64, there is the option to save it as json tho. So yeah its just a binray-json format containing some metadata and all the images, with a checksum. There are currently bson and cbor as options for storing a .mango file, cbor is the default, because it has less overhead.
@@ -36,4 +36,4 @@ The 3 Subprojects are licensed differently:
     - libmango
     - pymangofmt
 
-please check the License file in each directory for more information.
+Please check the License file in each directory for more information.
