@@ -316,7 +316,7 @@ extern void mangoimg_free(MangoImage img);
 
  * \returns instance of MangoImage, containg the data of the image file.
  */
-extern MangoImage mangoimg_from_path(char path*, int error *);
+extern MangoImage mangoimg_from_path(char * path, int * error);
 
 /**
  * Compresses the data of an MangoImage
@@ -331,7 +331,7 @@ extern MangoImage mangoimg_from_path(char path*, int error *);
  *
  * \returns 1 if everything went okay and 2 if some error occurred  
  */
-extern int mangoimg_compress(MangoImage, char *);
+extern int mangoimg_compress(MangoImage, char * type);
 
 /**
  * Uncompresses the data of an compressed MangoImage.
@@ -345,7 +345,7 @@ extern int mangoimg_compress(MangoImage, char *);
  * 
  * \returns 1 if everything went okay and 2 if some error occurred  
  */
-extern int mangoimg_uncompress(MangoImage);
+extern int mangoimg_uncompress(MangoImage image);
 
 /**
  * Gets the metadata of a MangImage.
@@ -354,7 +354,7 @@ extern int mangoimg_uncompress(MangoImage);
  *
  * \returns ManoImageMeta
  */
-extern MangoImageMeta mangoimg_get_meta(MangoImage);
+extern MangoImageMeta mangoimg_get_meta(MangoImage image);
 
 /**
  * Returns the actual data of the imagefile stored inside of the MangoImage.
@@ -366,7 +366,7 @@ extern MangoImageMeta mangoimg_get_meta(MangoImage);
  * 
  * \returns ImageData struct
  */
-extern ImageData mangoimg_get_image_data(MangoImage);
+extern ImageData mangoimg_get_image_data(MangoImage image);
 
 /**
  * Returns the actual data of the image file stored inside of the MangoImage, encoded as an base64 string.
@@ -378,7 +378,7 @@ extern ImageData mangoimg_get_image_data(MangoImage);
  *
  * \returns the image data encoded as base64
  */
-extern char * mangoimg_get_base64_image_data(MangoImage);
+extern char * mangoimg_get_base64_image_data(MangoImage image);
 
 /**
  * Encrypt the data of an MangoImage
@@ -388,12 +388,13 @@ extern char * mangoimg_get_base64_image_data(MangoImage);
  *
  * \param image
  * \param type The type of encryption you want to apply.
+ * \param password The password you want to use securiong the encryption.
  * 
  * \todo the return type doesn't appear to be an actual boolean.
  *
  * \returns 1 if everything went okay and 2 if some error occurred  
  */
-extern int mangoimg_encrypt(MangoImage, char *, char *);
+extern int mangoimg_encrypt(MangoImage image, char * type, char * password);
 
 /**
  * Decrypt the data of an compressed MangoImage.
@@ -403,10 +404,11 @@ extern int mangoimg_encrypt(MangoImage, char *, char *);
  * \todo the return type doesn't appear to be an actual boolean
  *
  * \param image
+ * \param password
  * 
  * \returns 1 if everything went okay and 2 if some error occurred  
  */
-extern int mangoimg_decrypt(MangoImage, char *);
+extern int mangoimg_decrypt(MangoImage image, char * password);
 
 /**
  * Saves the MangoImage to a file.
@@ -414,6 +416,12 @@ extern int mangoimg_decrypt(MangoImage, char *);
  * \param image the image to save
  * \param filename the path/filename of the file to be created
  *
+ * \returns The return codes mean:
+ * - 0 everything OK!
+ * - 1 permission denied!
+ * - -1 we just don't know!     
+ *
+ */
 extern int mangoimg_save(MangoImage, char *);
 
 // ------------------------------------------------------------------------------------------------
