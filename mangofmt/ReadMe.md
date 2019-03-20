@@ -9,9 +9,9 @@ Also checkout the Documentation! It explains much more than this little readme, 
 
 ## Features
 The following Features are currently available, none are enabled by default:
-    * aes
-        * requires openssl
-    * gzip
+* aes
+   * requires openssl
+* gzip
 
 If you do not enable them, then you will be all of the compression and encryption features.
 
