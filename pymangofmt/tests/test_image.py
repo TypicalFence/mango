@@ -1,11 +1,12 @@
 import os
+import shutil
 import pytest
 import subprocess
 from mangofmt import MangoImage, EncryptionType, CompressionType
 
 
 def test_open():
-    img = MangoImage.from_path("test.jpg")
+    MangoImage.from_path("test.jpg")
 
 
 def test_filename():
@@ -18,8 +19,8 @@ def test_mime():
     assert img.meta_data.mime == "JPEG"
 
 
+@pytest.mark.skipif(shutil.which("sha256sum") is None, reason="sha256sum cli is not available on the system")
 def test_checksum():
-    import subprocess
     img = MangoImage.from_path("test.jpg")
     meta = img.meta_data
     img_sum = meta.checksum
@@ -31,8 +32,12 @@ def test_checksum():
     assert img_sum == sys_sum
 
 
+@pytest.mark.skipif(shutil.which("sha256sum") is None, reason="sha256sum cli is not available on the system")
 def test_checksum_onelinner():
-    import subprocess
+    """
+    This test exist for ensuring that you can put everything on one line,
+    something a python developer might do
+    """
     img_sum = MangoImage.from_path("test.jpg").meta_data.checksum
     sys_proc = subprocess.run(["sha256sum", "test.jpg"], stdout=subprocess.PIPE)
     sys_sum = sys_proc.stdout.decode("utf-8").split(" ")[0]
