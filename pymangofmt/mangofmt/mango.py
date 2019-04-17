@@ -8,6 +8,11 @@ from mangofmt.error import EncodeError, WriteError
 
 
 class MangoFile(object):
+    """Represents a mango file.
+
+    It can be used to create, save and modify a file of the format.
+    """
+
     def __init__(self, pointer=None):
         if pointer is None:
             self._pointer = libmango.mangofile_new()
@@ -19,10 +24,20 @@ class MangoFile(object):
 
     @property
     def meta_data(self):
+        """:obj:`MangoMetaData` Metadata of the file.
+
+        This property is read only.
+
+        Note: libmango currently has no way to create a metadata struct.
+        """
         return MangoMetaData(libmango.mangofile_get_meta(self._pointer), self)
 
     @property
     def image_count(self):
+        """:int: Number of images contained in this file.
+
+        This property is read only.
+        """
         return libmango.mangofile_get_image_count(self._pointer)
 
     @property
