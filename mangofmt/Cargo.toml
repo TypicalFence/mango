@@ -1,7 +1,11 @@
 [package]
 name = "mangofmt"
-version = "0.1.0"
+version = "0.5.0"
 authors = ["Alex Fence <alexfence.code@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/AlexFence/mango.git"
+description = "file format for manga"
+readme = "ReadMe.md"
 
 ["features"]
 aes = ["openssl", "tiger-digest"]
@@ -17,7 +21,7 @@ serde = "1.0.10"
 serde_json = "1.0.2"
 serde_derive = "1.0"
 openssl = { version = "0.10.10", optional = true }
-bson = {git = "https://github.com/zonyitoo/bson-rs.git" }
+bson = "0.13.0" 
 serde_bytes = "0.10"
 serde_cbor = "0.8.2"
 tiger-digest = { version = "0.1.1", optional = true }
