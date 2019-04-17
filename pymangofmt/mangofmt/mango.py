@@ -1,6 +1,5 @@
 import base64
 import ctypes
-from ctypes import *
 from mangofmt.c import libmango
 from mangofmt.enums import CompressionType, EncryptionType, Language
 from mangofmt.error import DecodeError, ReadError
@@ -14,6 +13,16 @@ class MangoFile(object):
     """
 
     def __init__(self, pointer=None):
+        """Constructor:
+
+        Creates a new instance of :obj:`MangoFile`
+        or uses the pointer you pass it.
+        You should not pass anything to the pointer parameter yourself!
+
+        Args:
+            pointer (:obj:`ctypes.POINTER`, optional): C pointer to
+                the MangoFile Rust struct.
+        """
         if pointer is None:
             self._pointer = libmango.mangofile_new()
         else:
@@ -28,7 +37,8 @@ class MangoFile(object):
 
         This property is read only.
 
-        Note: libmango currently has no way to create a metadata struct.
+        Note:
+            libmango currently has no way to create a metadata struct.
         """
         return MangoMetaData(libmango.mangofile_get_meta(self._pointer), self)
 
@@ -42,13 +52,33 @@ class MangoFile(object):
 
     @property
     def images(self):
+        """:obj:`list` Images contained in this file.
+
+        This property is read only.
+        """
         for index in range(0, self.image_count):
             yield self.get_image(index)
 
     @staticmethod
     def open(path):
-        error = c_int(-10)
-        pointer = libmango.mangofile_open(path.encode("utf-8"), byref(error))
+        """Opens an existing MangoFile.
+
+        Args:
+            path (str): path of the file to open.
+
+        Raises:
+            DecodeError: could not decode MangoFile
+            ReadError: could not read MangoFile
+            FileNotFoundError: could not find file, `path` doesn't exist
+
+        Returns:
+            A instance of :obj:`MangoFile`.
+        """
+        error = ctypes.c_int(-10)
+        pointer = libmango.mangofile_open(
+                path.encode("utf-8"),
+                ctypes.byref(error)
+        )
 
         if error.value != 0:
             if error.value == 1:
@@ -63,6 +93,17 @@ class MangoFile(object):
         return MangoFile(pointer)
 
     def get_image(self, index):
+        """Gets an image from the file.
+
+        Args:
+            index (int): index of the image you want to get.
+
+        Raises:
+            IndexError: there is no image with that `index`.
+
+        Returns:
+            reference of a :obj:`MangoImage` from the file.
+        """
         if self.image_count > index >= 0:
             pointer = libmango.mangofile_get_image(self._pointer, index)
             return MangoImage(pointer, self)
@@ -71,7 +112,11 @@ class MangoFile(object):
 
     def set_image(self, img, index):
         if self.image_count > index >= 0:
-            success = libmango.mangofile_set_image(self._pointer, img._pointer, index)
+            success = libmango.mangofile_set_image(
+                    self._pointer,
+                    img._pointer,
+                    index
+            )
 
             if success == 1:
                 # TODO maybe set our self as parent of img?
@@ -90,30 +135,42 @@ class MangoFile(object):
 
     def add_image_by_path(self, path):
         # TODO check type of path
-        libmango.mangofile_add_image_by_path(self._pointer, path.encode("utf-8"))
+        libmango.mangofile_add_image_by_path(
+                self._pointer,
+                path.encode("utf-8")
+        )
 
     def _save_error_handling(self, code):
-       if code == 1:
-           raise EncodeError
-       elif code == 2:
-           raise WriteError
-       elif code == 3:
-           raise PermissionError
+        if code == 1:
+            raise EncodeError
+        elif code == 2:
+            raise WriteError
+        elif code == 3:
+            raise PermissionError
 
     def save(self, path):
         error = libmango.mangofile_save(self._pointer, path.encode("utf-8"))
         self._save_error_handling(error)
 
     def save_cbor(self, path):
-        error = libmango.mangofile_save_cbor(self._pointer, path.encode("utf-8"))
+        error = libmango.mangofile_save_cbor(
+                self._pointer,
+                path.encode("utf-8")
+        )
         self._save_error_handling(error)
 
     def save_bson(self, path):
-        error = libmango.mangofile_save_bson(self._pointer, path.encode("utf-8"))
+        error = libmango.mangofile_save_bson(
+                self._pointer,
+                path.encode("utf-8")
+        )
         self._save_error_handling(error)
 
     def save_json(self, path):
-        error = libmango.mangofile_save_json(self._pointer, path.encode("utf-8"))
+        error = libmango.mangofile_save_json(
+                self._pointer,
+                path.encode("utf-8")
+        )
         self._save_error_handling(error)
 
 
@@ -127,7 +184,7 @@ class MangoMetaData(object):
         ptr = libmango.mangometa_get_title(self._pointer)
         try:
             value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
-        except:
+        except Exception:
             value = None
         finally:
             # TODO free pointer here desu
@@ -144,7 +201,7 @@ class MangoMetaData(object):
         ptr = libmango.mangometa_get_author(self._pointer)
         try:
             value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
-        except:
+        except Exception:
             value = None
         finally:
             # TODO free pointer here desu
@@ -161,7 +218,7 @@ class MangoMetaData(object):
         ptr = libmango.mangometa_get_publisher(self._pointer)
         try:
             value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
-        except:
+        except Exception:
             value = None
         finally:
             # TODO free pointer here desu
@@ -178,7 +235,7 @@ class MangoMetaData(object):
         ptr = libmango.mangometa_get_source(self._pointer)
         try:
             value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
-        except:
+        except Exception:
             value = None
         finally:
             # TODO free pointer here desu
@@ -195,7 +252,7 @@ class MangoMetaData(object):
         ptr = libmango.mangometa_get_translation(self._pointer)
         try:
             value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
-        except:
+        except Exception:
             value = None
         finally:
             # TODO free pointer here desu
@@ -205,7 +262,10 @@ class MangoMetaData(object):
 
     @translation.setter
     def translation(self, value):
-        libmango.mangometa_set_translation(self._pointer, value.encode("utf-8"))
+        libmango.mangometa_set_translation(
+                self._pointer,
+                value.encode("utf-8")
+        )
 
     @property
     def language(self):
@@ -213,7 +273,7 @@ class MangoMetaData(object):
 
         try:
             lang = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
-        except:
+        except Exception:
             lang = None
         finally:
             # TODO free pointer
@@ -245,7 +305,10 @@ class MangoMetaData(object):
 
     @volume.setter
     def volume(self, value):
-        libmango.mangometa_set_volume(self._pointer, byref(c_int(value)))
+        libmango.mangometa_set_volume(
+                self._pointer,
+                ctypes.byref(ctypes.c_int(value))
+        )
 
     @property
     def chapter(self):
@@ -257,7 +320,10 @@ class MangoMetaData(object):
 
     @chapter.setter
     def chapter(self, value):
-        libmango.mangometa_set_chapter(self._pointer, byref(c_int(value)))
+        libmango.mangometa_set_chapter(
+                self._pointer,
+                ctypes.byref(ctypes.c_int(value))
+        )
 
     @property
     def year(self):
@@ -269,7 +335,10 @@ class MangoMetaData(object):
 
     @year.setter
     def year(self, value):
-        libmango.mangometa_set_year(self._pointer, byref(c_int(value)))
+        libmango.mangometa_set_year(
+                self._pointer,
+                ctypes.byref(ctypes.c_int(value))
+        )
 
 
 class MangoImage(object):
@@ -283,8 +352,11 @@ class MangoImage(object):
 
     @staticmethod
     def from_path(path):
-        error = c_int(-10)
-        pointer = libmango.mangoimg_from_path(path.encode("utf-8"), byref(error))
+        error = ctypes.c_int(-10)
+        pointer = libmango.mangoimg_from_path(
+                path.encode("utf-8"),
+                ctypes.byref(error)
+        )
 
         if error.value != 0:
             print(error)
@@ -305,7 +377,7 @@ class MangoImage(object):
         ptr = libmango.mangoimg_get_base64_image_data(self._pointer)
         try:
             value = ctypes.cast(ptr, ctypes.c_char_p).value.decode('utf-8')
-        except:
+        except Exception:
             value = None
 
         if value is not None:
@@ -349,7 +421,10 @@ class MangoImage(object):
                                          password.encode("utf-8"))
 
     def decrypt(self, password):
-        return libmango.mangoimg_decrypt(self._pointer, password.encode("utf-8"))
+        return libmango.mangoimg_decrypt(
+                self._pointer,
+                password.encode("utf-8")
+        )
 
 
 class MangoImageMetadata(object):
@@ -378,7 +453,7 @@ class MangoImageMetadata(object):
         ptr = libmango.mangoimgmeta_checksum(self._pointer)
         try:
             value = ptr.decode('utf-8')
-        except:
+        except Exception:
             value = None
         finally:
             # TODO free pointer here desu
@@ -413,5 +488,3 @@ class MangoImageMetadata(object):
             iv.append(ptr[i])
 
         return iv
-
-
