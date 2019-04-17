@@ -29,16 +29,16 @@
 //!
 //! ## Adding a Encryption/Compression Type
 //!
-//! Additional Algoritms can be added in easily.
+//! Additional Algorithms can be added in easily.
 //!
 //! You can use the *aes* and *gzip* features as examples.
 //!
-//! 1. create a new feature in the *cargo.toml* and add all your dependencies ad optional dependencies.
-//! 2. depending on what you adding create a file in */src/encryption* or *src/compression* for the Algorithm your adding.
-//! 3. annotate your module with *#[cfg(feature = "your feature")]*
-//! 4. add your algorithm to the Enum which contains all types, do not annotate it tho.
-//! 5. add your type to the match statements with annotations as above.
-//!    the code in the file you created earlier should be called there.
+//! 1. Create a new feature in the *cargo.toml* and add all your dependencies ad optional dependencies.
+//! 2. Depending on what you adding create a file in */src/encryption* or *src/compression* for the Algorithm your adding.
+//! 3. Annotate your module with *#[cfg(feature = "your feature")]*
+//! 4. Add your algorithm to the Enum which contains all types, do not annotate it tho.
+//! 5. Add your type to the match statements with annotations as above.
+//!    The code in the file you created earlier should be called there.
 //!
 //! Pull requests for additional encryption/compressions types are welcome, but please write tests.
 //!

@@ -1,7 +1,17 @@
+import platform
 import ctypes
 from ctypes import *
 
-libmango = ctypes.cdll.LoadLibrary("libmango.so")
+library_path = "libmango.so"
+
+if platform.system() == "Darwin":
+    library_path = "libmango.dylib"
+elif platform.system() == "Windows":
+    # TODO actually test it on windows
+    # priority: low
+    library_path = "libmango.dll"
+
+libmango = ctypes.cdll.LoadLibrary(library_path)
 
 
 class RustMangoFile(Structure):
@@ -21,11 +31,11 @@ class RustMangoImageMetadata(Structure):
 
 
 class ImageData(Structure):
-	_fields_ = [("pointer", POINTER(c_ubyte)),
-				("length", c_size_t)]
+    _fields_ = [("pointer", POINTER(c_ubyte)),
+                ("length", c_size_t)]
 
-	def __exit__(self, exc_type, exc_value, traceback):
-            libmango.mango_imagedata_free(self)
+    def __exit__(self, exc_type, exc_value, traceback):
+        libmango.mango_imagedata_free(self)
 
 
 class IntOption(Structure):
