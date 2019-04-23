@@ -117,9 +117,10 @@ pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, img_pointer: *mut
         assert!(!img_pointer.is_null());
         &mut *img_pointer
     };
+    
+    // TODO return error
 
     file.add_image(img.clone());
-
 }
 
 #[no_mangle]
