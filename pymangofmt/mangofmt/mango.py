@@ -111,6 +111,23 @@ class MangoFile(object):
             raise IndexError
 
     def set_image(self, img, index):
+        """Sets an image in the file.
+
+        You can not add a new :obj:`MangoImage` with this method,
+        use :meth:`add_image` for adding a new one.
+
+        Args:
+            img (:obj:`MangoImage`): image to set.
+            index (int): index of the position you want to replace.
+
+        Raises:
+            IndexError: the index specified does not exist yet
+            ValueError: an argument passed to the function contains
+            an invalid pointer
+
+        Returns:
+            True if it set the image, false if it couldn't set it.
+        """
         if self.image_count > index >= 0:
             success = libmango.mangofile_set_image(
                     self._pointer,
@@ -125,12 +142,17 @@ class MangoFile(object):
             elif success == 0:
                 return False
             else:
-                raise IndexError
+                raise ValueError("MangoFile.set_image, " +
+                                 "object contains an invalid pointer")
         else:
             raise IndexError
 
     def add_image(self, img):
-        # TODO check type of path
+        """Adds an image to the file.
+
+        Args:
+            img (:obj:`MangoImage`): image to add.
+        """
         libmango.mangofile_add_image(self._pointer, img._pointer)
 
     def add_image_by_path(self, path):
