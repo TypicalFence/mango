@@ -63,7 +63,7 @@ pub enum CompressionType {
 impl Clone for CompressionType {
     fn clone(&self) -> CompressionType {
         match self {
-            &CompressionType::GZIP => CompressionType::GZIP,
+            CompressionType::GZIP => CompressionType::GZIP,
         }
     }
 }
@@ -78,7 +78,7 @@ impl fmt::Display for CompressionType {
 
 impl CompressionType {
     #[allow(unreachable_patterns)]
-    pub fn is_supported(self) -> bool {
+    pub fn is_supported(&self) -> bool {
         match self {
             #[cfg(feature = "gzip")]
             CompressionType::GZIP => true,

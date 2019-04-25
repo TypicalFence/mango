@@ -236,7 +236,7 @@ impl MangoFile {
                 return Err(MangoFileError::with_cause(ErrorKind::EncodeError, "couldn't encode to BSON", encode.err().unwrap()));
             }
 
-            let mut file = File::create(p);
+            let file = File::create(p);
             if file.is_err() {
                 return Err(MangoFileError::convert_io_save(file.err().unwrap()));
             }
@@ -305,9 +305,9 @@ impl MangoFile {
         self.images.clone()
     }
 
-    /// Gets one image of the file
+    /// Gets an image of the file
     pub fn get_image(&self, index: usize) -> Option<&MangoImage> {
-        if &self.images.len() -1 >= index {
+        if self.images.len() > index {
 
             return Some(&self.images[index]);
         }
@@ -344,6 +344,12 @@ impl MangoFile {
     /// Sets the images of the file
     pub fn set_images(&mut self, imgs: Vec<MangoImage>) {
         self.images = imgs;
+    }
+}
+
+impl Default for MangoFile {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
