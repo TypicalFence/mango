@@ -58,8 +58,8 @@ impl ImageFileMetadata {
         }
     }
 
-    pub fn to_base64_metadata(self) -> MangoImageMetadata {
-        MangoImageMetadata::from_file_metadata(self)
+    pub fn to_base64_metadata(&self) -> MangoImageMetadata {
+        MangoImageMetadata::from_file_metadata(self.clone())
     }
 }
 
@@ -87,14 +87,14 @@ pub struct MangoImageMetadata {
 
 impl MangoImageMetadata {
     pub fn from_file_metadata(data: ImageFileMetadata) -> Self {
-        let filename: String = data.path.split("/")
+        let filename: String = data.path.split('/')
             .collect::<Vec<&str>>().last().unwrap().to_string();
 
          Self {
             compression: None,
             encryption: None,
             iv: None,
-            filename: filename,
+            filename,
             checksum: data.checksum,
             mime: data.mime,
         }
@@ -159,6 +159,12 @@ impl MangoMetadata {
             chapter: None,
             year: None,
         }
+    }
+}
+
+impl Default for MangoMetadata {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

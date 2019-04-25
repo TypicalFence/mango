@@ -73,8 +73,8 @@ pub enum EncryptionType {
 impl Clone for EncryptionType {
     fn clone(&self) -> EncryptionType {
         match self {
-            &EncryptionType::AES128 => EncryptionType::AES128,
-            &EncryptionType::AES256 => EncryptionType::AES256,
+            EncryptionType::AES128 => EncryptionType::AES128,
+            EncryptionType::AES256 => EncryptionType::AES256,
         }
     }
 }
@@ -92,7 +92,7 @@ impl EncryptionType {
     
     /// Returns whether the EncryptionType got compiled in or not.
     #[allow(unreachable_patterns)]
-    pub fn is_supported(self) -> bool {
+    pub fn is_supported(&self) -> bool {
         match self {
             #[cfg(feature = "aes")]
             EncryptionType::AES128 => true,
