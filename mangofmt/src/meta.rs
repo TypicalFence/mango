@@ -25,7 +25,7 @@ fn get_checksum(file: &mut File) -> Option<String> {
     Some(checksum.to_hex())
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ImageFileMetadata {
     pub path: String,
     pub checksum: String,
@@ -63,17 +63,7 @@ impl ImageFileMetadata {
     }
 }
 
-impl Clone for ImageFileMetadata {
-    fn clone(&self) -> ImageFileMetadata {
-        ImageFileMetadata {
-            path: self.path.clone(),
-            checksum: self.checksum.clone(),
-            mime: self.mime.clone(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct MangoImageMetadata {
     pub compression: Option<CompressionType>,
     pub encryption: Option<EncryptionType>,
@@ -100,27 +90,6 @@ impl MangoImageMetadata {
         }
     }
 }
-
-impl Clone for MangoImageMetadata {
-    fn clone(&self) -> Self {
-        Self {
-            // TODO just WHY???
-            compression: match self.compression.clone() {
-                Some(v) => Some(v),
-                None => None,
-            },
-            encryption: match self.encryption.clone() {
-                Some(e) => Some(e),
-                None => None,
-            },
-            iv: self.iv.clone(),
-            filename: self.filename.clone(),
-            checksum: self.checksum.clone(),
-            mime: self.mime.clone(),
-        }
-    }
-}
-
 
 #[derive(Serialize, Deserialize, Clone)]
 pub enum Language {
