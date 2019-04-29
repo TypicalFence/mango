@@ -38,8 +38,8 @@ impl MangoImage {
         // we can assume that ImageFile struct returns a valid file Path struct
         // therefore we can ignore the following result (probably) (maybe?)
         let mut file = File::open(file_image.get_path().as_path()).unwrap();
-        #[allow(unused_must_use)]
-        file.read_to_end(&mut vec).is_err();
+        
+        let _ = file.read_to_end(&mut vec).is_err();
 
         let new_meta = file_image.get_meta();
         MangoImage::new(

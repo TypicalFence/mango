@@ -42,7 +42,7 @@ impl JsonMangoFile {
         let json_file: JsonMangoFile = json_result.unwrap();
 
         for image in json_file.get_images() {
-            mango_imgs.push(Base64Image::to_mango(image));
+            mango_imgs.push(Base64Image::to_mango(&image));
         }
 
         let mut mango_file = MangoFile::new();
@@ -57,7 +57,7 @@ impl JsonMangoFile {
         let mut base64_imgs = Vec::new();
 
         for image in file.get_images() {
-            base64_imgs.push(Base64Image::from_mango(image));
+            base64_imgs.push(Base64Image::from_mango(&image));
         }
 
         let json_string = serde_json::to_string_pretty(&JsonMangoFile::new(file.get_meta(),
@@ -96,25 +96,25 @@ struct Base64ImageMetadata {
 }
 
 impl Base64ImageMetadata {
-    pub fn from_mango(meta: MangoImageMetadata) -> Self {
+    pub fn from_mango(meta: &MangoImageMetadata) -> Self {
         Self {
-            compression: meta.compression,
-            encryption: meta.encryption,
-            iv: meta.iv,
-            filename: meta.filename,
-            checksum: meta.checksum,
+            compression: meta.compression.clone(),
+            encryption: meta.encryption.clone(),
+            iv: meta.iv.clone(),
+            filename: meta.filename.clone(),
+            checksum: meta.checksum.clone(),
             mime: meta.mime,
         }
     }
 
-    pub fn to_mango(meta: Self) -> MangoImageMetadata {
+    pub fn to_mango(&self) -> MangoImageMetadata {
         MangoImageMetadata {
-            compression: meta.compression,
-            encryption: meta.encryption,
-            iv: meta.iv,
-            filename: meta.filename,
-            checksum: meta.checksum,
-            mime: meta.mime,
+            compression: self.compression.clone(),
+            encryption: self.encryption.clone(),
+            iv: self.iv.clone(),
+            filename: self.filename.clone(),
+            checksum: self.checksum.clone(),
+            mime: self.mime,
         }
     }
 }
@@ -127,15 +127,15 @@ struct Base64Image {
 }
 
 impl Base64Image {
-    pub fn from_mango(img: MangoImage) -> Self {
+    pub fn from_mango(img: &MangoImage) -> Self {
         Self {
             data: img.get_image_data(),
-            meta: Base64ImageMetadata::from_mango(img.get_meta()),
+            meta: Base64ImageMetadata::from_mango(&img.get_meta()),
         }
     }
 
-    pub fn to_mango(img: Self) -> MangoImage {
-        MangoImage::new(img.data, Base64ImageMetadata::to_mango(img.meta))
+    pub fn to_mango(&self) -> MangoImage {
+        MangoImage::new(self.data.clone(), Base64ImageMetadata::to_mango(&self.meta))
     }
 }
 
