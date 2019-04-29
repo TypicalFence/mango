@@ -1,5 +1,4 @@
 use std;
-use std::io::Read;
 use std::fs::File;
 use std::io::prelude::*;
 use super::ImageFile;
@@ -33,13 +32,14 @@ impl MangoImage {
     }
     
     /// Creates a new MangoImage based on an ImageFile.
-    pub fn from_file(file_image: &mut ImageFile) -> MangoImage {
+    pub fn from_file(file_image: &ImageFile) -> MangoImage {
         let mut vec = Vec::new();
 
-        // we can assume that ImageFile struct returns a valid File struct
-        // therefore we can ignore the following result (probably)
+        // we can assume that ImageFile struct returns a valid file Path struct
+        // therefore we can ignore the following result (probably) (maybe?)
+        let mut file = File::open(file_image.get_path().as_path()).unwrap();
         #[allow(unused_must_use)]
-        file_image.get_file().read_to_end(&mut vec).is_err();
+        file.read_to_end(&mut vec).is_err();
 
         let new_meta = file_image.get_meta();
         MangoImage::new(

@@ -293,7 +293,7 @@ impl MangoFile {
 
     /// Adds a MangoImage to the file by Path
     pub fn add_image_by_path(&mut self, p: &Path) -> Result<(), std::io::Error> {
-        let mut image_file = ImageFile::open(p)?;
+        let image_file = ImageFile::open(p)?;
         self.images.push(
             image_file.to_mango_image()
         );
