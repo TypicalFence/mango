@@ -1,6 +1,5 @@
-use std::io::{Error, ErrorKind, Read};
-use std::fs::File;
-use std::path::Path;
+use std::io::{Error, ErrorKind};
+use std::path::{Path, PathBuf};
 use image::MangoImage;
 use meta::ImageFileMetadata;
 
@@ -11,7 +10,7 @@ use meta::ImageFileMetadata;
 ///
 /// It can mainly opens a File and generates some meta data.
 pub struct ImageFile {
-    file: File,
+    path: PathBuf,
     meta: ImageFileMetadata,
 }
 
@@ -19,29 +18,25 @@ impl ImageFile {
     /// Returns a new Instance of the struct.
     ///
     /// The new instance is based on a file from the file system.
-    pub fn open(p: &Path) -> Result<ImageFile, Error> {
-        if p.is_file() {
-            match File::open(&p) {
-                Ok(file) => {
-                    match ImageFileMetadata::new(&p) {
-                        Some(meta) => Ok(ImageFile { file, meta }),
-                        None => Err(Error::new(ErrorKind::Other, "couldn't read metadata")),
-                    }
-                }
-                Err(e) => Err(e),
+    pub fn open(path: &Path) -> Result<ImageFile, Error> {
+        if path.is_file() {
+            match ImageFileMetadata::new(&path) {
+                Some(meta) => Ok(ImageFile { path: path.to_path_buf(), meta }),
+                None => Err(Error::new(ErrorKind::Other, "couldn't read metadata")),
             }
         } else {
            Err(Error::new(ErrorKind::InvalidInput, "path is not a file"))
         }
     }
 
-    /// Returns an instance of the internal File.
-    pub fn get_file(&mut self) -> &mut File {
-        self.file.by_ref()
+    /// Returns an instance of the internal Path to the File.
+    pub fn get_path(&self) -> &PathBuf {
+        &self.path
     }
-
+    
     /// Returns a copy of the metadata of the file.
     pub fn get_meta(&self) -> ImageFileMetadata {
+        // TODO why not just return a reference and let the user clone the struct?
         self.meta.clone()
     }
 
@@ -49,7 +44,7 @@ impl ImageFile {
     ///
     /// The file itself stays untouched it just converts the data to what
     /// is used inside .mango files.
-    pub fn to_mango_image(&mut self) -> MangoImage {
+    pub fn to_mango_image(&self) -> MangoImage {
         MangoImage::from_file(self)
     }
 }
