@@ -1,3 +1,4 @@
+import os
 import platform
 import ctypes
 from ctypes import *
@@ -7,9 +8,15 @@ library_path = "libmango.so"
 if platform.system() == "Darwin":
     library_path = "libmango.dylib"
 elif platform.system() == "Windows":
-    # TODO actually test it on windows
-    # priority: low
-    library_path = "libmango.dll"
+    import pathlib
+
+    try:
+        library_name = None
+        library_base = os.environ["libmangoPath"]
+        library_name = "mango.dll"
+        library_path = str(pathlib.Path(library_base, library_name))
+    except KeyError:
+        library_path = "libmango.dll"
 
 libmango = ctypes.cdll.LoadLibrary(library_path)
 
