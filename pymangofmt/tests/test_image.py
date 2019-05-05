@@ -1,8 +1,17 @@
 import os
 import shutil
+import platform
 import pytest
 import subprocess
 from mangofmt import MangoImage, EncryptionType, CompressionType
+
+def is_root():
+    # there is no os.geteuid on windows
+    # just skip those tests
+    if platform.system() == "Windows":
+        return False
+    else:
+        return os.geteuid() == 0
 
 
 def test_open():
@@ -96,7 +105,7 @@ def test_save():
     img.save("save_test.jpg")
 
 
-@pytest.mark.skipif(os.geteuid() == 0, reason="can't be tested as root")
+@pytest.mark.skipif(is_root(), reason="can't be tested as root")
 def test_save_permission():
     img = MangoImage.from_path("test.jpg")
 
