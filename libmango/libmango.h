@@ -79,10 +79,14 @@ extern MangoFile mangofile_new();
 /**
  * Frees the memory of a MangoFile.
  *
- * Important here is that this will also free all child elements, like MangoImage, and MangoMeta.
+ * this will also free all child elements, like MangoImage, and MangoMeta.
  * It will also free the MangoImageMeta children of the MangoImage instances.
  *
- * hereby is important that if you have an instance of the child element, that you must not free the child before the parent  * and when you free the parent all child references will be gone too. so keep that in mind when writting your code.
+ * it is important that if you have an instance of the child element, 
+ * that you must not free the child before the parent 
+ * and when you free the parent all child references will be gone too. 
+ *
+ * so keep that in mind when writting your code.
  * 
  * \param file the file you want to free.
  */
@@ -93,8 +97,12 @@ extern void mangofile_free(MangoFile file);
  *
  * \param file
  * \param image
+ *
+ * * \returns an error code:
+ * - 0 ok
+ * - -42 either of the pointers passed are null
  */
-extern void mangofile_add_image(MangoFile file, MangoImage image);
+extern int mangofile_add_image(MangoFile file, MangoImage image);
 
 /**
  * Adds a image to a MangoFile.
@@ -106,6 +114,7 @@ extern void mangofile_add_image(MangoFile file, MangoImage image);
  * - 0 ok
  * - 1 permission denied
  * - -1 unknown error
+ * - -42  MangoFile is null
  */
 extern int mangofile_add_image_by_path(MangoFile file , char *path);
 
