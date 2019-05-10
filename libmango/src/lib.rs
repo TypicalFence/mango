@@ -62,6 +62,7 @@ pub extern "C" fn mango_compression_is_supported(comp_type: *const c_char) -> bo
 
     false
 }
+
 //----------------------------------------------------------------------------------------
 // Mango File
 //----------------------------------------------------------------------------------------
@@ -83,8 +84,11 @@ pub extern "C" fn mangofile_free(pointer: *mut MangoFile) {
 
 #[no_mangle]
 pub extern "C" fn mangofile_add_image_by_path(pointer: *mut MangoFile, path: *const c_char) -> i8 {
+    if pointer.is_null() {
+       return -42;
+    }
+
     let file: &mut MangoFile = unsafe {
-        assert!(!pointer.is_null());
         &mut *pointer
     };
 
@@ -107,20 +111,26 @@ pub extern "C" fn mangofile_add_image_by_path(pointer: *mut MangoFile, path: *co
 }
 
 #[no_mangle]
-pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, img_pointer: *mut MangoImage) {
+pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, img_pointer: *mut MangoImage) -> i8 {
+    if pointer.is_null() {
+       return -42;
+    }
+
     let file: &mut MangoFile = unsafe {
-        assert!(!pointer.is_null());
         &mut *pointer
     };
 
+    if img_pointer.is_null() {
+       return -42;
+    }
+
     let img = unsafe {
-        assert!(!img_pointer.is_null());
         &mut *img_pointer
     };
     
-    // TODO return error
-
     file.add_image(img.clone());
+    
+    0
 }
 
 #[no_mangle]
@@ -136,7 +146,9 @@ pub extern "C" fn mangofile_get_image(pointer: *mut MangoFile, index: usize) -> 
 }
 
 #[no_mangle]
-pub extern "C" fn mangofile_set_image(file_pointer: *mut MangoFile, img_pointer: *mut MangoImage, index: usize) -> usize {
+pub extern "C" fn mangofile_set_image(file_pointer: *mut MangoFile,
+                                      img_pointer: *mut MangoImage, 
+                                      index: usize) -> usize {
     let file: &mut MangoFile = unsafe {
         assert!(!file_pointer.is_null());
         &mut *file_pointer
@@ -555,9 +567,9 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, error_code:  *m
 
             use mangofmt::ImageFile;
 
-            let mut file = ImageFile::open(std::path::Path::new(value));
+            let file = ImageFile::open(std::path::Path::new(value));
             if file.is_ok() {
-                let mut img = file.unwrap().to_mango_image();
+                let img = file.unwrap().to_mango_image();
                 //println!("{}", img.clone().get_meta().checksum);
                 unsafe { *error_code = 0; }
                 return Box::into_raw(Box::new(img));

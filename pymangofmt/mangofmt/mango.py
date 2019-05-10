@@ -152,15 +152,37 @@ class MangoFile(object):
 
         Args:
             img (:obj:`MangoImage`): image to add.
+
+        Raises:
+            ValueError: MangoFile or MangoImage is null/invalid
         """
-        libmango.mangofile_add_image(self._pointer, img._pointer)
+        error_code = libmango.mangofile_add_image(self._pointer, img._pointer)
+
+        if error_code != 0:
+            if error_code == -42:
+                raise ValueError("MangoFile or MangoImage is null/invalid")
 
     def add_image_by_path(self, path):
-        # TODO check type of path
-        libmango.mangofile_add_image_by_path(
+        """Adds an image to the file by path.
+
+        Args:
+            path (str): path to the image file
+
+        Raises:
+            ValueError: MangoFile instance's pointer is null/invalid
+        """
+        error_code = libmango.mangofile_add_image_by_path(
                 self._pointer,
                 path.encode("utf-8")
         )
+
+        if error_code != 0:
+            if error_code == 1:
+                raise PermissionError
+            elif error_code == -1:
+                raise Exception("mangofmt: something went horribly wrong")
+            elif error_code == -42:
+                raise ValueError("MangoFile pointer is null/invalid")
 
     def _save_error_handling(self, code):
         if code == 1:
