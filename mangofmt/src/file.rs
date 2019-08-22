@@ -44,7 +44,7 @@ impl ErrorKind {
 pub struct MangoFileError {
     kind: ErrorKind,
     msg: &'static str,
-    cause: Option<Box<Error + Send + Sync>>,
+    cause: Option<Box<dyn Error + Send + Sync>>,
 }
 
 impl MangoFileError {
@@ -53,7 +53,7 @@ impl MangoFileError {
     }
 
     pub fn with_cause<E>(kind: ErrorKind, msg: &'static str, cause: E) -> Self
-    where E: Into<Box<Error + Send + Sync>>
+    where E: Into<Box<dyn Error + Send + Sync>>
     {
         Self { kind, msg, cause: Some(cause.into()) }
     }
@@ -95,8 +95,8 @@ impl Error for MangoFileError {
         self.msg
     }
 
-    fn cause(&self) -> Option<&Error> {
-        self.cause.as_ref().map(|e| e.as_ref() as &Error)
+    fn cause(&self) -> Option<&dyn Error> {
+        self.cause.as_ref().map(|e| e.as_ref() as &dyn Error)
     }
 }
 
@@ -268,7 +268,9 @@ impl MangoFile {
     pub fn save_cbor(&self, p: &Path) -> Result<(), MangoFileError> {
         let bytes = serde_cbor::to_vec(&self);
         if bytes.is_err() {
-            return Err(MangoFileError::with_cause(ErrorKind::EncodeError, "couldn't encode to CBOR", bytes.err().unwrap()));
+            return Err(MangoFileError::with_cause(
+                    ErrorKind::EncodeError, "couldn't encode to CBOR", bytes.err().unwrap()
+            ));
         }
 
         let file = File::create(p);
