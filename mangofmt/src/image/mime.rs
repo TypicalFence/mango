@@ -1,6 +1,6 @@
+use std::clone::Clone;
 use std::io::{Error, ErrorKind};
 use std::path::Path;
-use std::clone::Clone;
 
 /// Contains all supported image file formats.
 #[derive(Copy, Serialize, Deserialize)]
@@ -24,15 +24,13 @@ impl Mime {
     pub fn get_from_path(p: &Path) -> Result<Mime, Error> {
         if p.is_file() {
             match p.to_str() {
-                Some(path_str) => {
-                    match Mime::path_string_to_mime(path_str) {
-                        Some(mime) => Ok(mime),
-                        None => Err(Error::new(
-                            ErrorKind::InvalidInput,
-                            "file format is not supported",
-                        )),
-                    }
-                }
+                Some(path_str) => match Mime::path_string_to_mime(path_str) {
+                    Some(mime) => Ok(mime),
+                    None => Err(Error::new(
+                        ErrorKind::InvalidInput,
+                        "file format is not supported",
+                    )),
+                },
                 None => Err(Error::new(
                     ErrorKind::Other,
                     "can't convert your path to string",

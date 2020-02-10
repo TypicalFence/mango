@@ -1,7 +1,7 @@
-use std::io::{Error, ErrorKind};
-use std::path::{Path, PathBuf};
 use image::MangoImage;
 use meta::ImageFileMetadata;
+use std::io::{Error, ErrorKind};
+use std::path::{Path, PathBuf};
 
 /// Represents an image file.
 ///
@@ -21,11 +21,14 @@ impl ImageFile {
     pub fn open(path: &Path) -> Result<ImageFile, Error> {
         if path.is_file() {
             match ImageFileMetadata::new(&path) {
-                Some(meta) => Ok(ImageFile { path: path.to_path_buf(), meta }),
+                Some(meta) => Ok(ImageFile {
+                    path: path.to_path_buf(),
+                    meta,
+                }),
                 None => Err(Error::new(ErrorKind::Other, "couldn't read metadata")),
             }
         } else {
-           Err(Error::new(ErrorKind::InvalidInput, "path is not a file"))
+            Err(Error::new(ErrorKind::InvalidInput, "path is not a file"))
         }
     }
 
@@ -33,7 +36,7 @@ impl ImageFile {
     pub fn get_path(&self) -> &PathBuf {
         &self.path
     }
-    
+
     /// Returns a copy of the metadata of the file.
     pub fn get_meta(&self) -> ImageFileMetadata {
         // TODO why not just return a reference and let the user clone the struct?

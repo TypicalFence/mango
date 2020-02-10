@@ -1,16 +1,16 @@
 //! All Metadata Stuff.
 
-use std::default::Default;
-use std::path::Path;
-use std::io::Read;
-use std::fs::File;
-use std::clone::Clone;
-use sha2::{Sha256, Digest};
-use hex::ToHex;
 use compression::CompressionType;
 use encryption::EncryptionType;
+use hex::ToHex;
 use image::Mime;
 use json::base64option;
+use sha2::{Digest, Sha256};
+use std::clone::Clone;
+use std::default::Default;
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
 
 fn get_checksum(file: &mut File) -> Option<String> {
     let mut data = Vec::new();
@@ -74,13 +74,17 @@ pub struct MangoImageMetadata {
     pub mime: Mime,
 }
 
-
 impl MangoImageMetadata {
     pub fn from_file_metadata(data: ImageFileMetadata) -> Self {
-        let filename: String = data.path.split('/')
-            .collect::<Vec<&str>>().last().unwrap().to_string();
+        let filename: String = data
+            .path
+            .split('/')
+            .collect::<Vec<&str>>()
+            .last()
+            .unwrap()
+            .to_string();
 
-         Self {
+        Self {
             compression: None,
             encryption: None,
             iv: None,
@@ -136,4 +140,3 @@ impl Default for MangoMetadata {
         Self::new()
     }
 }
-

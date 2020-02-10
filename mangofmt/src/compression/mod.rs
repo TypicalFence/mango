@@ -1,10 +1,10 @@
 #[cfg(feature = "gzip")]
 mod gzip;
 
-use std::fmt;
-use std::clone::Clone;
 use image::MangoImage;
+use std::clone::Clone;
 use std::error;
+use std::fmt;
 
 //------------------------------------------------------------------------------
 //  Custom Error
@@ -13,7 +13,7 @@ use std::error;
 #[derive(Debug, Clone)]
 pub enum CompressionError {
     UnsupportedType,
-    ExecutionError
+    ExecutionError,
 }
 
 impl fmt::Display for CompressionError {
@@ -89,7 +89,10 @@ impl CompressionType {
 
 #[allow(unreachable_patterns)]
 #[allow(unused_variables)]
-pub fn compress(ctype: CompressionType, image: &MangoImage) -> Result<MangoImage, CompressionError> {
+pub fn compress(
+    ctype: CompressionType,
+    image: &MangoImage,
+) -> Result<MangoImage, CompressionError> {
     match ctype {
         #[cfg(feature = "gzip")]
         CompressionType::GZIP => Ok(gzip::compress(image)),
@@ -99,11 +102,13 @@ pub fn compress(ctype: CompressionType, image: &MangoImage) -> Result<MangoImage
 
 #[allow(unreachable_patterns)]
 #[allow(unused_variables)]
-pub fn uncompress(ctype: CompressionType, image: &MangoImage) -> Result<MangoImage, CompressionError> {
+pub fn uncompress(
+    ctype: CompressionType,
+    image: &MangoImage,
+) -> Result<MangoImage, CompressionError> {
     match ctype {
         #[cfg(feature = "gzip")]
         CompressionType::GZIP => gzip::uncompress(image),
         _ => Err(CompressionError::UnsupportedType),
     }
 }
-

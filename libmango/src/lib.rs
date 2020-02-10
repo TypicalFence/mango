@@ -1,17 +1,17 @@
 extern crate mangofmt;
 mod util;
 
-use std::slice;
-use std::path::Path;
 use std::ffi::{CStr, CString};
-use std::io;
 use std::fs;
-use std::os::raw::{c_int, c_short, c_char};
+use std::io;
+use std::os::raw::{c_char, c_int, c_short};
+use std::path::Path;
+use std::slice;
 
+use mangofmt::meta::MangoImageMetadata;
+use mangofmt::meta::MangoMetadata;
 use mangofmt::MangoFile;
 use mangofmt::MangoImage;
-use mangofmt::meta::MangoMetadata;
-use mangofmt::meta::MangoImageMetadata;
 
 //----------------------------------------------------------------------------------------
 // Helper Structs
@@ -42,7 +42,7 @@ pub extern "C" fn mango_encryption_is_supported(enc_type: *const c_char) -> bool
         return match e_type {
             Some(value) => value.is_supported(),
             None => false,
-        }
+        };
     }
 
     false
@@ -57,7 +57,7 @@ pub extern "C" fn mango_compression_is_supported(comp_type: *const c_char) -> bo
         return match c_type {
             Some(value) => value.is_supported(),
             None => false,
-        }
+        };
     }
 
     false
@@ -85,51 +85,41 @@ pub extern "C" fn mangofile_free(pointer: *mut MangoFile) {
 #[no_mangle]
 pub extern "C" fn mangofile_add_image_by_path(pointer: *mut MangoFile, path: *const c_char) -> i8 {
     if pointer.is_null() {
-       return -42;
+        return -42;
     }
 
-    let file: &mut MangoFile = unsafe {
-        &mut *pointer
-    };
+    let file: &mut MangoFile = unsafe { &mut *pointer };
 
-    let c_str = unsafe {
-        CStr::from_ptr(path)
-    };
+    let c_str = unsafe { CStr::from_ptr(path) };
 
-    let path_str  = c_str.to_str().unwrap();
+    let path_str = c_str.to_str().unwrap();
     let error = file.add_image_by_path(Path::new(&path_str.to_owned()));
 
     match error {
         Ok(()) => 0,
-        Err(err) => {
-            match err.kind() {
-                io::ErrorKind::PermissionDenied => 1,
-                _ => -1,
-            }
-        }
+        Err(err) => match err.kind() {
+            io::ErrorKind::PermissionDenied => 1,
+            _ => -1,
+        },
     }
 }
 
 #[no_mangle]
 pub extern "C" fn mangofile_add_image(pointer: *mut MangoFile, img_pointer: *mut MangoImage) -> i8 {
     if pointer.is_null() {
-       return -42;
+        return -42;
     }
 
-    let file: &mut MangoFile = unsafe {
-        &mut *pointer
-    };
+    let file: &mut MangoFile = unsafe { &mut *pointer };
 
     if img_pointer.is_null() {
-       return -42;
+        return -42;
     }
 
-    let img = unsafe {
-        &mut *img_pointer
-    };
-    
+    let img = unsafe { &mut *img_pointer };
+
     file.add_image(img.clone());
-    
+
     0
 }
 
@@ -146,9 +136,11 @@ pub extern "C" fn mangofile_get_image(pointer: *mut MangoFile, index: usize) -> 
 }
 
 #[no_mangle]
-pub extern "C" fn mangofile_set_image(file_pointer: *mut MangoFile,
-                                      img_pointer: *mut MangoImage, 
-                                      index: usize) -> usize {
+pub extern "C" fn mangofile_set_image(
+    file_pointer: *mut MangoFile,
+    img_pointer: *mut MangoImage,
+    index: usize,
+) -> usize {
     let file: &mut MangoFile = unsafe {
         assert!(!file_pointer.is_null());
         &mut *file_pointer
@@ -160,7 +152,7 @@ pub extern "C" fn mangofile_set_image(file_pointer: *mut MangoFile,
     };
 
     let mut imgs = file.get_images();
-    if index == 0 || index <= imgs.len() -1 {
+    if index == 0 || index <= imgs.len() - 1 {
         imgs[index] = img.clone();
         file.set_images(imgs);
         return 1;
@@ -177,7 +169,7 @@ pub extern "C" fn mangofile_remove_image(file_pointer: *mut MangoFile, index: us
     };
 
     let mut imgs = file.get_images();
-    if (index == 0 && imgs.len() > 0) || index <= imgs.len() -1 {
+    if (index == 0 && imgs.len() > 0) || index <= imgs.len() - 1 {
         imgs.remove(index);
         file.set_images(imgs);
         return 1;
@@ -196,7 +188,6 @@ pub extern "C" fn mangofile_get_image_count(pointer: *mut MangoFile) -> usize {
     let imgs = file.get_images();
     imgs.len()
 }
-
 
 #[no_mangle]
 pub extern "C" fn mangofile_get_meta(pointer: *mut MangoFile) -> *mut MangoMetadata {
@@ -217,11 +208,11 @@ pub extern "C" fn mangofile_save(file: &mut MangoFile, path_ptr: *mut c_char) ->
 
         if let Ok(value) = c_str.to_str() {
             let result = file.save(std::path::Path::new(value));
-            if  result.is_err() {
+            if result.is_err() {
                 return util::handle_mangofile_error(result.err().unwrap());
             }
         } else {
-            return -1
+            return -1;
         }
     }
 
@@ -282,20 +273,29 @@ pub extern "C" fn mangofile_save_json(file: &mut MangoFile, path_ptr: *mut c_cha
 // Open
 #[no_mangle]
 #[allow(unused_variables, unused_assignments)]
-pub extern "C" fn mangofile_open(path_pointer: *mut c_char, error_code: *mut std::os::raw::c_int) -> *mut MangoFile {
+pub extern "C" fn mangofile_open(
+    path_pointer: *mut c_char,
+    error_code: *mut std::os::raw::c_int,
+) -> *mut MangoFile {
     if !path_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(path_pointer) };
         if let Ok(path) = c_str.to_str() {
             let file = MangoFile::open(Path::new(path));
             if file.is_ok() {
-                unsafe { *error_code = 0; }
+                unsafe {
+                    *error_code = 0;
+                }
                 return Box::into_raw(Box::new(file.unwrap()));
             } else {
-                unsafe {*error_code = util::handle_mangofile_error(file.err().unwrap()).into(); }
+                unsafe {
+                    *error_code = util::handle_mangofile_error(file.err().unwrap()).into();
+                }
             }
         } else {
             // set error code to -1 because something was wrong with the parameters given
-            unsafe { *error_code = -1; }
+            unsafe {
+                *error_code = -1;
+            }
         }
     }
 
@@ -313,9 +313,7 @@ pub extern "C" fn mangometa_get_title(pointer: *mut MangoMetadata) -> *mut c_cha
     };
 
     match meta.clone().title {
-        Some(x) => {
-            CString::new(x).unwrap().into_raw()
-        },
+        Some(x) => CString::new(x).unwrap().into_raw(),
         None => std::ptr::null_mut(),
     }
 }
@@ -345,9 +343,7 @@ pub extern "C" fn mangometa_get_author(pointer: *mut MangoMetadata) -> *mut c_ch
     };
 
     match meta.clone().author {
-        Some(x) => {
-            CString::new(x).unwrap().into_raw()
-        },
+        Some(x) => CString::new(x).unwrap().into_raw(),
         None => std::ptr::null_mut(),
     }
 }
@@ -362,7 +358,6 @@ pub extern "C" fn mangometa_set_author(pointer: *mut MangoMetadata, value_pointe
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
         if let Ok(value) = c_str.to_str() {
-
             meta.author = Some(value.to_string());
         }
     } else {
@@ -378,9 +373,7 @@ pub extern "C" fn mangometa_get_publisher(pointer: *mut MangoMetadata) -> *mut c
     };
 
     match meta.clone().publisher {
-        Some(x) => {
-            CString::new(x).unwrap().into_raw()
-        },
+        Some(x) => CString::new(x).unwrap().into_raw(),
         None => std::ptr::null_mut(),
     }
 }
@@ -395,7 +388,6 @@ pub extern "C" fn mangometa_set_publisher(pointer: *mut MangoMetadata, value_poi
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
         if let Ok(value) = c_str.to_str() {
-
             meta.publisher = Some(value.to_string());
         }
     } else {
@@ -411,9 +403,7 @@ pub extern "C" fn mangometa_get_source(pointer: *mut MangoMetadata) -> *mut c_ch
     };
 
     match meta.clone().source {
-        Some(x) => {
-            CString::new(x).unwrap().into_raw()
-        },
+        Some(x) => CString::new(x).unwrap().into_raw(),
         None => std::ptr::null_mut(),
     }
 }
@@ -428,7 +418,6 @@ pub extern "C" fn mangometa_set_source(pointer: *mut MangoMetadata, value_pointe
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
         if let Ok(value) = c_str.to_str() {
-
             meta.source = Some(value.to_string());
         }
     } else {
@@ -439,9 +428,7 @@ pub extern "C" fn mangometa_set_source(pointer: *mut MangoMetadata, value_pointe
 #[no_mangle]
 pub extern "C" fn mangometa_get_language(meta: &mut MangoMetadata) -> *mut c_char {
     match meta.language.clone() {
-        Some(lang) => {
-            CString::new(util::from_lang(lang)).unwrap().into_raw()
-        },
+        Some(lang) => CString::new(util::from_lang(lang)).unwrap().into_raw(),
         None => std::ptr::null_mut(),
     }
 }
@@ -466,15 +453,16 @@ pub extern "C" fn mangometa_get_translation(pointer: *mut MangoMetadata) -> *mut
     };
 
     match meta.clone().translation {
-        Some(x) => {
-            CString::new(x).unwrap().into_raw()
-        },
+        Some(x) => CString::new(x).unwrap().into_raw(),
         None => std::ptr::null_mut(),
     }
 }
 
 #[no_mangle]
-pub extern "C" fn mangometa_set_translation(pointer: *mut MangoMetadata, value_pointer: *mut c_char) {
+pub extern "C" fn mangometa_set_translation(
+    pointer: *mut MangoMetadata,
+    value_pointer: *mut c_char,
+) {
     let meta: &mut MangoMetadata = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
@@ -483,7 +471,6 @@ pub extern "C" fn mangometa_set_translation(pointer: *mut MangoMetadata, value_p
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
         if let Ok(value) = c_str.to_str() {
-
             meta.translation = Some(value.to_string());
         }
     } else {
@@ -491,19 +478,26 @@ pub extern "C" fn mangometa_set_translation(pointer: *mut MangoMetadata, value_p
     }
 }
 
-
 #[no_mangle]
 pub extern "C" fn mangometa_get_volume(meta: &mut MangoMetadata) -> IntOption {
     match &meta.volume {
-        Some(value) => IntOption{ value: value.clone().into(), present: 1 /* true */ },
-        None => IntOption { value: 0, present: 0 /* flase */ },
+        Some(value) => IntOption {
+            value: value.clone().into(),
+            present: 1, /* true */
+        },
+        None => IntOption {
+            value: 0,
+            present: 0, /* flase */
+        },
     }
 }
 
 #[no_mangle]
 pub extern "C" fn mangometa_set_volume(meta: &mut MangoMetadata, value_pointer: *mut c_short) {
     if !value_pointer.is_null() {
-        unsafe { meta.volume = Some(*value_pointer); }
+        unsafe {
+            meta.volume = Some(*value_pointer);
+        }
     } else {
         meta.volume = None;
     }
@@ -512,15 +506,23 @@ pub extern "C" fn mangometa_set_volume(meta: &mut MangoMetadata, value_pointer: 
 #[no_mangle]
 pub extern "C" fn mangometa_get_chapter(meta: &mut MangoMetadata) -> IntOption {
     match &meta.chapter {
-        Some(value) => IntOption{ value: value.clone().into(), present: 1 /* true */ },
-        None => IntOption { value: 0, present: 0 /* flase */ },
+        Some(value) => IntOption {
+            value: value.clone().into(),
+            present: 1, /* true */
+        },
+        None => IntOption {
+            value: 0,
+            present: 0, /* flase */
+        },
     }
 }
 
 #[no_mangle]
 pub extern "C" fn mangometa_set_chapter(meta: &mut MangoMetadata, value_pointer: *mut c_short) {
     if !value_pointer.is_null() {
-        unsafe { meta.chapter = Some(*value_pointer); }
+        unsafe {
+            meta.chapter = Some(*value_pointer);
+        }
     } else {
         meta.chapter = None;
     }
@@ -529,15 +531,23 @@ pub extern "C" fn mangometa_set_chapter(meta: &mut MangoMetadata, value_pointer:
 #[no_mangle]
 pub extern "C" fn mangometa_get_year(meta: &mut MangoMetadata) -> IntOption {
     match &meta.year {
-        Some(value) => IntOption{ value: value.clone().into(), present: 1 /* true */ },
-        None => IntOption { value: 0, present: 0 /* flase */ },
+        Some(value) => IntOption {
+            value: value.clone().into(),
+            present: 1, /* true */
+        },
+        None => IntOption {
+            value: 0,
+            present: 0, /* flase */
+        },
     }
 }
 
 #[no_mangle]
 pub extern "C" fn mangometa_set_year(meta: &mut MangoMetadata, value_pointer: *mut c_short) {
     if !value_pointer.is_null() {
-        unsafe { meta.year = Some(*value_pointer); }
+        unsafe {
+            meta.year = Some(*value_pointer);
+        }
     } else {
         meta.year = None;
     }
@@ -559,7 +569,10 @@ pub extern "C" fn mangoimg_free(pointer: *mut MangoImage) {
 }
 
 #[no_mangle]
-pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, error_code:  *mut std::os::raw::c_int) -> *mut MangoImage {
+pub extern "C" fn mangoimg_from_path(
+    value_pointer: *mut c_char,
+    error_code: *mut std::os::raw::c_int,
+) -> *mut MangoImage {
     if !value_pointer.is_null() {
         let c_str = unsafe { CStr::from_ptr(value_pointer) };
         if let Ok(value) = c_str.to_str() {
@@ -571,13 +584,15 @@ pub extern "C" fn mangoimg_from_path(value_pointer: *mut c_char, error_code:  *m
             if file.is_ok() {
                 let img = file.unwrap().to_mango_image();
                 //println!("{}", img.clone().get_meta().checksum);
-                unsafe { *error_code = 0; }
+                unsafe {
+                    *error_code = 0;
+                }
                 return Box::into_raw(Box::new(img));
             } else {
                 unsafe {
                     *error_code = match file.err().unwrap().kind() {
                         io::ErrorKind::NotFound => 1,
-                        _ => -1
+                        _ => -1,
                     };
                 }
             }
@@ -602,7 +617,7 @@ pub unsafe extern "C" fn mango_imagedata_free(bytes: ImageData) {
 
 #[no_mangle]
 pub extern "C" fn mangoimg_get_image_data(pointer: *mut MangoImage) -> ImageData {
-	let img: &mut MangoImage = unsafe {
+    let img: &mut MangoImage = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
     };
@@ -620,10 +635,7 @@ pub extern "C" fn mangoimg_get_image_data(pointer: *mut MangoImage) -> ImageData
     // length anyway.
     let pointer = Box::into_raw(slice) as *mut u8;
 
-    ImageData {
-		    pointer,
-        length,
-	  }
+    ImageData { pointer, length }
 }
 
 #[no_mangle]
@@ -633,9 +645,10 @@ pub extern "C" fn mangoimg_get_base64_image_data(pointer: *mut MangoImage) -> *m
         &mut *pointer
     };
 
-    CString::new(img.get_base64_image_data()).unwrap().into_raw()
+    CString::new(img.get_base64_image_data())
+        .unwrap()
+        .into_raw()
 }
-
 
 #[no_mangle]
 pub extern "C" fn mangoimg_get_meta(img: &mut MangoImage) -> *mut MangoImageMetadata {
@@ -643,7 +656,6 @@ pub extern "C" fn mangoimg_get_meta(img: &mut MangoImage) -> *mut MangoImageMeta
     let p_mut: *mut MangoImageMetadata = meta;
     p_mut
 }
-
 
 #[no_mangle]
 pub extern "C" fn mangoimg_compress(pointer: *mut MangoImage, value_pointer: *mut c_char) -> i8 {
@@ -661,10 +673,10 @@ pub extern "C" fn mangoimg_compress(pointer: *mut MangoImage, value_pointer: *mu
                         true => 1,
                         false => 2,
                     }
-                },
+                }
                 None => {
                     return 2;
-                },
+                }
             }
         }
     }
@@ -686,7 +698,11 @@ pub extern "C" fn mangoimg_uncompress(pointer: *mut MangoImage) -> i8 {
 }
 
 #[no_mangle]
-pub extern "C" fn mangoimg_encrypt(image: &mut MangoImage, enc_type: *const c_char, password: *const c_char) -> i8 {
+pub extern "C" fn mangoimg_encrypt(
+    image: &mut MangoImage,
+    enc_type: *const c_char,
+    password: *const c_char,
+) -> i8 {
     let pw = unsafe { CStr::from_ptr(password).to_str() };
 
     if pw.is_ok() {
@@ -698,7 +714,7 @@ pub extern "C" fn mangoimg_encrypt(image: &mut MangoImage, enc_type: *const c_ch
                 return match image.encrypt_mut(enc.unwrap(), pw.unwrap().to_string()) {
                     true => 1,
                     false => 2,
-                }
+                };
             }
         }
     }
@@ -714,7 +730,7 @@ pub extern "C" fn mangoimg_decrypt(image: &mut MangoImage, password: *const c_ch
         return match image.decrypt_mut(pw.unwrap().to_string()) {
             true => 1,
             false => 2,
-        }
+        };
     }
 
     2
@@ -726,13 +742,11 @@ pub extern "C" fn mangoimg_save(image: &MangoImage, filename: *const c_char) -> 
     if name.is_ok() {
         return match image.save(&name.unwrap().to_string()) {
             Ok(()) => 0,
-            Err(err) => {
-                match err.kind() {
-                    io::ErrorKind::PermissionDenied => 1,
-                    _ => -1
-                }
-            }
-        }
+            Err(err) => match err.kind() {
+                io::ErrorKind::PermissionDenied => 1,
+                _ => -1,
+            },
+        };
     }
 
     -1
@@ -749,7 +763,9 @@ pub extern "C" fn mangoimgmeta_compression(pointer: *mut MangoImageMetadata) -> 
     };
 
     match meta.compression.clone() {
-        Some(value) => CString::new(util::from_comp_type(value)).unwrap().into_raw(),
+        Some(value) => CString::new(util::from_comp_type(value))
+            .unwrap()
+            .into_raw(),
         None => std::ptr::null_mut(),
     }
 }
@@ -773,7 +789,7 @@ pub extern "C" fn mangoimgmeta_checksum(meta: &mut MangoImageMetadata) -> *mut c
 }
 
 #[no_mangle]
-pub  extern "C" fn mangoimgmeta_mime(pointer: *mut MangoImageMetadata) -> *mut c_char {
+pub extern "C" fn mangoimgmeta_mime(pointer: *mut MangoImageMetadata) -> *mut c_char {
     let meta: &mut MangoImageMetadata = unsafe {
         assert!(!pointer.is_null());
         &mut *pointer
@@ -794,14 +810,16 @@ pub extern "C" fn mangoimgmeta_filename(pointer: *mut MangoImageMetadata) -> *mu
     CString::new(meta.filename.clone()).unwrap().into_raw()
 }
 
-
 #[no_mangle]
 pub extern "C" fn mangoimgmeta_iv(meta: &MangoImageMetadata) -> *const u8 {
-    meta.iv.as_ref().map_or(std::ptr::null_mut(), |iv| iv.as_ptr())
+    meta.iv
+        .as_ref()
+        .map_or(std::ptr::null_mut(), |iv| iv.as_ptr())
 }
 
 #[no_mangle]
 pub extern "C" fn mangoimgmeta_iv_size(meta: &MangoImageMetadata) -> *const u16 {
-    meta.iv.as_ref().map_or(0 as *const u16, |iv| iv.len() as *const u16)
+    meta.iv
+        .as_ref()
+        .map_or(0 as *const u16, |iv| iv.len() as *const u16)
 }
-

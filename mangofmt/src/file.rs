@@ -1,17 +1,17 @@
 //! Contains the MangoFile struct and some related stuff.
 
-use std;
-use std::error::Error;
-use std::path::Path;
-use std::fs::File;
-use std::io::prelude::*;
-use std::io;
-use std::fmt;
+use bson;
 use image::{ImageFile, MangoImage};
 use json::JsonMangoFile;
-use bson;
-use serde_cbor;
 use meta::MangoMetadata;
+use serde_cbor;
+use std;
+use std::error::Error;
+use std::fmt;
+use std::fs::File;
+use std::io;
+use std::io::prelude::*;
+use std::path::Path;
 
 //------------------------------------------------------------------------------
 //  Custom Error
@@ -49,13 +49,22 @@ pub struct MangoFileError {
 
 impl MangoFileError {
     pub fn new(kind: ErrorKind, msg: &'static str) -> Self {
-        Self { kind, msg, cause: None }
+        Self {
+            kind,
+            msg,
+            cause: None,
+        }
     }
 
     pub fn with_cause<E>(kind: ErrorKind, msg: &'static str, cause: E) -> Self
-    where E: Into<Box<dyn Error + Send + Sync>>
+    where
+        E: Into<Box<dyn Error + Send + Sync>>,
     {
-        Self { kind, msg, cause: Some(cause.into()) }
+        Self {
+            kind,
+            msg,
+            cause: Some(cause.into()),
+        }
     }
 
     pub fn get_kind(self) -> ErrorKind {
@@ -64,27 +73,41 @@ impl MangoFileError {
 
     pub fn convert_io_open(error: io::Error) -> Self {
         match error.kind() {
-            io::ErrorKind::NotFound => MangoFileError::with_cause(ErrorKind::ReadError, "not found", error),
-            io::ErrorKind::PermissionDenied => MangoFileError::with_cause(ErrorKind::PermissionError, "permission denied", error),
-            _ => MangoFileError::with_cause(ErrorKind::PermissionError, "unexpected io error", error),
+            io::ErrorKind::NotFound => {
+                MangoFileError::with_cause(ErrorKind::ReadError, "not found", error)
+            }
+            io::ErrorKind::PermissionDenied => {
+                MangoFileError::with_cause(ErrorKind::PermissionError, "permission denied", error)
+            }
+            _ => {
+                MangoFileError::with_cause(ErrorKind::PermissionError, "unexpected io error", error)
+            }
         }
     }
 
     pub fn convert_io_save(error: io::Error) -> Self {
         match error.kind() {
-            io::ErrorKind::PermissionDenied => MangoFileError::with_cause(ErrorKind::PermissionError, "permission denied", error),
-            _ => MangoFileError::with_cause(ErrorKind::PermissionError, "unexpected io error", error),
+            io::ErrorKind::PermissionDenied => {
+                MangoFileError::with_cause(ErrorKind::PermissionError, "permission denied", error)
+            }
+            _ => {
+                MangoFileError::with_cause(ErrorKind::PermissionError, "unexpected io error", error)
+            }
         }
     }
 }
 
-
 impl fmt::Display for MangoFileError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-       if let Some(ref cause) = self.cause {
-           return write!(f, "{} ({}); cause: {}",
-                         self.msg, self.kind.description(), cause);
-       }
+        if let Some(ref cause) = self.cause {
+            return write!(
+                f,
+                "{} ({}); cause: {}",
+                self.msg,
+                self.kind.description(),
+                cause
+            );
+        }
 
         write!(f, "{} ({})", self.msg, self.kind.description())
     }
@@ -143,10 +166,12 @@ impl MangoFile {
             return json_file;
         }
 
-        Err(MangoFileError::new(ErrorKind::DecodeError,
-                                   "file is not a  MangoFile"))
+        Err(MangoFileError::new(
+            ErrorKind::DecodeError,
+            "file is not a  MangoFile",
+        ))
     }
-    
+
     /// Opens a MangoFile which uses bson as for serialization.
     ///
     /// You probably don't want to use this function, if you don't know the serialization format,
@@ -161,17 +186,21 @@ impl MangoFile {
         let document = bson::decode_document(&mut file.unwrap());
 
         if document.is_err() {
-            return Err(MangoFileError::with_cause(ErrorKind::DecodeError,
-                                                  "couldn't decode BSON Document",
-                                                  document.err().unwrap()));
+            return Err(MangoFileError::with_cause(
+                ErrorKind::DecodeError,
+                "couldn't decode BSON Document",
+                document.err().unwrap(),
+            ));
         }
 
         let mangofile = bson::from_bson(bson::Bson::Document(document.unwrap()));
 
         if mangofile.is_err() {
-            return Err(MangoFileError::with_cause(ErrorKind::DecodeError,
-                                                  "couldn't convert BSON Document to MangoFile",
-                                                  mangofile.err().unwrap()));
+            return Err(MangoFileError::with_cause(
+                ErrorKind::DecodeError,
+                "couldn't convert BSON Document to MangoFile",
+                mangofile.err().unwrap(),
+            ));
         }
 
         Ok(mangofile.unwrap())
@@ -198,15 +227,20 @@ impl MangoFile {
 
         let mut bytes = Vec::new();
         if file.unwrap().read_to_end(&mut bytes).is_err() {
-            return Err(MangoFileError::new(ErrorKind::ReadError, "could not read file"));
+            return Err(MangoFileError::new(
+                ErrorKind::ReadError,
+                "could not read file",
+            ));
         };
 
         let mangofile = serde_cbor::from_slice(&bytes);
 
         if mangofile.is_err() {
-            return Err(MangoFileError::with_cause(ErrorKind::DecodeError,
-                                                  "couldn't decode CBOR",
-                                                  mangofile.err().unwrap()));
+            return Err(MangoFileError::with_cause(
+                ErrorKind::DecodeError,
+                "couldn't decode CBOR",
+                mangofile.err().unwrap(),
+            ));
         }
 
         Ok(mangofile.unwrap())
@@ -219,13 +253,17 @@ impl MangoFile {
         self.save_cbor(p)?;
         Ok(())
     }
-    
+
     /// Saves a .mango file with the bson serialization format.    
     pub fn save_bson(&self, p: &Path) -> Result<(), MangoFileError> {
         let bson_data = bson::to_bson(&self);
 
         if bson_data.is_err() {
-            return Err(MangoFileError::with_cause(ErrorKind::EncodeError, "couldn't encode to BSON", bson_data.err().unwrap()));
+            return Err(MangoFileError::with_cause(
+                ErrorKind::EncodeError,
+                "couldn't encode to BSON",
+                bson_data.err().unwrap(),
+            ));
         }
 
         if let bson::Bson::Document(document) = bson_data.unwrap() {
@@ -233,7 +271,11 @@ impl MangoFile {
 
             let encode = bson::encode_document(&mut buf, &document);
             if encode.is_err() {
-                return Err(MangoFileError::with_cause(ErrorKind::EncodeError, "couldn't encode to BSON", encode.err().unwrap()));
+                return Err(MangoFileError::with_cause(
+                    ErrorKind::EncodeError,
+                    "couldn't encode to BSON",
+                    encode.err().unwrap(),
+                ));
             }
 
             let file = File::create(p);
@@ -248,7 +290,7 @@ impl MangoFile {
 
         Ok(())
     }
- 
+
     /// Saves a .mango file with the json serialization format.
     ///
     /// **Important:** you should not use this for anything but debugging,
@@ -259,7 +301,7 @@ impl MangoFile {
     /// at json files, and see if everything works how it should.
     ///
     /// There are currently no plans to deprecate this serialization format.
-    pub fn save_json(&self, p:&Path) -> Result<(), MangoFileError> {
+    pub fn save_json(&self, p: &Path) -> Result<(), MangoFileError> {
         JsonMangoFile::save(p, self)?;
         Ok(())
     }
@@ -269,7 +311,9 @@ impl MangoFile {
         let bytes = serde_cbor::to_vec(&self);
         if bytes.is_err() {
             return Err(MangoFileError::with_cause(
-                    ErrorKind::EncodeError, "couldn't encode to CBOR", bytes.err().unwrap()
+                ErrorKind::EncodeError,
+                "couldn't encode to CBOR",
+                bytes.err().unwrap(),
             ));
         }
 
@@ -296,9 +340,7 @@ impl MangoFile {
     /// Adds a MangoImage to the file by Path
     pub fn add_image_by_path(&mut self, p: &Path) -> Result<(), std::io::Error> {
         let image_file = ImageFile::open(p)?;
-        self.images.push(
-            image_file.to_mango_image()
-        );
+        self.images.push(image_file.to_mango_image());
         Ok(())
     }
 
@@ -310,7 +352,6 @@ impl MangoFile {
     /// Gets an image of the file
     pub fn get_image(&self, index: usize) -> Option<&MangoImage> {
         if self.images.len() > index {
-
             return Some(&self.images[index]);
         }
 
@@ -358,8 +399,8 @@ impl Default for MangoFile {
 #[cfg(test)]
 mod tests {
     use super::MangoFile;
-    use std::path::Path;
     use encryption;
+    use std::path::Path;
 
     fn create() {
         let mut file = MangoFile::new();
@@ -385,7 +426,9 @@ mod tests {
         file.add_image_by_path(Path::new("test.jpg"));
         let image = file.get_image_mut(0);
         let key = String::from("1234567812345678");
-        let encrypted_image = image.clone().encrypt(encryption::EncryptionType::AES128, key.clone());
+        let encrypted_image = image
+            .clone()
+            .encrypt(encryption::EncryptionType::AES128, key.clone());
         let decrypted_image = encrypted_image.unwrap().decrypt(key).unwrap();
 
         assert_eq!(image.get_image_data(), decrypted_image.get_image_data());
@@ -405,7 +448,7 @@ mod tests {
     fn get_full_file() -> MangoFile {
         use compression::CompressionType;
         use encryption::EncryptionType;
-        use image::{MangoImage, ImageFile};
+        use image::{ImageFile, MangoImage};
 
         let mut file = MangoFile::new();
         let mut img = MangoImage::from_file(&mut ImageFile::open(Path::new("test.jpg")).unwrap());
@@ -420,18 +463,17 @@ mod tests {
         let file = get_full_file();
         let save = file.save_cbor(Path::new("save.cbor"));
         assert!(save.is_ok());
-
     }
 
     #[test]
-    fn  save_json() {
+    fn save_json() {
         let file = get_full_file();
         let save = file.save_json(Path::new("save.json"));
         assert!(save.is_ok());
     }
 
     #[test]
-    fn  save_bson() {
+    fn save_bson() {
         let file = get_full_file();
         let save = file.save_bson(Path::new("save.bson"));
         assert!(save.is_ok());
