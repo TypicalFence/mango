@@ -1,11 +1,11 @@
 extern crate flate2;
 
-use std::io::{Write, Read};
-use self::flate2::write::GzEncoder;
 use self::flate2::read::GzDecoder;
-use image::MangoImage;
-use super::CompressionType;
+use self::flate2::write::GzEncoder;
 use super::CompressionError;
+use super::CompressionType;
+use image::MangoImage;
+use std::io::{Read, Write};
 
 pub fn compress(image: &MangoImage) -> MangoImage {
     let image_vec = &image.get_image_data();

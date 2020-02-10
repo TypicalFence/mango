@@ -1,14 +1,14 @@
+use super::ImageFile;
+use base64;
+use compression;
+use compression::{CompressionError, CompressionType};
+use encryption;
+use encryption::{EncryptionError, EncryptionType};
+use meta::MangoImageMetadata;
+use serde_bytes;
 use std;
 use std::fs::File;
 use std::io::prelude::*;
-use super::ImageFile;
-use meta::MangoImageMetadata;
-use compression;
-use compression::{CompressionType, CompressionError};
-use encryption;
-use encryption::{EncryptionType, EncryptionError};
-use serde_bytes;
-use base64;
 
 /// Represents an image inside of a MangoFile.
 ///
@@ -30,7 +30,7 @@ impl MangoImage {
     pub fn new(data: Vec<u8>, meta: MangoImageMetadata) -> MangoImage {
         MangoImage { data, meta }
     }
-    
+
     /// Creates a new MangoImage based on an ImageFile.
     pub fn from_file(file_image: &ImageFile) -> MangoImage {
         let mut vec = Vec::new();
@@ -38,36 +38,33 @@ impl MangoImage {
         // we can assume that ImageFile struct returns a valid file Path struct
         // therefore we can ignore the following result (probably) (maybe?)
         let mut file = File::open(file_image.get_path().as_path()).unwrap();
-        
+
         let _ = file.read_to_end(&mut vec).is_err();
 
         let new_meta = file_image.get_meta();
-        MangoImage::new(
-            vec,
-            new_meta.to_base64_metadata(),
-        )
+        MangoImage::new(vec, new_meta.to_base64_metadata())
     }
-    
+
     /// Returns the meta data.
     pub fn get_meta(&self) -> MangoImageMetadata {
         self.meta.clone()
     }
-    
+
     /// Returns the meta data in a mutable form.
     pub fn get_meta_mut(&mut self) -> &mut MangoImageMetadata {
         &mut self.meta
     }
-    
+
     /// Returns the raw image data.
     pub fn get_image_data(&self) -> Vec<u8> {
         self.data.clone()
     }
-    
+
     /// Returns the raw image data in a Base64 encoding.
-	pub fn get_base64_image_data(&self) -> String {
-		base64::encode(&self.data.clone())
-	}
-    
+    pub fn get_base64_image_data(&self) -> String {
+        base64::encode(&self.data.clone())
+    }
+
     /// Compresses the MangoImage and returns a copy of it.
     pub fn compress(&self, comp: CompressionType) -> Result<MangoImage, CompressionError> {
         if self.meta.encryption.is_none() && self.meta.compression.is_none() {
@@ -76,7 +73,7 @@ impl MangoImage {
 
         Err(CompressionError::UnsupportedType)
     }
-    
+
     /// Compresses this MangoImage instance and returns if it worked or not.
     pub fn compress_mut(&mut self, comp: CompressionType) -> bool {
         let compressed_opt = self.clone().compress(comp);
@@ -89,7 +86,7 @@ impl MangoImage {
             false
         }
     }
-    
+
     /// Decompresses the MangoImage and returns a copy of it.
     pub fn uncompress(&self) -> Result<MangoImage, CompressionError> {
         let meta = &self.meta;
@@ -101,7 +98,7 @@ impl MangoImage {
 
         Err(CompressionError::UnsupportedType)
     }
-    
+
     /// Decompresses this MangoImage instance and returns if it worked or not.
     pub fn uncompress_mut(&mut self) -> bool {
         let uncompressed_opt = self.clone().uncompress();
@@ -114,16 +111,20 @@ impl MangoImage {
             false
         }
     }
-    
+
     /// Encrypts the MangoImage and returns a copy of it.
-    pub fn encrypt(self, etype: EncryptionType, key: String) -> Result<MangoImage, EncryptionError> {
+    pub fn encrypt(
+        self,
+        etype: EncryptionType,
+        key: String,
+    ) -> Result<MangoImage, EncryptionError> {
         if self.meta.encryption.is_none() {
             return encryption::encrypt(etype, self, key);
         }
 
         Err(EncryptionError::UnsupportedType)
     }
-    
+
     /// Encrypts this MangoImage instance and returns if it worked or not.
     pub fn encrypt_mut(&mut self, etype: EncryptionType, key: String) -> bool {
         let encrypted_opt = self.clone().encrypt(etype, key);
@@ -136,7 +137,6 @@ impl MangoImage {
             false
         }
     }
-    
 
     /// Decrypts the MangoImage and returns a copy of it.
     pub fn decrypt(self, key: String) -> Result<MangoImage, EncryptionError> {
@@ -161,7 +161,7 @@ impl MangoImage {
             false
         }
     }
-    
+
     /// saves the raw image data to a file.
     pub fn save(&self, file_name: &str) -> std::io::Result<()> {
         let mut file = File::create(file_name)?;
@@ -170,14 +170,12 @@ impl MangoImage {
     }
 }
 
-
 #[cfg(test)]
 mod test {
-    use std;
-    use super::{MangoImage, ImageFile};
-    use encryption::EncryptionType;
+    use super::{ImageFile, MangoImage};
     use compression::CompressionType;
-
+    use encryption::EncryptionType;
+    use std;
 
     #[test]
     #[cfg(feature = "aes")]
@@ -224,5 +222,3 @@ mod test {
         assert_eq!(img.meta.checksum.len() > 0, true)
     }
 }
-
-

@@ -1,14 +1,14 @@
-use std::ffi::CString;
+use mangofmt::file::{ErrorKind, MangoFileError};
+use mangofmt::meta::Language;
 use mangofmt::CompressionType;
 use mangofmt::EncryptionType;
 use mangofmt::Mime;
-use mangofmt::file::{MangoFileError, ErrorKind};
-use mangofmt::meta::Language;
+use std::ffi::CString;
 
 pub fn to_comp_type(value: String) -> Option<CompressionType> {
     match value.as_ref() {
         "GZIP" => Some(CompressionType::GZIP),
-        _ => None
+        _ => None,
     }
 }
 
@@ -18,12 +18,11 @@ pub fn from_comp_type(value: CompressionType) -> String {
     }
 }
 
-
 pub fn to_enc_type(value: String) -> Option<EncryptionType> {
     match value.as_ref() {
         "AES128" => Some(EncryptionType::AES128),
         "AES256" => Some(EncryptionType::AES256),
-        _ => None
+        _ => None,
     }
 }
 
@@ -78,7 +77,6 @@ pub fn from_lang(lang: Language) -> String {
     String::from(lang_str)
 }
 
-
 pub fn filter_nul_bytes(string: String) -> CString {
     match CString::new(string) {
         Ok(v) => v,
@@ -88,7 +86,5 @@ pub fn filter_nul_bytes(string: String) -> CString {
             data.remove(index);
             filter_nul_bytes(String::from_utf8(data).unwrap())
         }
-        
     }
-    
 }

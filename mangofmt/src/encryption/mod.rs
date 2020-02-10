@@ -1,11 +1,11 @@
 #[cfg(feature = "aes")]
-mod tiger;
-#[cfg(feature = "aes")]
 mod openssl_mods;
+#[cfg(feature = "aes")]
+mod tiger;
 
-use std::fmt;
 use image::MangoImage;
 use std::error;
+use std::fmt;
 
 //------------------------------------------------------------------------------
 //  Custom Error
@@ -14,7 +14,7 @@ use std::error;
 #[derive(Debug, Clone)]
 pub enum EncryptionError {
     UnsupportedType,
-    ExecutionError
+    ExecutionError,
 }
 
 impl fmt::Display for EncryptionError {
@@ -40,7 +40,7 @@ impl error::Error for EncryptionError {
 //  Encryption Types
 //------------------------------------------------------------------------------
 /// All "supported" types of encryptions.
-/// 
+///
 /// # Important
 ///
 /// All EncryptionTypes are optional and have to be compiled in by passing a --feature flag to
@@ -58,8 +58,8 @@ pub enum EncryptionType {
     /// It requires openssl to be installed on the system.
     ///
     /// The key will be hashed with a Tiger/128 hash, which consists of the first 128 bits of a
-    /// Tiger/192 hash, check 
-    /// [this](http://www.cs.technion.ac.il/~biham/Reports/Tiger/tiger/node2.html) 
+    /// Tiger/192 hash, check
+    /// [this](http://www.cs.technion.ac.il/~biham/Reports/Tiger/tiger/node2.html)
     /// out for information.
     AES128,
     /// **Feature:** aes
@@ -89,7 +89,6 @@ impl fmt::Display for EncryptionType {
 }
 
 impl EncryptionType {
-    
     /// Returns whether the EncryptionType got compiled in or not.
     #[allow(unreachable_patterns)]
     pub fn is_supported(&self) -> bool {
@@ -105,7 +104,11 @@ impl EncryptionType {
 
 #[allow(unreachable_patterns)]
 #[allow(unused_variables)]
-pub fn encrypt(etype: EncryptionType, img: MangoImage, key: String) -> Result<MangoImage, EncryptionError> {
+pub fn encrypt(
+    etype: EncryptionType,
+    img: MangoImage,
+    key: String,
+) -> Result<MangoImage, EncryptionError> {
     match etype {
         #[cfg(feature = "aes")]
         EncryptionType::AES128 => Ok(openssl_mods::aes::encrypt_aes128(img, key)),
@@ -115,10 +118,14 @@ pub fn encrypt(etype: EncryptionType, img: MangoImage, key: String) -> Result<Ma
     }
 }
 
-
 #[allow(unreachable_patterns)]
 #[allow(unused_variables)]
-pub fn decrypt(etype: EncryptionType, img: MangoImage, key: String, iv: &[u8]) -> Result<MangoImage, EncryptionError> {
+pub fn decrypt(
+    etype: EncryptionType,
+    img: MangoImage,
+    key: String,
+    iv: &[u8],
+) -> Result<MangoImage, EncryptionError> {
     match etype {
         #[cfg(feature = "aes")]
         EncryptionType::AES128 => Ok(openssl_mods::aes::decrypt_aes128(img, key, iv)),
@@ -127,5 +134,3 @@ pub fn decrypt(etype: EncryptionType, img: MangoImage, key: String, iv: &[u8]) -
         _ => Err(EncryptionError::UnsupportedType),
     }
 }
-
-

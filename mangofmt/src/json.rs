@@ -1,12 +1,12 @@
-use std::io::prelude::*;
-use serde_json;
+use super::{CompressionType, EncryptionType};
+use file::{ErrorKind, MangoFile, MangoFileError};
 use image::{MangoImage, Mime};
 use meta::MangoImageMetadata;
-use file::{MangoFile, ErrorKind, MangoFileError};
-use super::{CompressionType, EncryptionType};
-use std::fs::File;
-use std::path::Path;
 use meta::MangoMetadata;
+use serde_json;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct JsonMangoFile {
@@ -31,9 +31,11 @@ impl JsonMangoFile {
 
         let json_result = serde_json::from_reader(file.unwrap());
         if json_result.is_err() {
-            return Err(MangoFileError::with_cause(ErrorKind::DecodeError,
-                                                  "couldn't decode JSON to MangoFile",
-                                                  json_result.err().unwrap()));
+            return Err(MangoFileError::with_cause(
+                ErrorKind::DecodeError,
+                "couldn't decode JSON to MangoFile",
+                json_result.err().unwrap(),
+            ));
         }
 
         // convert JsonMangoFile to MangoFile
@@ -53,20 +55,21 @@ impl JsonMangoFile {
     }
 
     pub fn save(p: &Path, file: &MangoFile) -> Result<(), MangoFileError> {
-
         let mut base64_imgs = Vec::new();
 
         for image in file.get_images() {
             base64_imgs.push(Base64Image::from_mango(&image));
         }
 
-        let json_string = serde_json::to_string_pretty(&JsonMangoFile::new(file.get_meta(),
-                                                                           base64_imgs));
+        let json_string =
+            serde_json::to_string_pretty(&JsonMangoFile::new(file.get_meta(), base64_imgs));
 
         if json_string.is_err() {
-            return Err(MangoFileError::with_cause(ErrorKind::EncodeError,
-                                                  "couldn't encode JSON to MangoFile",
-                                                  json_string.err().unwrap()));
+            return Err(MangoFileError::with_cause(
+                ErrorKind::EncodeError,
+                "couldn't encode JSON to MangoFile",
+                json_string.err().unwrap(),
+            ));
         }
 
         let f = File::create(p);
@@ -141,7 +144,7 @@ impl Base64Image {
 
 pub mod base64encoding {
     use base64;
-    use serde::{Serializer, de, Deserialize, Deserializer};
+    use serde::{de, Deserialize, Deserializer, Serializer};
 
     pub fn serialize<S>(bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -161,7 +164,7 @@ pub mod base64encoding {
 
 pub mod base64option {
     use base64;
-    use serde::{Serializer, de, Deserialize, Deserializer};
+    use serde::{de, Deserialize, Deserializer, Serializer};
 
     pub fn serialize<S>(bytes: &Option<Vec<u8>>, serializer: S) -> Result<S::Ok, S::Error>
     where

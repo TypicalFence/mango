@@ -44,30 +44,29 @@
 //!
 
 extern crate base64;
-extern crate sha2;
+extern crate bson;
 extern crate hex;
 extern crate serde;
-extern crate serde_json;
-extern crate bson;
 extern crate serde_bytes;
 extern crate serde_cbor;
+extern crate serde_json;
+extern crate sha2;
 
 #[macro_use]
 extern crate serde_derive;
 
 mod compression;
 mod encryption;
-pub mod meta;
-pub mod image;
 pub mod file;
+pub mod image;
 mod json;
+pub mod meta;
 
 #[doc(inline)]
-pub use compression::{CompressionType, CompressionError};
+pub use compression::{CompressionError, CompressionType};
 #[doc(inline)]
-pub use encryption::{EncryptionType, EncryptionError};
-#[doc(inline)]
-pub use image::{ImageFile, MangoImage, Mime};
+pub use encryption::{EncryptionError, EncryptionType};
 #[doc(inline)]
 pub use file::MangoFile;
-
+#[doc(inline)]
+pub use image::{ImageFile, MangoImage, Mime};
