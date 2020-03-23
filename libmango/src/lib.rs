@@ -169,7 +169,7 @@ pub extern "C" fn mangofile_remove_image(file_pointer: *mut MangoFile, index: us
     };
 
     let mut imgs = file.get_images();
-    if (index == 0 && imgs.len() > 0) || index <= imgs.len() - 1 {
+    if imgs.len() > 0 && (index == 0 || index <= imgs.len() - 1) {
         imgs.remove(index);
         file.set_images(imgs);
         return 1;

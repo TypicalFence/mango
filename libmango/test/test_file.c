@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <check.h>
 #include <string.h>
 #include "../libmango.h"
@@ -270,12 +271,24 @@ START_TEST(test_remove_image) {
     
     int img_count1 = mangofile_get_image_count(file);
 
-    mangofile_remove_image(file, 0);
+    bool success = mangofile_remove_image(file, 0);
+    ck_assert(success == true);
 
     int img_count2 = mangofile_get_image_count(file);
 
     ck_assert(img_count1 == 1);
     ck_assert(img_count2 == 0);
+}
+END_TEST
+
+START_TEST(test_remove_image_fail) {
+    MangoFile file;
+
+    file = mangofile_new();
+    mangofile_add_image_by_path(file, "test.jpg");
+
+    int success = mangofile_remove_image(file, 1);
+    ck_assert(success == false);
 }
 END_TEST
 
@@ -309,6 +322,7 @@ Suite * file_suite(void) {
     
     tcase_add_test(tc_core, test_set_image);
     tcase_add_test(tc_core, test_remove_image);
+    tcase_add_test(tc_core, test_remove_image_fail);
 
     // IO
     tcase_add_test(tc_io, test_save);

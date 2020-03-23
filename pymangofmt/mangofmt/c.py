@@ -78,6 +78,11 @@ libmango.mangofile_add_image_by_path.argtypes = (
 )
 libmango.mangofile_add_image_by_path.restype = c_int
 
+libmango.mangofile_remove_image.argtypes = (
+    POINTER(RustMangoFile),
+    c_int,
+)
+
 libmango.mangofile_get_image.argtypes = (POINTER(RustMangoFile), c_uint)
 libmango.mangofile_get_image.restype = POINTER(RustMangoImage)
 

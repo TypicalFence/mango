@@ -76,8 +76,8 @@ class MangoFile(object):
         """
         error = ctypes.c_int(-10)
         pointer = libmango.mangofile_open(
-                path.encode("utf-8"),
-                ctypes.byref(error)
+            path.encode("utf-8"),
+            ctypes.byref(error)
         )
 
         if error.value != 0:
@@ -130,9 +130,9 @@ class MangoFile(object):
         """
         if self.image_count > index >= 0:
             success = libmango.mangofile_set_image(
-                    self._pointer,
-                    img._pointer,
-                    index
+                self._pointer,
+                img._pointer,
+                index
             )
 
             if success == 1:
@@ -172,8 +172,8 @@ class MangoFile(object):
             ValueError: MangoFile instance's pointer is null/invalid
         """
         error_code = libmango.mangofile_add_image_by_path(
-                self._pointer,
-                path.encode("utf-8")
+            self._pointer,
+            path.encode("utf-8")
         )
 
         if error_code != 0:
@@ -183,6 +183,20 @@ class MangoFile(object):
                 raise Exception("mangofmt: something went horribly wrong")
             elif error_code == -42:
                 raise ValueError("MangoFile pointer is null/invalid")
+
+    def remove_image(self, index):
+        """Removes an image from the file.
+
+        Args:
+            index (int): the index of the image to remove
+
+        Raises:
+            IndexError: when the index argument is out of bounds
+        """
+        status = libmango.mangofile_remove_image(self._pointer, index)
+
+        if status == 0:
+            raise IndexError
 
     def _save_error_handling(self, code):
         if code == 1:
@@ -198,22 +212,22 @@ class MangoFile(object):
 
     def save_cbor(self, path):
         error = libmango.mangofile_save_cbor(
-                self._pointer,
-                path.encode("utf-8")
+            self._pointer,
+            path.encode("utf-8")
         )
         self._save_error_handling(error)
 
     def save_bson(self, path):
         error = libmango.mangofile_save_bson(
-                self._pointer,
-                path.encode("utf-8")
+            self._pointer,
+            path.encode("utf-8")
         )
         self._save_error_handling(error)
 
     def save_json(self, path):
         error = libmango.mangofile_save_json(
-                self._pointer,
-                path.encode("utf-8")
+            self._pointer,
+            path.encode("utf-8")
         )
         self._save_error_handling(error)
 
@@ -307,8 +321,8 @@ class MangoMetaData(object):
     @translation.setter
     def translation(self, value):
         libmango.mangometa_set_translation(
-                self._pointer,
-                value.encode("utf-8")
+            self._pointer,
+            value.encode("utf-8")
         )
 
     @property
@@ -350,8 +364,8 @@ class MangoMetaData(object):
     @volume.setter
     def volume(self, value):
         libmango.mangometa_set_volume(
-                self._pointer,
-                ctypes.byref(ctypes.c_int(value))
+            self._pointer,
+            ctypes.byref(ctypes.c_int(value))
         )
 
     @property
@@ -365,8 +379,8 @@ class MangoMetaData(object):
     @chapter.setter
     def chapter(self, value):
         libmango.mangometa_set_chapter(
-                self._pointer,
-                ctypes.byref(ctypes.c_int(value))
+            self._pointer,
+            ctypes.byref(ctypes.c_int(value))
         )
 
     @property
@@ -380,8 +394,8 @@ class MangoMetaData(object):
     @year.setter
     def year(self, value):
         libmango.mangometa_set_year(
-                self._pointer,
-                ctypes.byref(ctypes.c_int(value))
+            self._pointer,
+            ctypes.byref(ctypes.c_int(value))
         )
 
 
@@ -398,8 +412,8 @@ class MangoImage(object):
     def from_path(path):
         error = ctypes.c_int(-10)
         pointer = libmango.mangoimg_from_path(
-                path.encode("utf-8"),
-                ctypes.byref(error)
+            path.encode("utf-8"),
+            ctypes.byref(error)
         )
 
         if error.value != 0:
@@ -466,8 +480,8 @@ class MangoImage(object):
 
     def decrypt(self, password):
         return libmango.mangoimg_decrypt(
-                self._pointer,
-                password.encode("utf-8")
+            self._pointer,
+            password.encode("utf-8")
         )
 
 

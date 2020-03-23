@@ -1,11 +1,12 @@
 import os
+import pytest
 from mangofmt import MangoImage, EncryptionType, CompressionType, MangoFile
 
 
 def test_meta_is_none():
     mango_file = MangoFile()
 
-    assert mango_file.meta_data.author is  None
+    assert mango_file.meta_data.author is None
 
 
 def test_set_meta():
@@ -118,3 +119,21 @@ def test_get_images():
         assert hashlib.sha256(my_bytes).hexdigest() == my_hash
         print(my_hash)
 
+
+def test_remove_image():
+    file = MangoFile()
+    file.add_image_by_path("test.jpg")
+    file.add_image_by_path("test.jpg")
+    file.add_image_by_path("test.jpg")
+
+    images = file.image_count
+
+    file.remove_image(1)
+    assert images > file.image_count
+
+
+def test_remove_image_index_error():
+    file = MangoFile()
+
+    with pytest.raises(IndexError):
+        file.remove_image(1)
