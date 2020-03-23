@@ -147,7 +147,7 @@ extern int  mangofile_set_image(MangoFile file, MangoImage image, int index);
  * \param file
  * \param id must be an index that exists in the *file*
  *
- * \returns 0 or 1 depending on if it worked.
+ * \returns 0 or 1 depending on if it worked or not. (bool)
  */
 extern int  mangofile_remove_image(MangoFile file, int id);
 
